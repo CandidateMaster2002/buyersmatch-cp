@@ -1,0 +1,474 @@
+{
+    "data": [
+        {
+            "Owner": {
+                "name": "BuyersMatch Admin",
+                "id": "86680000000367001",
+                "email": "vkungwani@gmail.com"
+            },
+            "Bed_Bath_Garage": "4/2/1",
+            "Email": null,
+            "$currency_symbol": "$",
+            "$field_states": null,
+            "Buyer_Email": "sanju36@gmail.com",
+            "Preferred_Suburbs_List": "QLD",
+            "Maximum_Budget": 900000,
+            "Land_Size_sqm": "450",
+            "Name": "Sanjeev Test - Mar-26",
+            "Last_Activity_Time": "2026-03-14T11:23:14+10:00",
+            "$state": "save",
+            "Unsubscribed_Mode": null,
+            "$process_flow": true,
+            "$locked_for_me": false,
+            "Timeline_to_Buy": "ASAP / Immediate",
+            "id": "86680000005970143",
+            "$approved": true,
+            "Status": "Brief Completed",
+            "Monthly_Holding_Cost": 1000,
+            "$approval": {
+                "delegate": false,
+                "takeover": false,
+                "approve": false,
+                "reject": false,
+                "resubmit": false
+            },
+            "Created_Time": "2026-03-14T11:18:51+10:00",
+            "Priority": "Medium",
+            "$editable": true,
+            "Pre_Approved": null,
+            "Property_Type": [
+                "House"
+            ],
+            "Buyer_Name": {
+                "name": "Sanjeev Test",
+                "id": "86680000002047087"
+            },
+            "Financer": null,
+            "Pre_Approval_Letter": null,
+            "Created_By": {
+                "name": "BuyersMatch Admin",
+                "id": "86680000000367001",
+                "email": "vkungwani@gmail.com"
+            },
+            "$zia_owner_assignment": "owner_recommendation_unavailable",
+            "$review_process": {
+                "approve": false,
+                "reject": false,
+                "resubmit": false
+            },
+            "Interest_Rate_Percent": null,
+            "$layout_id": {
+                "display_label": "Standard",
+                "name": "Standard",
+                "id": "86680000000375003"
+            },
+            "Preffered_State": [
+                "QLD"
+            ],
+            "Contact_Greeting_Name_1": "Sanjeev",
+            "Modified_By": {
+                "name": "Vish Kungwani",
+                "id": "86680000000547898",
+                "email": "vish@buyersmatch.com.au"
+            },
+            "$review": null,
+            "Secondary_Client_Email": null,
+            "Email_Opt_Out": false,
+            "Buyers_Brief_Owner_1": [],
+            "Yield_Percent2": 0.58,
+            "Modified_Time": "2026-03-14T11:23:14+10:00",
+            "Unsubscribed_Time": null,
+            "Minimum_Budget": 800000,
+            "Available_Deposit": null,
+            "$orchestration": false,
+            "Tax_Rate": null,
+            "Property_Assigned": true,
+            "$in_merge": false,
+            "Locked__s": false,
+            "Tag": [],
+            "Weekly_Rent": 100,
+            "$approval_state": "approved",
+            "Deposit_Equity_Percent": null
+        },
+        {
+            "Owner": {
+                "name": "Vish Kungwani",
+                "id": "86680000000547898",
+                "email": "vish@buyersmatch.com.au"
+            },
+            "Bed_Bath_Garage": "3 1 1",
+            "Email": null,
+            "$currency_symbol": "$",
+            "$field_states": null,
+            "Buyer_Email": "rahil.kamal.personal@gmail.com",
+            "Preferred_Suburbs_List": "Bundaberg, Rockhampton, and Townsville preferred",
+            "Maximum_Budget": 650000,
+            "Land_Size_sqm": "500",
+            "Name": "Rahil Kamal - Mar-26",
+            "Last_Activity_Time": "2026-03-24T16:49:24+10:00",
+            "$state": "save",
+            "Unsubscribed_Mode": null,
+            "$process_flow": true,
+            "$locked_for_me": false,
+            "Timeline_to_Buy": "ASAP / Immediate",
+            "id": "86680000005744621",
+            "$approved": true,
+            "Status": "Brief Confirmed",
+            "Monthly_Holding_Cost": null,
+            "$approval": {
+                "delegate": false,
+                "takeover": false,
+                "approve": false,
+                "reject": false,
+                "resubmit": false
+            },
+            "Created_Time": "2026-03-03T22:52:10+10:00",
+            "Priority": "Medium",
+            "$editable": true,
+            "Pre_Approved": "Yes",
+            "Property_Type": [
+                "House"
+            ],
+            "Buyer_Name": {
+                "name": "Rahil Kamal",
+                "id": "86680000000572378"
+            },
+            "Financer": {
+                "name": "Saurabh Arora",
+                "id": "86680000001133711"
+            },
+            "Pre_Approval_Letter": null,
+            "Created_By": {
+                "name": "Vish Kungwani",
+                "id": "86680000000547898",
+                "email": "vish@buyersmatch.com.au"
+            },
+            "$zia_owner_assignment": "owner_recommendation_unavailable",
+            "$review_process": {
+                "approve": false,
+                "reject": false,
+                "resubmit": false
+            },
+            "Interest_Rate_Percent": 6.66,
+            "$layout_id": {
+                "display_label": "Standard",
+                "name": "Standard",
+                "id": "86680000000375003"
+            },
+            "Preffered_State": [],
+            "Contact_Greeting_Name_1": "Rahil",
+            "Modified_By": {
+                "name": "Vish Kungwani",
+                "id": "86680000000547898",
+                "email": "vish@buyersmatch.com.au"
+            },
+            "$review": null,
+            "Secondary_Client_Email": null,
+            "Email_Opt_Out": false,
+            "Buyers_Brief_Owner_1": [
+                "Vish",
+                "Martin"
+            ],
+            "Yield_Percent2": 4.8,
+            "Modified_Time": "2026-03-24T16:49:24+10:00",
+            "Unsubscribed_Time": null,
+            "Minimum_Budget": 630000,
+            "Available_Deposit": 140000,
+            "$orchestration": false,
+            "Tax_Rate": null,
+            "Property_Assigned": true,
+            "$in_merge": false,
+            "Locked__s": false,
+            "Tag": [],
+            "Weekly_Rent": 600,
+            "$approval_state": "approved",
+            "Deposit_Equity_Percent": 10
+        },
+        {
+            "Owner": {
+                "name": "BuyersMatch VA",
+                "id": "86680000002163050",
+                "email": "info@buyersmatch.com.au"
+            },
+            "Bed_Bath_Garage": null,
+            "Email": null,
+            "$currency_symbol": "$",
+            "$field_states": null,
+            "Buyer_Email": "harshiscoding@gmail.com",
+            "Preferred_Suburbs_List": null,
+            "Maximum_Budget": null,
+            "Land_Size_sqm": null,
+            "Name": "Harsh Client portal",
+            "Last_Activity_Time": "2026-03-02T23:49:23+10:00",
+            "$state": "save",
+            "Unsubscribed_Mode": null,
+            "$process_flow": true,
+            "$locked_for_me": false,
+            "Timeline_to_Buy": "ASAP / Immediate",
+            "id": "86680000005700851",
+            "$approved": true,
+            "Status": "Brief Completed",
+            "Monthly_Holding_Cost": null,
+            "$approval": {
+                "delegate": false,
+                "takeover": false,
+                "approve": false,
+                "reject": false,
+                "resubmit": false
+            },
+            "Created_Time": "2026-03-02T23:43:05+10:00",
+            "Priority": "Medium",
+            "$editable": true,
+            "Pre_Approved": null,
+            "Property_Type": [
+                "House"
+            ],
+            "Buyer_Name": {
+                "name": "Harsh Client portal",
+                "id": "86680000005700795"
+            },
+            "Financer": null,
+            "Pre_Approval_Letter": null,
+            "Created_By": {
+                "name": "BuyersMatch Admin",
+                "id": "86680000000367001",
+                "email": "vkungwani@gmail.com"
+            },
+            "$zia_owner_assignment": "owner_recommendation_unavailable",
+            "$review_process": {
+                "approve": false,
+                "reject": false,
+                "resubmit": false
+            },
+            "Interest_Rate_Percent": null,
+            "$layout_id": {
+                "display_label": "Standard",
+                "name": "Standard",
+                "id": "86680000000375003"
+            },
+            "Preffered_State": [],
+            "Contact_Greeting_Name_1": "Harsh",
+            "Modified_By": {
+                "name": "Vish Kungwani",
+                "id": "86680000000547898",
+                "email": "vish@buyersmatch.com.au"
+            },
+            "$review": null,
+            "Secondary_Client_Email": null,
+            "Email_Opt_Out": false,
+            "Buyers_Brief_Owner_1": [],
+            "Yield_Percent2": null,
+            "Modified_Time": "2026-03-02T23:49:23+10:00",
+            "Unsubscribed_Time": null,
+            "Minimum_Budget": null,
+            "Available_Deposit": null,
+            "$orchestration": false,
+            "Tax_Rate": null,
+            "Property_Assigned": true,
+            "$in_merge": false,
+            "Locked__s": false,
+            "Tag": [],
+            "Weekly_Rent": null,
+            "$approval_state": "approved",
+            "Deposit_Equity_Percent": null
+        },
+        {
+            "Owner": {
+                "name": "BuyersMatch VA",
+                "id": "86680000002163050",
+                "email": "info@buyersmatch.com.au"
+            },
+            "Bed_Bath_Garage": "3 1 1",
+            "Email": null,
+            "$currency_symbol": "$",
+            "$field_states": null,
+            "Buyer_Email": "mauvinrego@gmail.com",
+            "Preferred_Suburbs_List": "Regional VIC, Perth, QLD",
+            "Maximum_Budget": 670000,
+            "Land_Size_sqm": "350",
+            "Name": "Mauvin Rego - Feb-26",
+            "Last_Activity_Time": "2026-03-24T11:05:46+10:00",
+            "$state": "save",
+            "Unsubscribed_Mode": null,
+            "$process_flow": true,
+            "$locked_for_me": false,
+            "Timeline_to_Buy": "ASAP / Immediate",
+            "id": "86680000005667116",
+            "$approved": true,
+            "Status": "Under Contract",
+            "Monthly_Holding_Cost": 600,
+            "$approval": {
+                "delegate": false,
+                "takeover": false,
+                "approve": false,
+                "reject": false,
+                "resubmit": false
+            },
+            "Created_Time": "2026-02-26T02:24:54+10:00",
+            "Priority": "Medium",
+            "$editable": true,
+            "Pre_Approved": null,
+            "Property_Type": [
+                "House"
+            ],
+            "Buyer_Name": {
+                "name": "Mauvin Rego",
+                "id": "86680000005661133"
+            },
+            "Financer": null,
+            "Pre_Approval_Letter": null,
+            "Created_By": {
+                "name": "BuyersMatch Admin",
+                "id": "86680000000367001",
+                "email": "vkungwani@gmail.com"
+            },
+            "$zia_owner_assignment": "owner_recommendation_unavailable",
+            "$review_process": {
+                "approve": false,
+                "reject": false,
+                "resubmit": false
+            },
+            "Interest_Rate_Percent": null,
+            "$layout_id": {
+                "display_label": "Standard",
+                "name": "Standard",
+                "id": "86680000000375003"
+            },
+            "Preffered_State": [
+                "VIC",
+                "NSW",
+                "QLD",
+                "WA"
+            ],
+            "Contact_Greeting_Name_1": "Mauvin",
+            "Modified_By": {
+                "name": "Vish Kungwani",
+                "id": "86680000000547898",
+                "email": "vish@buyersmatch.com.au"
+            },
+            "$review": null,
+            "Secondary_Client_Email": null,
+            "Email_Opt_Out": false,
+            "Buyers_Brief_Owner_1": [
+                "Puja"
+            ],
+            "Yield_Percent2": 4.5,
+            "Modified_Time": "2026-03-24T11:05:46+10:00",
+            "Unsubscribed_Time": null,
+            "Minimum_Budget": 600000,
+            "Available_Deposit": null,
+            "$orchestration": false,
+            "Tax_Rate": null,
+            "Property_Assigned": true,
+            "$in_merge": false,
+            "Locked__s": false,
+            "Tag": [],
+            "Weekly_Rent": 580,
+            "$approval_state": "approved",
+            "Deposit_Equity_Percent": null
+        },
+        {
+            "Owner": {
+                "name": "BuyersMatch VA",
+                "id": "86680000002163050",
+                "email": "info@buyersmatch.com.au"
+            },
+            "Bed_Bath_Garage": "3,1,",
+            "Email": null,
+            "$currency_symbol": "$",
+            "$field_states": null,
+            "Buyer_Email": "narendhra1947@gmail.com",
+            "Preferred_Suburbs_List": "Albury, Wodonga, Wagga Wagga, Regional QLD",
+            "Maximum_Budget": 750000,
+            "Land_Size_sqm": "400",
+            "Name": "Narendhra Anumolu - 750K",
+            "Last_Activity_Time": "2026-03-24T16:48:54+10:00",
+            "$state": "save",
+            "Unsubscribed_Mode": null,
+            "$process_flow": true,
+            "$locked_for_me": false,
+            "Timeline_to_Buy": "ASAP / Immediate",
+            "id": "86680000005659292",
+            "$approved": true,
+            "Status": "Brief Confirmed",
+            "Monthly_Holding_Cost": null,
+            "$approval": {
+                "delegate": false,
+                "takeover": false,
+                "approve": false,
+                "reject": false,
+                "resubmit": false
+            },
+            "Created_Time": "2026-03-02T13:47:36+10:00",
+            "Priority": "Medium",
+            "$editable": true,
+            "Pre_Approved": "Yes",
+            "Property_Type": [
+                "House"
+            ],
+            "Buyer_Name": {
+                "name": "Narendhra Anumolu",
+                "id": "86680000005691546"
+            },
+            "Financer": null,
+            "Pre_Approval_Letter": null,
+            "Created_By": {
+                "name": "BuyersMatch Admin",
+                "id": "86680000000367001",
+                "email": "vkungwani@gmail.com"
+            },
+            "$zia_owner_assignment": "owner_recommendation_unavailable",
+            "$review_process": {
+                "approve": false,
+                "reject": false,
+                "resubmit": false
+            },
+            "Interest_Rate_Percent": 6.69,
+            "$layout_id": {
+                "display_label": "Standard",
+                "name": "Standard",
+                "id": "86680000000375003"
+            },
+            "Preffered_State": [],
+            "Contact_Greeting_Name_1": "Narendhra & Swetha",
+            "Modified_By": {
+                "name": "Vish Kungwani",
+                "id": "86680000000547898",
+                "email": "vish@buyersmatch.com.au"
+            },
+            "$review": null,
+            "Secondary_Client_Email": "chekuruswetha@gmail.com",
+            "Email_Opt_Out": false,
+            "Buyers_Brief_Owner_1": [
+                "Martin"
+            ],
+            "Yield_Percent2": null,
+            "Modified_Time": "2026-03-24T16:48:54+10:00",
+            "Unsubscribed_Time": null,
+            "Minimum_Budget": null,
+            "Available_Deposit": null,
+            "$orchestration": false,
+            "Tax_Rate": 40,
+            "Property_Assigned": true,
+            "$in_merge": false,
+            "Locked__s": false,
+            "Tag": [
+                {
+                    "name": "High Growth",
+                    "id": "86680000005704468"
+                }
+            ],
+            "Weekly_Rent": null,
+            "$approval_state": "approved",
+            "Deposit_Equity_Percent": 10
+        }
+    ],
+    "info": {
+        "per_page": 5,
+        "count": 5,
+        "page": 1,
+        "sort_by": "id",
+        "sort_order": "desc",
+        "more_records": true
+    }
+}
