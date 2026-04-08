@@ -41,7 +41,11 @@ function HostRedirect() {
       navigate('/client/login', { replace: true });
     }
   }, [navigate]);
-  return null;
+  return (
+    <div className="flex items-center justify-center min-h-screen bg-[#0A1128] text-white">
+      <p className="text-lg font-medium">Redirecting…</p>
+    </div>
+  );
 }
 
 function App() {
