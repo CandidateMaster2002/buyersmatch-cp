@@ -28,7 +28,7 @@ public class AuthService {
 
         // Strictly check client_portal_users. Do NOT fall back to admin_users here.
         Optional<ClientPortalUser> clientOpt = clientPortalUserRepository.findByLoginEmail(email);
-        
+
         if (clientOpt.isPresent()) {
             ClientPortalUser user = clientOpt.get();
 
@@ -39,7 +39,8 @@ public class AuthService {
 
             if ("deactivated".equals(user.getStatus())) {
                 log.warn("Attempt to login deactivated account: {}", email);
-                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Account is deactivated. Contact your agent.");
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED,
+                        "Account is deactivated. Contact your agent.");
             }
 
             log.info("Client successfully logged in: {}", email);
@@ -47,7 +48,11 @@ public class AuthService {
             return AuthLoginResponse.builder()
                     .id(user.getId())
                     .email(user.getLoginEmail())
-                    .fullName(user.getBuyerBrief() != null ? (user.getBuyerBrief().getFullName() != null ? user.getBuyerBrief().getFullName() : user.getBuyerBrief().getZohoName()) : null)
+                    .fullName(
+                            user.getBuyerBrief() != null
+                                    ? (user.getBuyerBrief().getFullName() != null ? user.getBuyerBrief().getFullName()
+                                            : user.getBuyerBrief().getZohoName())
+                                    : null)
                     .greetingName(user.getBuyerBrief() != null ? user.getBuyerBrief().getGreetingName() : null)
                     .role("CLIENT")
                     .clientId(user.getBuyerBrief() != null ? user.getBuyerBrief().getId() : null)
