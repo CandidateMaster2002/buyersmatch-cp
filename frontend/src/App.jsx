@@ -34,9 +34,9 @@ function HostRedirect() {
     const adminToken = localStorage.getItem(STORAGE_KEYS.ADMIN_TOKEN);
     if (isClient) {
       if (clientUser) {
-        navigate("/client/dashboard", { replace: true });
+        navigate("/dashboard", { replace: true });
       } else {
-        navigate("/client/login", { replace: true });
+        navigate("/login", { replace: true });
       }
     } else if (isAdmin) {
       if (adminToken) {
@@ -45,7 +45,7 @@ function HostRedirect() {
         navigate("/admin/login", { replace: true });
       }
     } else {
-      navigate("/client/login", { replace: true });
+      navigate("/login", { replace: true });
     }
   }, [navigate]);
   return (
@@ -81,12 +81,12 @@ function App() {
       <Router>
         <Routes>
           <Route path="/" element={<HostRedirect />} />
-          <Route path="/client/login" element={<Login />} />
+          <Route path="/login" element={<Login />} />
           <Route path="/admin/login" element={<AdminLogin />} />
 
           {/* Client Routes */}
           <Route
-            path="/client/dashboard"
+            path="/dashboard"
             element={
               <ProtectedRoute role="CLIENT">
                 <Dashboard />
@@ -95,7 +95,7 @@ function App() {
           />
 
           <Route
-            path="/client/property/:id"
+            path="/property/:id"
             element={
               <ProtectedRoute role="CLIENT">
                 <PropertyDetail />
@@ -104,7 +104,7 @@ function App() {
           />
 
           <Route
-            path="/client/profile"
+            path="/profile"
             element={
               <ProtectedRoute role="CLIENT">
                 <Profile />
@@ -160,7 +160,7 @@ function App() {
           />
 
           {/* Fallback */}
-          <Route path="*" element={<Navigate to="/client/login" replace />} />
+          <Route path="*" element={<Navigate to="/login" replace />} />
         </Routes>
       </Router>
     </ToastProvider>
