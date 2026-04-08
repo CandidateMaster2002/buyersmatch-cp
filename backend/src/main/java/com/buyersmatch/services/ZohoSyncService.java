@@ -33,6 +33,7 @@ public class ZohoSyncService {
     private final RestTemplate restTemplate;
     private final R2StorageService r2StorageService;
     private final ClientPortalUserRepository clientPortalUserRepository;
+    private final NotificationService notificationService;
 
     @Value("${zoho.base.url}")
     private String baseUrl;
@@ -788,5 +789,19 @@ public class ZohoSyncService {
     public void scheduledDeltaSync() {
         log.info("Scheduled delta sync started");
         runDeltaSync(); // uploadMissingR2Documents is called at end of runDeltaSync
+    }
+
+    // -------------------------------------------------------------------------
+    // SCHEDULER — runs daily at 9 AM Sydney time
+    // -------------------------------------------------------------------------
+
+    @Scheduled(cron = "0 0 9 * * *", zone = "Australia/Sydney")
+    public void checkRevaluations() {
+        log.info("Checking revaluation notifications");
+        try {
+            notificationService.createRevaluationNotifications();
+        } catch (Exception e) {
+            log.error("Revaluation check failed: {}", e.getMessage());
+        }
     }
 }

@@ -1067,7 +1067,9 @@ const AdminPropertyDetail = () => {
           <div className="bg-navy border border-teal/10 rounded-3xl p-8">
             <div className="flex items-center gap-3 mb-6">
               <MessageSquare className="text-teal" size={24} />
-              <h3 className="text-xl font-bold text-white">Agent Notes</h3>
+              <h3 className="text-xl font-bold text-white">
+                Buyers Match Notes
+              </h3>
             </div>
             {assignment?.agentNotes ? (
               <p className="text-gray-300 leading-relaxed whitespace-pre-wrap">
