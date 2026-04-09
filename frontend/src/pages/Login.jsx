@@ -43,7 +43,7 @@ const Login = () => {
             Buyers Match
           </h1>
           <p className="text-gold font-medium uppercase tracking-widest text-sm">
-            Portal Login
+            Client Portal Login
           </p>
         </div>
 

@@ -532,6 +532,7 @@ const Dashboard = () => {
                       <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">Price Range</th>
                       <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">Yield</th>
                       <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">Rental Yield</th>
+                      <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">Rental Situation</th>
                       <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">Status</th>
                     </tr>
                   </thead>
@@ -587,6 +588,11 @@ const Dashboard = () => {
                           <td className="px-6 py-4">
                             <p className="text-teal font-bold text-sm">
                               {rentalYield != null ? `${rentalYield}%` : '—'}
+                            </p>
+                          </td>
+                          <td className="px-6 py-4">
+                            <p className="text-sm text-gray-300">
+                              {item.property.rentalSituation || '—'}
                             </p>
                           </td>
                           <td className="px-6 py-4">
