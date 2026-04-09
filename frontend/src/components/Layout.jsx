@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { User } from 'lucide-react';
 import NotificationBell from './NotificationBell';
+import logo from '../assets/bm-logo-white-text-1B2A4A.jpg';
 
 const Layout = ({ children, title }) => {
   return (
@@ -9,8 +10,8 @@ const Layout = ({ children, title }) => {
       {/* Top Bar */}
       <header className="h-16 bg-navy border-b border-teal/20 px-6 flex items-center justify-between sticky top-0 z-30">
         <div className="flex items-center gap-8">
-          <Link to="/dashboard" className="text-xl font-bold text-teal tracking-tighter hover:opacity-80 transition-opacity">
-            BUYERS MATCH
+          <Link to="/dashboard" className="flex items-center hover:opacity-80 transition-opacity">
+            <img src={logo} alt="Buyers Match" className="h-8 w-auto" />
           </Link>
           <h2 className="hidden md:block text-lg font-medium text-white/60 tracking-tight border-l border-white/10 pl-8">
             {title}

@@ -212,10 +212,11 @@ public class ClientPortalUserService {
     // -------------------------------------------------------------------------
 
     @Transactional
-    public String resetPasswordByUserId(UUID userId, boolean sendEmail) {
+    public String resetPasswordByUserId(UUID userId, String requestedPassword, boolean sendEmail) {
         ClientPortalUser user = portalUserRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("Portal user not found: " + userId));
-        String plainPassword = generateRandomPassword();
+        String plainPassword = (requestedPassword != null && !requestedPassword.isBlank())
+                ? requestedPassword : generateRandomPassword();
         user.setPasswordHash(passwordEncoder.encode(plainPassword));
         user.setSourcePassword(plainPassword);
         user.setFailedLoginAttempts(0);

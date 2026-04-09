@@ -1,93 +1,239 @@
-import React, { useEffect, useState, useMemo } from "react";
-import { useParams, useNavigate } from "react-router-dom";
-import AdminLayout from "../../components/AdminLayout";
-import { useToast } from "../../components/Toast";
+import React, { useEffect, useState, useMemo } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import AdminLayout from '../../components/AdminLayout';
 import {
-  ChevronLeft,
-  Loader2,
-  Building2,
-  Search,
-  Bed,
-  Bath,
-  Car,
-  ArrowRight,
-  MessageSquare,
-  Save,
-  X,
-  FileText,
-  ChevronDown,
-} from "lucide-react";
-import {
-  getAdminClientProfile,
-  getClientProperties,
-  updateAgentNotes,
-  getPropertyDocuments,
-} from "../../api/client";
+  ChevronLeft, Loader2, Building2, Search, Bed, Bath, Car,
+  Scale, X, Check, Lock, DollarSign, MapPin, Clock, Tag, Users,
+  Percent, PiggyBank, Home, CheckCircle2, XCircle, FileText,
+  Briefcase, ChevronDown,
+} from 'lucide-react';
+import { getAdminClientProfile, getClientProperties, getPropertyDocuments } from '../../api/client';
 
-// Status badge color for buyer brief status
-const BRIEF_STATUS_COLOR = {
-  "New SignUp":       "bg-blue-500/20 text-blue-300 border-blue-500/30",
-  "Brief Confirmed":  "bg-teal/20 text-teal border-teal/30",
-  "Under Contract":   "bg-yellow-500/20 text-yellow-300 border-yellow-500/30",
-  "Brief Completed":  "bg-green-500/20 text-green-300 border-green-500/30",
-  "On Hold":          "bg-orange-500/20 text-orange-300 border-orange-500/30",
-  "Closed":           "bg-red-500/20 text-red-400 border-red-500/30",
+// ─── Formatting helpers ────────────────────────────────────────────────────────
+const fmt     = (v)   => v != null ? v : '—';
+const fmtMoney = (v)  => v != null ? `$${Number(v).toLocaleString()}` : '—';
+const fmtPct  = (v)   => v != null ? `${v}%` : '—';
+const fmtArr  = (arr) => Array.isArray(arr) && arr.length > 0 ? arr.join(', ') : '—';
+
+// ─── Buyer Brief sub-components ────────────────────────────────────────────────
+const BriefSection = ({ icon: Icon, label, children }) => (
+  <div className="bg-navy border border-white/5 rounded-2xl overflow-hidden">
+    <div className="px-6 py-4 bg-white/[0.03] border-b border-white/5 flex items-center gap-2">
+      <Icon size={15} className="text-teal" />
+      <p className="text-[11px] font-bold text-teal uppercase tracking-widest">{label}</p>
+    </div>
+    <div className="px-6 py-5 grid grid-cols-1 sm:grid-cols-2 gap-3">
+      {children}
+    </div>
+  </div>
+);
+
+const BriefField = ({ label, value, highlight }) => (
+  <div className="flex flex-col gap-0.5">
+    <p className="text-[10px] text-gray-500 uppercase tracking-wider font-bold">{label}</p>
+    <p className={`text-sm font-semibold ${highlight ? 'text-teal' : 'text-white'}`}>{value}</p>
+  </div>
+);
+
+const BuyerBriefView = ({ brief }) => {
+  if (!brief) return null;
+  return (
+    <div className="space-y-5">
+      <div className="flex flex-wrap items-center justify-between gap-3 px-1">
+        <p className="text-xs text-gray-500 font-mono">{brief.zohoBriefId}</p>
+        <div className="flex items-center gap-2">
+          {brief.priority && (
+            <span className="px-3 py-1 bg-gold/10 border border-gold/30 text-gold text-[10px] font-bold rounded-full uppercase tracking-widest">
+              {brief.priority}
+            </span>
+          )}
+          <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border ${
+            brief.status?.toLowerCase() === 'active'
+              ? 'bg-teal/10 border-teal/30 text-teal'
+              : 'bg-white/5 border-white/10 text-gray-400'
+          }`}>
+            {brief.status || 'Active'}
+          </span>
+        </div>
+      </div>
+
+      <BriefSection icon={DollarSign} label="Budget & Deposit">
+        <BriefField label="Min Budget"         value={fmtMoney(brief.minBudget)}          highlight />
+        <BriefField label="Max Budget"         value={fmtMoney(brief.maxBudget)}          highlight />
+        <BriefField label="Available Deposit"  value={fmtMoney(brief.availableDeposit)} />
+        <BriefField label="Deposit / Equity %" value={fmtPct(brief.depositEquityPercent)} />
+      </BriefSection>
+
+      <BriefSection icon={Home} label="Property Preferences">
+        <BriefField label="Property Types"    value={fmtArr(brief.propertyTypes)} />
+        <BriefField label="Preferred States"  value={fmtArr(brief.preferredStates)} />
+        <div className="sm:col-span-2">
+          <BriefField label="Preferred Suburbs" value={fmt(brief.preferredSuburbs)} />
+        </div>
+        <BriefField label="Bed / Bath / Garage" value={fmt(brief.bedBathGarage)} />
+        <BriefField label="Land Size (sqm)"     value={fmt(brief.landSizeSqm)} />
+      </BriefSection>
+
+      <BriefSection icon={Percent} label="Investment Criteria">
+        <BriefField label="Target Yield"         value={fmtPct(brief.yieldPercent)}          highlight />
+        <BriefField label="Weekly Rent"          value={fmtMoney(brief.weeklyRent)} />
+        <BriefField label="Monthly Holding Cost" value={fmtMoney(brief.monthlyHoldingCost)} />
+        <BriefField label="Interest Rate"        value={fmtPct(brief.interestRate)} />
+        <BriefField label="Tax Rate"             value={fmtPct(brief.taxRate)} />
+      </BriefSection>
+
+      <BriefSection icon={Clock} label="Timeline & Finance">
+        <BriefField label="Timeline to Buy" value={fmt(brief.timelineToBuy)} />
+        <div className="flex flex-col gap-0.5">
+          <p className="text-[10px] text-gray-500 uppercase tracking-wider font-bold">Pre-Approved</p>
+          <div className="flex items-center gap-1.5 mt-0.5">
+            {brief.preApproved === true
+              ? <><CheckCircle2 size={14} className="text-teal" /><span className="text-sm font-semibold text-teal">Yes</span></>
+              : brief.preApproved === false
+              ? <><XCircle size={14} className="text-red-400" /><span className="text-sm font-semibold text-red-400">No</span></>
+              : <span className="text-sm font-semibold text-white">—</span>
+            }
+          </div>
+        </div>
+        <BriefField label="Financer" value={fmt(brief.financerName)} />
+      </BriefSection>
+
+      {Array.isArray(brief.assignedAgents) && brief.assignedAgents.length > 0 && (
+        <BriefSection icon={Users} label="Assigned Agents">
+          <div className="sm:col-span-2 flex flex-wrap gap-2">
+            {brief.assignedAgents.map((agent, i) => (
+              <span key={i} className="px-3 py-1.5 bg-teal/10 border border-teal/20 text-teal text-xs font-semibold rounded-xl">
+                {agent}
+              </span>
+            ))}
+          </div>
+        </BriefSection>
+      )}
+    </div>
+  );
 };
 
+// ─── Comparison Modal ──────────────────────────────────────────────────────────
+const ComparisonModal = ({ properties, onClose }) => {
+  if (!properties || properties.length === 0) return null;
+  return (
+    <div className="fixed inset-0 z-[100] flex items-center justify-center p-2 sm:p-4 md:p-6">
+      <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={onClose} />
+      <div className="relative bg-navy border border-teal/30 rounded-3xl w-full max-w-6xl max-h-[90vh] overflow-hidden shadow-2xl flex flex-col">
+        <div className="p-4 md:p-6 border-b border-teal/20 flex items-center justify-between bg-navy/50 backdrop-blur-md">
+          <div className="flex items-center gap-3">
+            <Scale className="text-teal" size={20} />
+            <h2 className="text-lg md:text-2xl font-bold text-white">Property Comparison</h2>
+          </div>
+          <button onClick={onClose} className="p-2 hover:bg-white/10 rounded-full text-gray-400 hover:text-white transition-all">
+            <X size={20} />
+          </button>
+        </div>
+        <div className="flex-1 overflow-auto p-4 md:p-6">
+          <div className="grid grid-cols-[120px_repeat(auto-fit,minmax(180px,1fr))] md:grid-cols-[150px_repeat(auto-fit,minmax(200px,1fr))] gap-3 md:gap-4 min-w-[600px] md:min-w-[800px]">
+            <div className="space-y-3 md:space-y-4 pt-[140px] md:pt-[200px]">
+              {['Address', 'Price Range', 'Yield', 'Bedrooms', 'Bathrooms', 'Car Parking', 'Land Size', 'Year Built', 'Status'].map(l => (
+                <div key={l} className="h-10 md:h-12 flex items-center text-[10px] md:text-xs font-bold text-gray-500 uppercase tracking-widest">{l}</div>
+              ))}
+            </div>
+            {properties.map((item) => (
+              <div key={item.id} className="space-y-3 md:space-y-4">
+                <div className="h-[120px] md:h-[180px] rounded-xl md:rounded-2xl overflow-hidden border border-teal/20 mb-2 md:mb-4">
+                  <img src={item.firstImage || `https://placehold.co/400x300/1B2A4A/2ABFBF?text=IMG`} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                </div>
+                <div className="h-10 md:h-12 flex items-center text-xs md:text-sm font-bold text-white truncate px-1 md:px-2">{item.property.addressLine1}</div>
+                <div className="h-10 md:h-12 flex items-center text-xs md:text-sm font-bold text-gold px-1 md:px-2">${item.property.askingPriceMin / 1000}k - ${item.property.askingPriceMax / 1000}k</div>
+                <div className="h-10 md:h-12 flex items-center text-xs md:text-sm font-bold text-teal px-1 md:px-2">{item.property.yieldPercent}%</div>
+                <div className="h-10 md:h-12 flex items-center text-xs md:text-sm text-gray-300 px-1 md:px-2">{item.property.bedrooms} Bed</div>
+                <div className="h-10 md:h-12 flex items-center text-xs md:text-sm text-gray-300 px-1 md:px-2">{item.property.bathrooms} Bath</div>
+                <div className="h-10 md:h-12 flex items-center text-xs md:text-sm text-gray-300 px-1 md:px-2">{item.property.carParking} Car</div>
+                <div className="h-10 md:h-12 flex items-center text-xs md:text-sm text-gray-300 px-1 md:px-2">{item.property.areaSqm} sqm</div>
+                <div className="h-10 md:h-12 flex items-center text-xs md:text-sm text-gray-300 px-1 md:px-2">{item.property.yearBuilt || 'N/A'}</div>
+                <div className="h-10 md:h-12 flex items-center px-1 md:px-2">
+                  <span className="px-2 py-0.5 md:py-1 rounded-full text-[8px] md:text-[10px] font-bold uppercase tracking-wider bg-teal/10 text-teal border border-teal/30">
+                    {item.portalStatus}
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+// ─── Purchased detection ───────────────────────────────────────────────────────
+const PURCHASED_KEYWORDS = ['unconditional', 'psi', 'settl', 'tenant'];
+const isPurchasedItem = (item) => {
+  if (item.portalStatus === 'PURCHASED') return true;
+  const zs = (item.assignment?.zohoStatus || '').toLowerCase();
+  if (PURCHASED_KEYWORDS.some(kw => zs.includes(kw))) return true;
+  if (/\bdone\b/.test(zs) && !/bnp|finance/.test(zs)) return true;
+  return false;
+};
+
+// ─── Main component ────────────────────────────────────────────────────────────
 const ClientDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
-  const toast = useToast();
 
-  const [client, setClient] = useState(null);
-  const [assignments, setAssignments] = useState([]);
-  const [briefs, setBriefs] = useState([]);
-  const [propertyImages, setPropertyImages] = useState({});
-  const [loading, setLoading] = useState(true);
+  const [client, setClient]           = useState(null);
+  const [properties, setProperties]   = useState([]);
+  const [briefs, setBriefs]           = useState([]);
+  const [loading, setLoading]         = useState(true);
 
-  // Search & tab filter
-  const [searchQuery, setSearchQuery] = useState("");
-  const [activeTab, setActiveTab] = useState("ALL");
+  // Tabs
+  const [mainTab, setMainTab]                       = useState('PROPERTIES');
+  const [activeTab, setActiveTab]                   = useState('ALL');
+  const [searchQuery, setSearchQuery]               = useState('');
+  const [selectedBriefId, setSelectedBriefId]       = useState('ALL');
+  const [selectedActiveBriefId, setSelectedActiveBriefId] = useState(null);
 
-  // Notes modal
-  const [notesModal, setNotesModal] = useState(null); // { assignmentId, notes, address }
-  const [savingNotes, setSavingNotes] = useState(false);
+  // Compare
+  const [compareList, setCompareList]               = useState([]);
+  const [showCompareModal, setShowCompareModal]     = useState(false);
 
-  // Buyer brief selector — "ALL" means show all non-closed brief properties
-  const [selectedBriefId, setSelectedBriefId] = useState("ALL");
-  const [briefDropdownOpen, setBriefDropdownOpen] = useState(false);
+  const activeBriefs = useMemo(
+    () => briefs.filter(b => b.status?.toLowerCase() !== 'closed'),
+    [briefs]
+  );
+
+  const displayedBrief = useMemo(
+    () => activeBriefs.find(b => b.zohoBriefId === selectedActiveBriefId) || activeBriefs[0] || null,
+    [activeBriefs, selectedActiveBriefId]
+  );
 
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const [profile, props] = await Promise.all([
+        const [profile, responseData] = await Promise.all([
           getAdminClientProfile(id),
           getClientProperties(id),
         ]);
         setClient(profile);
-        const asgList = Array.isArray(props) ? props : props?.assignments || [];
-        setAssignments(asgList);
 
-        // Store briefs returned by the API (backend already strips Closed briefs)
-        const briefsList = props?.briefs || [];
-        setBriefs(briefsList);
+        const { assignments, briefs: userBriefs } = responseData;
+        const loaded = userBriefs || [];
+        setBriefs(loaded);
 
-        // Fetch first image for each assigned property
-        const imageMap = {};
-        await Promise.all(
-          asgList.map(async (item) => {
-            if (!item.propertyId) return;
+        const firstActive = loaded.find(b => b.status?.toLowerCase() !== 'closed');
+        if (firstActive) setSelectedActiveBriefId(firstActive.zohoBriefId);
+
+        const propertiesWithImages = await Promise.all(
+          assignments.map(async (item) => {
+            if (!item.propertyId) return { ...item, firstImage: null };
             try {
               const docs = await getPropertyDocuments(item.propertyId);
-              imageMap[item.propertyId] = docs.propertyImages?.[0]?.url || null;
+              return { ...item, firstImage: docs.propertyImages?.[0]?.url || null };
             } catch {
-              imageMap[item.propertyId] = null;
+              return { ...item, firstImage: null };
             }
-          }),
+          })
         );
-        setPropertyImages(imageMap);
+        setProperties(propertiesWithImages);
       } catch (err) {
-        console.error("Error fetching client details:", err);
+        console.error('Error fetching client details:', err);
       } finally {
         setLoading(false);
       }
@@ -95,93 +241,57 @@ const ClientDetail = () => {
     fetchData();
   }, [id]);
 
-  const stats = useMemo(
-    () => ({
-      total: assignments.length,
-      pending: assignments.filter((a) => a.portalStatus === "PENDING").length,
-      accepted: assignments.filter((a) => a.portalStatus === "ACCEPTED").length,
-      rejected: assignments.filter((a) => a.portalStatus === "REJECTED").length,
-    }),
-    [assignments],
-  );
+  const stats = useMemo(() => {
+    const relevant  = properties.filter(item => selectedBriefId === 'ALL' || item.zohoBriefId === selectedBriefId);
+    const purchased = relevant.filter(isPurchasedItem);
+    const purchasedIds = new Set(purchased.map(p => p.assignment?.id));
+    const notPurchased = relevant.filter(p => !purchasedIds.has(p.assignment?.id));
+    return {
+      total:     relevant.length,
+      assigned:  notPurchased.filter(p => p.portalStatus === 'PENDING').length,
+      accepted:  notPurchased.filter(p => p.portalStatus === 'ACCEPTED').length,
+      rejected:  relevant.filter(p => p.portalStatus === 'REJECTED').length,
+      purchased: purchased.length,
+    };
+  }, [properties, selectedBriefId]);
 
-  // Build a lookup: zohoBriefId → brief object
-  const briefLookup = useMemo(() => {
-    const map = {};
-    briefs.forEach((b) => { if (b.zohoBriefId) map[b.zohoBriefId] = b; });
-    return map;
-  }, [briefs]);
-
-  // The active brief being shown (for displaying status badge etc.)
-  const activeBrief = selectedBriefId === "ALL" ? null : briefs.find(
-    (b) => b.id === selectedBriefId || b.zohoBriefId === selectedBriefId
-  );
-
-  const filteredAssignments = useMemo(() => assignments.filter((item) => {
-    if (!item.property) return false;
-    const matchesSearch =
-      (item.property.addressLine1 || item.property.address || "")
-        .toLowerCase()
-        .includes(searchQuery.toLowerCase()) ||
-      (item.property.suburb || "")
-        .toLowerCase()
-        .includes(searchQuery.toLowerCase());
-    const matchesTab = activeTab === "ALL" || item.portalStatus === activeTab;
-    // Brief filter: if a specific brief is selected, only show assignments for that brief
-    const matchesBrief =
-      selectedBriefId === "ALL" ||
-      item.zohoBriefId === selectedBriefId ||
-      (activeBrief && item.zohoBriefId === activeBrief.zohoBriefId);
-    return matchesSearch && matchesTab && matchesBrief;
-  }), [assignments, searchQuery, activeTab, selectedBriefId, activeBrief]);
-
-  const getStatusColor = (status) => {
-    switch (status) {
-      case "ACCEPTED":
-        return "bg-teal text-navy";
-      case "REJECTED":
-        return "bg-red-500 text-white";
-      case "PURCHASED":
-        return "bg-gold text-navy";
-      default:
-        return "bg-blue-500/20 text-blue-300 border border-blue-500/30";
+  const getStatusBadge = (item) => {
+    if (isPurchasedItem(item)) return { cls: 'bg-gold text-navy',                                          label: 'PURCHASED' };
+    switch (item.portalStatus) {
+      case 'ACCEPTED': return { cls: 'bg-teal text-navy',                                                  label: 'ACCEPTED'  };
+      case 'REJECTED': return { cls: 'bg-red-500 text-white',                                              label: 'REJECTED'  };
+      case 'PENDING':  return { cls: 'bg-blue-500/20 text-blue-300 border border-blue-500/30',             label: 'ASSIGNED'  };
+      default:         return { cls: 'bg-gray-500/20 text-gray-400',                                       label: item.portalStatus || '—' };
     }
   };
 
-  const openNotesModal = (item) => {
-    setNotesModal({
-      assignmentId: item.assignment?.id || item.id,
-      notes: item.agentNotes || item.assignment?.agentNotes || "",
-      address: item.property?.addressLine1 || item.property?.address || "",
+  const filteredProperties = properties.filter(item => {
+    if (!item.property) return false;
+    const matchesBrief  = selectedBriefId === 'ALL' || item.zohoBriefId === selectedBriefId;
+    const matchesSearch =
+      (item.property.addressLine1 || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (item.property.suburb       || '').toLowerCase().includes(searchQuery.toLowerCase());
+    const purchased = isPurchasedItem(item);
+    let matchesTab;
+    if      (activeTab === 'ALL')       matchesTab = true;
+    else if (activeTab === 'PURCHASED') matchesTab = purchased;
+    else if (activeTab === 'REJECTED')  matchesTab = item.portalStatus === 'REJECTED';
+    else if (activeTab === 'ACCEPTED')  matchesTab = item.portalStatus === 'ACCEPTED' && !purchased;
+    else if (activeTab === 'PENDING')   matchesTab = item.portalStatus === 'PENDING'  && !purchased;
+    else                                matchesTab = item.portalStatus === activeTab;
+    return matchesBrief && matchesSearch && matchesTab;
+  });
+
+  const toggleCompare = (property) => {
+    setCompareList(prev => {
+      const exists = prev.find(p => p.id === property.assignment.id);
+      if (exists) return prev.filter(p => p.id !== property.assignment.id);
+      if (prev.length >= 3) return prev;
+      return [...prev, { ...property, id: property.assignment.id }];
     });
   };
 
-  const handleSaveNotes = async () => {
-    if (!notesModal) return;
-    setSavingNotes(true);
-    try {
-      await updateAgentNotes(notesModal.assignmentId, notesModal.notes);
-      setAssignments((prev) =>
-        prev.map((a) => {
-          const asgId = a.assignment?.id || a.id;
-          if (asgId !== notesModal.assignmentId) return a;
-          return {
-            ...a,
-            agentNotes: notesModal.notes,
-            assignment: a.assignment
-              ? { ...a.assignment, agentNotes: notesModal.notes }
-              : a.assignment,
-          };
-        }),
-      );
-      toast("Notes saved!");
-      setNotesModal(null);
-    } catch (err) {
-      toast("Failed to save notes: " + err.message, "error");
-    } finally {
-      setSavingNotes(false);
-    }
-  };
+  const clientName = client?.fullName || client?.buyerBrief?.fullName || 'Client';
 
   if (loading) {
     return (
@@ -193,458 +303,302 @@ const ClientDetail = () => {
     );
   }
 
-  const clientName =
-    client?.fullName || client?.buyerBrief?.fullName || "Client";
-
   return (
     <AdminLayout title={clientName}>
       <div className="space-y-8">
+
         {/* Back */}
         <button
-          onClick={() => navigate("/admin/clients")}
+          onClick={() => navigate('/admin/clients')}
           className="flex items-center gap-2 text-gray-400 hover:text-teal transition-colors group"
         >
-          <ChevronLeft
-            size={20}
-            className="group-hover:-translate-x-1 transition-transform"
-          />
+          <ChevronLeft size={20} className="group-hover:-translate-x-1 transition-transform" />
           Back to Client Management
         </button>
 
-        {/* Client Banner + Stats */}
+        {/* Client banner */}
         <div className="bg-teal/10 border border-teal/30 rounded-2xl p-6 lg:p-8">
-          <div className="flex flex-col xl:flex-row xl:items-center justify-between gap-8">
-            <div className="flex items-center gap-5">
-              <div className="w-16 h-16 rounded-2xl bg-teal/20 flex items-center justify-center text-teal text-2xl font-bold shrink-0">
-                {clientName.charAt(0)}
-              </div>
-              <div>
-                <h1 className="text-2xl font-bold text-white">{clientName}</h1>
-                <p className="text-gray-400 text-sm mt-1">
-                  {client?.loginEmail ||
-                    client?.email ||
-                    client?.buyerBrief?.email ||
-                    ""}
-                </p>
-                {client?.zohoContactId && (
-                  <p className="text-xs font-mono text-gray-500 mt-0.5">
-                    {client.zohoContactId}
-                  </p>
-                )}
-              </div>
+          <div className="flex items-center gap-5">
+            <div className="w-16 h-16 rounded-2xl bg-teal/20 flex items-center justify-center text-teal text-2xl font-bold shrink-0">
+              {clientName.charAt(0)}
             </div>
-
-            <div className="grid grid-cols-4 gap-3">
-              {[
-                {
-                  label: "Total",
-                  value: stats.total,
-                  color: "text-white",
-                  bg: "bg-white/5",
-                },
-                {
-                  label: "Assigned",
-                  value: stats.pending,
-                  color: "text-blue-300",
-                  bg: "bg-blue-500/10",
-                },
-                {
-                  label: "Accepted",
-                  value: stats.accepted,
-                  color: "text-teal",
-                  bg: "bg-teal/10",
-                },
-                {
-                  label: "Rejected",
-                  value: stats.rejected,
-                  color: "text-red-400",
-                  bg: "bg-red-400/10",
-                },
-              ].map((s, i) => (
-                <div
-                  key={i}
-                  className={`${s.bg} border border-white/10 px-4 py-3 rounded-xl text-center`}
-                >
-                  <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-1 font-bold">
-                    {s.label}
-                  </p>
-                  <p className={`text-2xl font-bold ${s.color}`}>{s.value}</p>
-                </div>
-              ))}
+            <div>
+              <h1 className="text-2xl font-bold text-white">{clientName}</h1>
+              <p className="text-gray-400 text-sm mt-1">
+                {client?.loginEmail || client?.email || client?.buyerBrief?.email || ''}
+              </p>
+              {client?.zohoContactId && (
+                <p className="text-xs font-mono text-gray-500 mt-0.5">{client.zohoContactId}</p>
+              )}
             </div>
           </div>
         </div>
 
-        {/* Buyer Brief Selector — shown only when client has multiple non-closed briefs */}
-        {briefs.length > 1 && (
-          <div className="flex items-start gap-4 flex-wrap">
-            <div className="flex items-center gap-2">
-              <FileText size={16} className="text-teal" />
-              <span className="text-xs font-bold text-gray-400 uppercase tracking-widest">
-                Active Buyer Brief
-              </span>
-            </div>
-            <div className="relative" style={{ minWidth: 280 }}>
-              <button
-                onClick={() => setBriefDropdownOpen((o) => !o)}
-                className="w-full flex items-center justify-between gap-3 bg-navy border border-teal/30 rounded-xl px-4 py-2.5 text-sm text-white hover:border-teal transition-all"
-              >
-                <span className="flex items-center gap-2 min-w-0">
-                  {selectedBriefId === "ALL" ? (
-                    <span className="text-gray-300">All Briefs</span>
-                  ) : (
-                    <>
-                      <span className="text-white font-semibold truncate">
-                        {activeBrief
-                          ? (activeBrief.fullName || activeBrief.zohoName || activeBrief.zohoBriefId)
-                          : selectedBriefId}
-                      </span>
-                      {activeBrief?.status && (
-                        <span
-                          className={`px-2 py-0.5 rounded-full text-[10px] font-bold border whitespace-nowrap ${
-                            BRIEF_STATUS_COLOR[activeBrief.status] ||
-                            "bg-white/10 text-gray-300 border-white/20"
-                          }`}
-                        >
-                          {activeBrief.status}
-                        </span>
-                      )}
-                    </>
-                  )}
-                </span>
-                <ChevronDown
-                  size={16}
-                  className={`text-gray-400 transition-transform shrink-0 ${briefDropdownOpen ? "rotate-180" : ""}`}
-                />
-              </button>
+        {/* Main Tabs — same as client dashboard */}
+        <div className="flex gap-1 bg-navy border border-white/10 rounded-2xl p-1 w-fit">
+          {[
+            { key: 'PROPERTIES', label: 'My Properties',  icon: Building2 },
+            { key: 'BRIEF',      label: 'My Buyer Brief', icon: Briefcase },
+          ].map(({ key, label, icon: Icon }) => (
+            <button
+              key={key}
+              onClick={() => setMainTab(key)}
+              className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${
+                mainTab === key ? 'bg-teal text-navy shadow' : 'text-gray-400 hover:text-white'
+              }`}
+            >
+              <Icon size={16} />
+              {label}
+            </button>
+          ))}
+        </div>
 
-              {briefDropdownOpen && (
-                <div className="absolute top-full left-0 right-0 mt-1 z-50 bg-[#1B2A4A] border border-teal/30 rounded-xl shadow-2xl overflow-hidden">
-                  {/* All option */}
-                  <button
-                    onClick={() => { setSelectedBriefId("ALL"); setBriefDropdownOpen(false); }}
-                    className={`w-full text-left px-4 py-3 text-sm transition-colors flex items-center justify-between ${
-                      selectedBriefId === "ALL"
-                        ? "bg-teal/20 text-teal"
-                        : "text-gray-300 hover:bg-white/5 hover:text-white"
-                    }`}
-                  >
-                    <span className="font-semibold">All Briefs</span>
-                    <span className="text-[10px] text-gray-500">{assignments.length} properties</span>
-                  </button>
-                  <div className="border-t border-white/5" />
-                  {briefs.map((brief) => {
-                    const briefKey = brief.zohoBriefId || brief.id;
-                    const isSelected = selectedBriefId === briefKey;
-                    const briefName = brief.fullName || brief.zohoName || brief.zohoBriefId || "Brief";
-                    const propCount = assignments.filter(
-                      (a) => a.zohoBriefId === brief.zohoBriefId
-                    ).length;
-                    return (
-                      <button
-                        key={briefKey}
-                        onClick={() => { setSelectedBriefId(briefKey); setBriefDropdownOpen(false); }}
-                        className={`w-full text-left px-4 py-3 text-sm transition-colors flex items-center justify-between gap-3 ${
-                          isSelected
-                            ? "bg-teal/20 text-teal"
-                            : "text-gray-300 hover:bg-white/5 hover:text-white"
-                        }`}
+        {/* ── MY BUYER BRIEF TAB ──────────────────────────────────────────────── */}
+        {mainTab === 'BRIEF' && (
+          <div>
+            {activeBriefs.length === 0 ? (
+              <div className="flex flex-col items-center justify-center py-20 bg-white/5 border border-dashed border-white/10 rounded-3xl">
+                <Briefcase className="text-teal mb-4" size={40} />
+                <h3 className="text-xl font-bold text-white mb-2">No active buyer briefs</h3>
+                <p className="text-gray-400 text-center max-w-sm">No active buyer briefs found for this client.</p>
+              </div>
+            ) : (
+              <>
+                {activeBriefs.length > 1 && (
+                  <div className="flex items-center gap-3 mb-6">
+                    <span className="text-xs font-bold text-gray-500 uppercase tracking-widest whitespace-nowrap">Viewing brief:</span>
+                    <div className="relative">
+                      <select
+                        value={selectedActiveBriefId || ''}
+                        onChange={e => setSelectedActiveBriefId(e.target.value)}
+                        className="appearance-none bg-navy border border-teal/30 rounded-xl px-4 py-2 pr-10 text-sm font-bold text-teal focus:outline-none focus:border-teal transition-all cursor-pointer"
                       >
-                        <div className="flex items-center gap-2 min-w-0">
-                          <span className="font-semibold truncate">{briefName}</span>
-                          {brief.status && (
-                            <span
-                              className={`px-2 py-0.5 rounded-full text-[10px] font-bold border whitespace-nowrap ${
-                                BRIEF_STATUS_COLOR[brief.status] ||
-                                "bg-white/10 text-gray-300 border-white/20"
-                              }`}
-                            >
-                              {brief.status}
-                            </span>
-                          )}
-                        </div>
-                        <span className="text-[10px] text-gray-500 shrink-0">{propCount} props</span>
-                      </button>
-                    );
-                  })}
-                </div>
-              )}
-            </div>
-
-            {/* Close dropdown on outside click */}
-            {briefDropdownOpen && (
-              <div
-                className="fixed inset-0 z-40"
-                onClick={() => setBriefDropdownOpen(false)}
-              />
+                        {activeBriefs.map(b => (
+                          <option key={b.zohoBriefId} value={b.zohoBriefId}>
+                            {b.zohoBriefId}{b.status ? ` — ${b.status}` : ''}
+                          </option>
+                        ))}
+                      </select>
+                      <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-teal pointer-events-none" />
+                    </div>
+                  </div>
+                )}
+                <BuyerBriefView brief={displayedBrief} />
+              </>
             )}
           </div>
         )}
 
-        {/* Single brief info badge (when only 1 brief) */}
-        {briefs.length === 1 && (() => {
-          const b = briefs[0];
-          return (
-            <div className="flex items-center gap-3 px-4 py-2.5 bg-navy border border-teal/20 rounded-xl w-fit">
-              <FileText size={15} className="text-teal" />
-              <span className="text-xs text-gray-400 font-bold uppercase tracking-widest">Active Brief:</span>
-              <span className="text-sm text-white font-semibold">{b.fullName || b.zohoName || b.zohoBriefId}</span>
-              {b.status && (
-                <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold border ${BRIEF_STATUS_COLOR[b.status] || "bg-white/10 text-gray-300 border-white/20"}`}>
-                  {b.status}
-                </span>
+        {/* ── MY PROPERTIES TAB ───────────────────────────────────────────────── */}
+        {mainTab === 'PROPERTIES' && (
+          <>
+            {/* Stats + brief filter */}
+            <div className="bg-white/[0.03] border border-white/5 rounded-2xl p-5 flex flex-col xl:flex-row xl:items-center justify-between gap-6">
+              <div className="grid grid-cols-2 sm:grid-cols-5 gap-4">
+                {[
+                  { label: 'Total',     value: stats.total,     color: 'text-white',    bg: 'bg-white/5'     },
+                  { label: 'Assigned',  value: stats.assigned,  color: 'text-blue-300', bg: 'bg-blue-500/10' },
+                  { label: 'Accepted',  value: stats.accepted,  color: 'text-teal',     bg: 'bg-teal/10'     },
+                  { label: 'Rejected',  value: stats.rejected,  color: 'text-red-400',  bg: 'bg-red-400/10'  },
+                  { label: 'Purchased', value: stats.purchased, color: 'text-gold',     bg: 'bg-gold/10'     },
+                ].map((s, i) => (
+                  <div key={i} className={`${s.bg} border border-white/10 px-4 py-3 rounded-xl min-w-[80px]`}>
+                    <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-1 font-bold">{s.label}</p>
+                    <p className={`text-2xl font-bold ${s.color}`}>{s.value}</p>
+                  </div>
+                ))}
+              </div>
+
+              {activeBriefs.length > 1 && (
+                <div className="flex items-center gap-3">
+                  <span className="text-xs font-bold text-gray-500 uppercase tracking-widest whitespace-nowrap">Filter by brief:</span>
+                  <div className="relative">
+                    <select
+                      value={selectedBriefId}
+                      onChange={e => setSelectedBriefId(e.target.value)}
+                      className="appearance-none bg-navy border border-teal/30 rounded-xl px-4 py-2 pr-10 text-sm font-bold text-teal focus:outline-none focus:border-teal transition-all cursor-pointer"
+                    >
+                      <option value="ALL">All Briefs ({activeBriefs.length})</option>
+                      {activeBriefs.map(b => (
+                        <option key={b.zohoBriefId} value={b.zohoBriefId}>{b.zohoBriefId}</option>
+                      ))}
+                    </select>
+                    <ChevronDown size={14} className="absolute right-3 top-1/2 -translate-y-1/2 text-teal pointer-events-none" />
+                  </div>
+                </div>
               )}
             </div>
-          );
-        })()}
 
-        {/* Controls */}
-        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
-          <div className="relative flex-1 max-w-md">
-            <Search
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500"
-              size={18}
-            />
-            <input
-              type="text"
-              placeholder="Search by address or suburb..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full bg-navy border border-teal/20 rounded-xl py-2.5 pl-10 pr-4 text-sm text-white focus:outline-none focus:border-teal transition-all"
-            />
-          </div>
-          <div className="flex bg-navy border border-teal/20 rounded-xl p-1">
-            {["ALL", "PENDING", "ACCEPTED", "REJECTED"].map((tab) => (
-              <button
-                key={tab}
-                onClick={() => setActiveTab(tab)}
-                className={`px-4 py-1.5 rounded-lg text-xs font-bold transition-all ${activeTab === tab ? "bg-teal text-navy" : "text-gray-400 hover:text-white"}`}
-              >
-                {tab === "PENDING" ? "ASSIGNED" : tab}
-              </button>
-            ))}
-          </div>
-        </div>
+            {/* Search + Status Tabs */}
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-4">
+              <div className="relative flex-1 max-w-md">
+                <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-500" size={18} />
+                <input
+                  type="text"
+                  placeholder="Search by address or suburb..."
+                  value={searchQuery}
+                  onChange={e => setSearchQuery(e.target.value)}
+                  className="w-full bg-navy border border-teal/20 rounded-xl py-2.5 pl-10 pr-4 text-sm text-white focus:outline-none focus:border-teal transition-all"
+                />
+              </div>
+              <div className="flex bg-navy border border-teal/20 rounded-xl p-1">
+                {[
+                  { key: 'ALL',       label: 'ALL'       },
+                  { key: 'PENDING',   label: 'ASSIGNED'  },
+                  { key: 'ACCEPTED',  label: 'ACCEPTED'  },
+                  { key: 'REJECTED',  label: 'REJECTED'  },
+                  { key: 'PURCHASED', label: 'PURCHASED' },
+                ].map(({ key, label }) => (
+                  <button
+                    key={key}
+                    onClick={() => setActiveTab(key)}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
+                      activeTab === key
+                        ? key === 'PURCHASED' ? 'bg-gold text-navy' : 'bg-teal text-navy'
+                        : 'text-gray-400 hover:text-white'
+                    }`}
+                  >
+                    {label}
+                  </button>
+                ))}
+              </div>
+            </div>
 
-        {/* Properties Table */}
-        {filteredAssignments.length > 0 ? (
-          <div className="bg-navy border border-teal/20 rounded-2xl overflow-hidden">
-            <div className="overflow-x-auto">
-              <table className="w-full text-left border-collapse">
-                <thead>
-                  <tr className="bg-white/5 border-b border-teal/20">
-                    <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">
-                      Property
-                    </th>
-                    <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">
-                      Specs
-                    </th>
-                    <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">
-                      Price Range
-                    </th>
-                    <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">
-                      Yield
-                    </th>
-                    <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">
-                      Status
-                    </th>
-                    <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest text-right">
-                      Actions
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-white/5">
-                  {filteredAssignments.map((item) => {
-                    const asgKey = item.assignment?.id || item.id;
-                    const hasNotes = !!(
-                      item.agentNotes || item.assignment?.agentNotes
-                    );
-                    return (
-                      <tr
-                        key={asgKey}
-                        className="hover:bg-white/5 transition-colors group"
-                      >
-                        {/* Property */}
-                        <td className="px-6 py-4">
-                          <div className="flex items-center gap-3">
-                            <div className="w-12 h-12 rounded-xl overflow-hidden shrink-0 bg-white/5 border border-white/5">
-                              {propertyImages[item.propertyId] ? (
-                                <img
-                                  src={propertyImages[item.propertyId]}
-                                  className="w-full h-full object-cover"
-                                  referrerPolicy="no-referrer"
-                                />
-                              ) : (
-                                <div className="w-full h-full flex items-center justify-center">
-                                  <Building2
-                                    size={16}
-                                    className="text-gray-600"
-                                  />
-                                </div>
-                              )}
-                            </div>
-                            <div>
-                              <p className="text-white font-bold text-sm">
-                                {item.property.addressLine1 ||
-                                  item.property.address}
-                              </p>
-                              <p className="text-teal text-xs">
-                                {item.property.suburb}, {item.property.state}
-                              </p>
-                            </div>
-                          </div>
-                        </td>
+            {/* Comparison Bar */}
+            {compareList.length > 0 && (
+              <div className="fixed bottom-4 md:bottom-8 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-2rem)] max-w-2xl">
+                <div className="bg-navy/90 backdrop-blur-md border border-teal/50 rounded-2xl p-3 md:p-4 shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-4">
+                  <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-start">
+                    <div className="flex -space-x-3">
+                      {compareList.map(p => (
+                        <div key={p.id} className="w-8 h-8 md:w-10 md:h-10 rounded-full border-2 border-navy overflow-hidden bg-teal/20 flex-shrink-0">
+                          <img src={p.firstImage} className="w-full h-full object-cover" referrerPolicy="no-referrer" />
+                        </div>
+                      ))}
+                    </div>
+                    <p className="text-xs md:text-sm font-bold text-white whitespace-nowrap">
+                      {compareList.length} {compareList.length === 1 ? 'Property' : 'Properties'} selected
+                    </p>
+                  </div>
+                  <div className="flex items-center gap-3 w-full sm:w-auto justify-end">
+                    <button onClick={() => setCompareList([])} className="text-gray-400 hover:text-white text-[10px] md:text-xs font-bold uppercase tracking-widest px-2">
+                      Clear
+                    </button>
+                    <button
+                      onClick={() => setShowCompareModal(true)}
+                      disabled={compareList.length < 2}
+                      className="flex-1 sm:flex-none bg-teal text-navy px-4 md:px-6 py-2 rounded-xl font-bold text-xs md:text-sm hover:bg-teal/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    >
+                      <Scale size={16} />
+                      Compare
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
 
-                        {/* Specs */}
-                        <td className="px-6 py-4">
-                          <div className="flex gap-3 text-xs text-gray-400">
-                            <span className="flex items-center gap-1">
-                              <Bed size={12} /> {item.property.bedrooms ?? "—"}
-                            </span>
-                            <span className="flex items-center gap-1">
-                              <Bath size={12} />{" "}
-                              {item.property.bathrooms ?? "—"}
-                            </span>
-                            <span className="flex items-center gap-1">
-                              <Car size={12} />{" "}
-                              {item.property.carParking ?? "—"}
-                            </span>
-                          </div>
-                        </td>
-
-                        {/* Price */}
-                        <td className="px-6 py-4">
-                          <p className="text-gold font-bold text-sm">
-                            ${item.property.askingPriceMin / 1000}k – $
-                            {item.property.askingPriceMax / 1000}k
-                          </p>
-                        </td>
-
-                        {/* Yield */}
-                        <td className="px-6 py-4">
-                          <p className="text-teal font-bold text-sm">
-                            {item.property.yieldPercent}%
-                          </p>
-                        </td>
-
-                        {/* Status */}
-                        <td className="px-6 py-4">
-                          <span
-                            className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${getStatusColor(item.portalStatus)}`}
-                          >
-                            {item.portalStatus === "PENDING"
-                              ? "ASSIGNED"
-                              : item.portalStatus}
-                          </span>
-                        </td>
-
-                        {/* Actions */}
-                        <td className="px-6 py-4 text-right">
-                          <div className="flex items-center justify-end gap-2">
-                            <button
-                              onClick={() => openNotesModal(item)}
-                              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-bold transition-all border ${
-                                hasNotes
-                                  ? "bg-teal/10 text-teal border-teal/30 hover:bg-teal hover:text-navy"
-                                  : "bg-white/5 text-gray-400 border-white/10 hover:bg-white/10 hover:text-white"
-                              }`}
-                              title="Agent Notes"
-                            >
-                              <MessageSquare size={13} />
-                              Notes
-                            </button>
-                            <button
-                              onClick={() =>
-                                navigate(
-                                  `/admin/client/${id}/property/${item.propertyId}`,
-                                )
-                              }
-                              className="p-2 bg-white/5 rounded-xl text-gray-400 hover:text-teal hover:bg-teal/10 transition-all"
-                              title="View property"
-                            >
-                              <ArrowRight size={16} />
-                            </button>
-                          </div>
-                        </td>
+            {/* Properties Table */}
+            {filteredProperties.length > 0 ? (
+              <div className="bg-navy border border-teal/20 rounded-2xl overflow-hidden">
+                <div className="overflow-x-auto">
+                  <table className="w-full text-left border-collapse">
+                    <thead>
+                      <tr className="bg-white/5 border-b border-teal/20">
+                        <th className="px-6 py-4 w-12" />
+                        <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">Property</th>
+                        <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">Specs</th>
+                        <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">Price Range</th>
+                        <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">Yield</th>
+                        <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">Rental Yield</th>
+                        <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">Status</th>
                       </tr>
-                    );
-                  })}
-                </tbody>
-              </table>
-            </div>
-          </div>
-        ) : (
-          <div className="flex flex-col items-center justify-center py-20 bg-white/5 border border-dashed border-white/10 rounded-3xl">
-            <div className="w-16 h-16 bg-teal/10 rounded-full flex items-center justify-center mb-4">
-              <Building2 className="text-teal" size={32} />
-            </div>
-            <h3 className="text-xl font-bold text-white mb-2">
-              No properties found
-            </h3>
-            <p className="text-gray-400 text-center max-w-sm">
-              {searchQuery || activeTab !== "ALL"
-                ? "Try adjusting your search or filters."
-                : "No properties have been assigned to this client yet."}
-            </p>
-          </div>
+                    </thead>
+                    <tbody className="divide-y divide-white/5">
+                      {filteredProperties.map(item => {
+                        const isComparing  = compareList.find(p => p.id === item.assignment.id);
+                        const isOffMarket  = /off.?market/i.test(item.property.saleType || '');
+                        const rentalYield  = item.assignment?.rentalYield ?? item.property.yieldPercent;
+                        const { cls, label } = getStatusBadge(item);
+                        return (
+                          <tr
+                            key={item.assignment.id}
+                            onClick={() => navigate(`/admin/client/${id}/property/${item.propertyId}`)}
+                            className={`cursor-pointer hover:bg-teal/5 transition-colors group ${isComparing ? 'bg-teal/5' : ''}`}
+                          >
+                            <td className="px-6 py-4" onClick={e => e.stopPropagation()}>
+                              <button
+                                onClick={() => toggleCompare(item)}
+                                className={`w-6 h-6 rounded border flex items-center justify-center transition-all ${isComparing ? 'bg-teal border-teal text-navy' : 'border-white/20 text-transparent group-hover:text-gray-500'}`}
+                              >
+                                <Check size={14} strokeWidth={3} />
+                              </button>
+                            </td>
+                            <td className="px-6 py-4">
+                              <div>
+                                <div className="flex items-center gap-2 flex-wrap">
+                                  <p className="text-white font-bold text-sm">{item.property.addressLine1}</p>
+                                  {isOffMarket && (
+                                    <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-purple-500/20 border border-purple-400/40 text-purple-300 text-[8px] font-bold rounded tracking-widest shrink-0">
+                                      <Lock size={8} /> OFF MARKET
+                                    </span>
+                                  )}
+                                </div>
+                                <p className="text-teal text-xs mt-0.5">{item.property.suburb}, {item.property.state}</p>
+                              </div>
+                            </td>
+                            <td className="px-6 py-4">
+                              <div className="flex gap-3 text-xs text-gray-400">
+                                <span className="flex items-center gap-1"><Bed size={12} /> {item.property.bedrooms}</span>
+                                <span className="flex items-center gap-1"><Bath size={12} /> {item.property.bathrooms}</span>
+                                <span className="flex items-center gap-1"><Car size={12} /> {item.property.carParking}</span>
+                              </div>
+                            </td>
+                            <td className="px-6 py-4">
+                              <p className="text-gold font-bold text-sm">
+                                ${item.property.askingPriceMin / 1000}k – ${item.property.askingPriceMax / 1000}k
+                              </p>
+                            </td>
+                            <td className="px-6 py-4">
+                              <p className="text-teal font-bold text-sm">
+                                {item.property.yieldPercent != null ? `${item.property.yieldPercent}%` : '—'}
+                              </p>
+                            </td>
+                            <td className="px-6 py-4">
+                              <p className="text-teal font-bold text-sm">
+                                {rentalYield != null ? `${rentalYield}%` : '—'}
+                              </p>
+                            </td>
+                            <td className="px-6 py-4">
+                              <span className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${cls}`}>
+                                {label}
+                              </span>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            ) : (
+              <div className="flex flex-col items-center justify-center py-20 bg-white/5 border border-dashed border-white/10 rounded-3xl">
+                <div className="w-16 h-16 bg-teal/10 rounded-full flex items-center justify-center mb-4">
+                  <Building2 className="text-teal" size={32} />
+                </div>
+                <h3 className="text-xl font-bold text-white mb-2">No properties found</h3>
+                <p className="text-gray-400 text-center max-w-sm">
+                  {searchQuery || activeTab !== 'ALL'
+                    ? 'Try adjusting your search or filters.'
+                    : 'No properties have been assigned to this client yet.'}
+                </p>
+              </div>
+            )}
+          </>
         )}
       </div>
 
-      {/* ── Notes Modal ────────────────────────────────────────────────────── */}
-      {notesModal && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-          <div
-            className="absolute inset-0 bg-black/80 backdrop-blur-sm"
-            onClick={() => setNotesModal(null)}
-          />
-          <div className="relative bg-[#1B2A4A] border border-teal/30 rounded-3xl p-8 max-w-lg w-full shadow-2xl">
-            <div className="flex items-center justify-between mb-2">
-              <h3 className="text-xl font-bold text-white flex items-center gap-2">
-                <MessageSquare className="text-teal" size={20} />
-                Buyers Match Notes
-              </h3>
-              <button
-                onClick={() => setNotesModal(null)}
-                className="text-gray-500 hover:text-white"
-              >
-                <X size={22} />
-              </button>
-            </div>
-            {notesModal.address && (
-              <p className="text-gray-500 text-sm mb-6">{notesModal.address}</p>
-            )}
-            <textarea
-              className="w-full bg-navy border border-white/10 rounded-2xl p-4 text-sm text-gray-300 focus:border-teal outline-none transition-all resize-none h-40"
-              placeholder="Add specific remarks or advice for this client regarding this property..."
-              value={notesModal.notes}
-              onChange={(e) =>
-                setNotesModal({ ...notesModal, notes: e.target.value })
-              }
-              autoFocus
-            />
-            <div className="flex gap-3 mt-4">
-              <button
-                onClick={() => setNotesModal(null)}
-                className="flex-1 py-3 border border-white/10 text-gray-400 font-bold rounded-2xl hover:bg-white/5 transition-all"
-              >
-                Cancel
-              </button>
-              <button
-                onClick={handleSaveNotes}
-                disabled={savingNotes}
-                className="flex-1 py-3 bg-teal text-navy rounded-2xl font-bold hover:bg-teal/90 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
-              >
-                {savingNotes ? (
-                  <Loader2 className="animate-spin" size={18} />
-                ) : (
-                  <>
-                    <Save size={16} /> Save Notes
-                  </>
-                )}
-              </button>
-            </div>
-          </div>
-        </div>
+      {showCompareModal && (
+        <ComparisonModal properties={compareList} onClose={() => setShowCompareModal(false)} />
       )}
     </AdminLayout>
   );

@@ -21,7 +21,8 @@ public class AdminUserController {
             @PathVariable UUID userId,
             @RequestBody(required = false) Map<String, Object> body) {
         boolean sendEmail = body != null && Boolean.TRUE.equals(body.get("sendEmail"));
-        String newPassword = clientPortalUserService.resetPasswordByUserId(userId, sendEmail);
+        String requestedPassword = body != null ? (String) body.get("newPassword") : null;
+        String newPassword = clientPortalUserService.resetPasswordByUserId(userId, requestedPassword, sendEmail);
         return ResponseEntity.ok(Map.of("success", true, "data", Map.of("newPassword", newPassword)));
     }
 

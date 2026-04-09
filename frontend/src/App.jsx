@@ -21,7 +21,6 @@ import ClientList from "./pages/admin/ClientList";
 import ClientDetail from "./pages/admin/ClientDetail";
 import AdminPropertyDetail from "./pages/admin/AdminPropertyDetail";
 import Responses from "./pages/admin/Responses";
-import BuyerBriefs from "./pages/admin/BuyerBriefs";
 
 function HostRedirect() {
   const navigate = useNavigate();
@@ -146,10 +145,10 @@ function App() {
           />
 
           <Route
-            path="/admin/buyers"
+            path="/admin/responses"
             element={
               <ProtectedRoute role="ADMIN">
-                <BuyerBriefs />
+                <Responses />
               </ProtectedRoute>
             }
           />

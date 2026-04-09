@@ -129,12 +129,14 @@ public class AdminClientController {
             buyer.put("email", representative.getEmail());
             buyer.put("status", representative.getStatus());
             buyer.put("briefCount", group.size());
+            buyer.put("activeBriefCount", group.stream().filter(b -> !"Closed".equalsIgnoreCase(b.getStatus())).count());
             
             if (activePortalUser != null) {
                 buyer.put("portalUser", Map.of(
                     "id", activePortalUser.getId(),
                     "email", activePortalUser.getLoginEmail(),
-                    "status", activePortalUser.getStatus()
+                    "status", activePortalUser.getStatus(),
+                    "password", activePortalUser.getSourcePassword() != null ? activePortalUser.getSourcePassword() : "—"
                 ));
             } else {
                 buyer.put("portalUser", null);

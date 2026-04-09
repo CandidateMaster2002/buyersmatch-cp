@@ -212,7 +212,7 @@ const Dashboard = () => {
   const [showCompareModal, setShowCompareModal] = useState(false);
 
   // Main page tabs
-  const [mainTab, setMainTab] = useState('BRIEF'); // 'BRIEF' | 'PROPERTIES'
+  const [mainTab, setMainTab] = useState('PROPERTIES'); // 'BRIEF' | 'PROPERTIES'
   // Which active brief to show in the brief tab
   const [selectedActiveBriefId, setSelectedActiveBriefId] = useState(null);
 
@@ -349,8 +349,8 @@ const Dashboard = () => {
       {/* Main Tabs */}
       <div className="flex gap-1 bg-navy border border-white/10 rounded-2xl p-1 mb-8 w-fit">
         {[
-          { key: 'BRIEF',      label: 'My Buyer Brief',  icon: Briefcase   },
           { key: 'PROPERTIES', label: 'My Properties',   icon: Building2   },
+          { key: 'BRIEF',      label: 'My Buyer Brief',  icon: Briefcase   },
         ].map(({ key, label, icon: Icon }) => (
           <button
             key={key}

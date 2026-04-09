@@ -119,9 +119,9 @@ const ClientList = () => {
       if (credentialForm.email !== originalEmail) {
         await updateClientEmail(briefId, credentialForm.email);
       }
-      await resetClientPassword(portalUserId, credentialForm.password, credSendEmail);
+      const newPwd = await resetClientPassword(portalUserId, credentialForm.password, credSendEmail);
       setClients(prev => prev.map(c => c.id === briefId
-        ? { ...c, portalUser: { ...c.portalUser, email: credentialForm.email } }
+        ? { ...c, portalUser: { ...c.portalUser, email: credentialForm.email, password: newPwd || credentialForm.password } }
         : c));
       setShowCredentialsModal(false);
       toast('Credentials updated!');
@@ -152,7 +152,7 @@ const ClientList = () => {
         sendEmail: onboardSendEmail,
       });
       setClients(prev => prev.map(c => c.id === onboardingClient.id
-        ? { ...c, portalUser: { id: result.id, email: onboardForm.email, status: 'onboarded' } }
+        ? { ...c, portalUser: { id: result.id, email: onboardForm.email, status: 'onboarded', password: onboardForm.password } }
         : c));
       setShowOnboardModal(false);
       toast(`${onboardingClient.fullName} onboarded successfully!`);
@@ -226,6 +226,8 @@ const ClientList = () => {
                 <tr className="border-b border-white/5 bg-white/5">
                   <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest pl-8">Name</th>
                   <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">Email</th>
+                  <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">Active Briefs</th>
+                  <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">Password</th>
                   <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">Status</th>
                   <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest text-right pr-8">Actions</th>
                 </tr>
@@ -233,13 +235,13 @@ const ClientList = () => {
               <tbody className="divide-y divide-white/5">
                 {loading ? (
                   <tr>
-                    <td colSpan="4" className="px-6 py-20 text-center">
+                    <td colSpan="6" className="px-6 py-20 text-center">
                       <Loader2 className="animate-spin text-teal mx-auto" size={32} />
                     </td>
                   </tr>
                 ) : filtered.length === 0 ? (
                   <tr>
-                    <td colSpan="4" className="px-6 py-20 text-center text-gray-500 italic">
+                    <td colSpan="6" className="px-6 py-20 text-center text-gray-500 italic">
                       No {activeTab} clients found.
                     </td>
                   </tr>
@@ -266,6 +268,28 @@ const ClientList = () => {
                     {/* Email */}
                     <td className="px-6 py-4">
                       <p className="text-sm text-gray-300">{client.portalUser?.email || client.email || '—'}</p>
+                    </td>
+
+                    {/* Active Briefs */}
+                    <td className="px-6 py-4">
+                      {client.activeBriefCount > 0 ? (
+                        <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-teal/10 text-teal border border-teal/20">
+                          {client.activeBriefCount}
+                        </span>
+                      ) : (
+                        <span className="text-sm text-gray-600">—</span>
+                      )}
+                    </td>
+
+                    {/* Password */}
+                    <td className="px-6 py-4">
+                      {client.portalUser ? (
+                        <p className="text-sm font-mono text-teal bg-teal/5 px-2 py-1 rounded inline-block">
+                          {client.portalUser.password || '—'}
+                        </p>
+                      ) : (
+                        <p className="text-sm text-gray-600 italic">Not set</p>
+                      )}
                     </td>
 
                     {/* Status */}
