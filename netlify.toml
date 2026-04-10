@@ -1,7 +1,9 @@
 [build]
-  base    = "frontend"
-  command = "npm run build"
+  base = "frontend"
+  command = "npm run build:demo"
   publish = "dist"
 
-[build.environment]
-  NODE_VERSION = "20"
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
