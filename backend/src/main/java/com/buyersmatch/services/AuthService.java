@@ -32,7 +32,7 @@ public class AuthService {
         if (clientOpt.isPresent()) {
             ClientPortalUser user = clientOpt.get();
 
-            if (!passwordEncoder.matches(request.getPassword(), user.getPasswordHash())) {
+            if (!checkPassword(request.getPassword(), user)) {
                 log.warn("Failed client login attempt (wrong password): {}", email);
                 throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid email or password");
             }
@@ -62,5 +62,18 @@ public class AuthService {
 
         log.warn("Failed login attempt (email not found): {}", email);
         throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid email or password");
+    }
+
+    private boolean checkPassword(String inputPassword, ClientPortalUser user) {
+        // Plain text match first (sourcePassword)
+        if (inputPassword != null && inputPassword.equals(user.getSourcePassword())) {
+            return true;
+        }
+        // BCrypt fallback
+        try {
+            return passwordEncoder.matches(inputPassword, user.getPasswordHash());
+        } catch (Exception e) {
+            return false;
+        }
     }
 }

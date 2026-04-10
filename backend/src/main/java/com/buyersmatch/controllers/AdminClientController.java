@@ -255,4 +255,12 @@ public class AdminClientController {
     public ResponseEntity<Map<String, Object>> handleIllegalState(IllegalStateException ex) {
         return ResponseEntity.badRequest().body(Map.of("success", false, "error", ex.getMessage()));
     }
+
+    // TEMPORARY - DELETE AFTER USE
+    @GetMapping("/hash")
+    public org.springframework.http.ResponseEntity<String> hashPassword(
+            @RequestParam String password) {
+        String hashed = new org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder().encode(password);
+        return org.springframework.http.ResponseEntity.ok(hashed);
+    }
 }
