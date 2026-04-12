@@ -34,9 +34,9 @@ export const ToastProvider = ({ children }) => {
 
 const STYLES = {
   success: {
-    border: 'border-teal/40',
-    icon: <CheckCircle2 size={18} className="text-teal shrink-0" />,
-    title: 'text-teal',
+    border: 'border-sage/40',
+    icon: <CheckCircle2 size={18} className="text-sage shrink-0" />,
+    title: 'text-sage',
   },
   error: {
     border: 'border-red-500/40',
@@ -44,9 +44,9 @@ const STYLES = {
     title: 'text-red-400',
   },
   info: {
-    border: 'border-blue-400/40',
-    icon: <AlertCircle size={18} className="text-blue-400 shrink-0" />,
-    title: 'text-blue-400',
+    border: 'border-emerald-400/40',
+    icon: <AlertCircle size={18} className="text-emerald-400 shrink-0" />,
+    title: 'text-emerald-400',
   },
 };
 
@@ -54,7 +54,7 @@ const ToastItem = ({ toast, onClose }) => {
   const s = STYLES[toast.type] || STYLES.info;
   return (
     <div
-      className={`pointer-events-auto flex items-start gap-3 bg-[#1B2A4A] border ${s.border} rounded-2xl px-4 py-3 shadow-2xl min-w-[280px] max-w-sm animate-in fade-in slide-in-from-right-4 duration-200`}
+      className={`pointer-events-auto flex items-start gap-3 bg-[#2D3A2E] border ${s.border} rounded-2xl px-4 py-3 shadow-2xl min-w-[280px] max-w-sm animate-in fade-in slide-in-from-right-4 duration-200`}
     >
       {s.icon}
       <p className="text-sm text-white flex-1 leading-snug">{toast.message}</p>

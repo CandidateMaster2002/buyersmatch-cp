@@ -7,8 +7,8 @@ export default {
   theme: {
     extend: {
       colors: {
-        navy: "#1B2A4A",
-        teal: "#2ABFBF",
+        forest: "#2D3A2E",
+        sage: "#52B788",
         gold: "#D4A843",
       },
     },

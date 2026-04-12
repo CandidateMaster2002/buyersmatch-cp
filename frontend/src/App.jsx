@@ -50,9 +50,9 @@ function HostRedirect() {
     }
   }, [navigate]);
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-[#0A1128] text-white">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-[#182219] text-white">
       <svg
-        className="animate-spin h-8 w-8 mb-4 text-teal-400"
+        className="animate-spin h-8 w-8 mb-4 text-sage-400"
         xmlns="http://www.w3.org/2000/svg"
         fill="none"
         viewBox="0 0 24 24"

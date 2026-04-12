@@ -54,7 +54,7 @@ const AdminDashboard = () => {
   }, []);
 
   const statCards = [
-    { label: 'Active Onboarded', value: stats.totalClients, icon: Users, color: 'text-blue-400', bg: 'bg-blue-400/10' },
+    { label: 'Active Onboarded', value: stats.totalClients, icon: Users, color: 'text-emerald-400', bg: 'bg-emerald-400/10' },
     { label: 'Active Responses', value: stats.totalResponses, icon: MessageSquare, color: 'text-purple-400', bg: 'bg-purple-400/10' },
     { label: 'Accepted Deals', value: stats.acceptedAssignments, icon: CheckCircle2, color: 'text-green-400', bg: 'bg-green-400/10' },
   ];
@@ -65,7 +65,7 @@ const AdminDashboard = () => {
         {/* Stats Grid */}
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
           {statCards.map((stat, idx) => (
-            <div key={idx} className="bg-[#1B2A4A] border border-white/5 p-6 rounded-3xl group hover:border-teal/30 transition-all">
+            <div key={idx} className="bg-[#2D3A2E] border border-white/5 p-6 rounded-3xl group hover:border-sage/30 transition-all">
               <div className="flex items-center justify-between mb-4">
                 <div className={`w-12 h-12 rounded-2xl ${stat.bg} flex items-center justify-center ${stat.color}`}>
                   <stat.icon size={24} />
@@ -83,15 +83,15 @@ const AdminDashboard = () => {
           <div className="lg:col-span-12 space-y-6">
             <div className="flex items-center justify-between">
               <h3 className="text-xl font-bold text-white flex items-center gap-2">
-                <Clock className="text-teal" size={24} />
+                <Clock className="text-sage" size={24} />
                 Recent Onboarded Activity
               </h3>
-              <Link to="/admin/responses" className="text-teal text-sm font-bold hover:underline flex items-center gap-1">
+              <Link to="/admin/responses" className="text-sage text-sm font-bold hover:underline flex items-center gap-1">
                 View All <ArrowRight size={14} />
               </Link>
             </div>
 
-            <div className="bg-[#1B2A4A] border border-white/5 rounded-3xl overflow-hidden">
+            <div className="bg-[#2D3A2E] border border-white/5 rounded-3xl overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full text-left">
                   <thead>
@@ -107,10 +107,10 @@ const AdminDashboard = () => {
                       <tr key={res.id} className="hover:bg-white/5 transition-colors group">
                         <td className="px-6 py-4">
                           <div className="flex items-center gap-3">
-                            <div className="w-8 h-8 rounded-full bg-teal/20 flex items-center justify-center text-teal text-xs font-bold">
+                            <div className="w-8 h-8 rounded-full bg-sage/20 flex items-center justify-center text-sage text-xs font-bold">
                               {anonymizeName(res.client?.fullName)?.charAt(0)}
                             </div>
-                            <p className="text-sm font-bold text-white group-hover:text-teal transition-colors">{anonymizeName(res.client?.fullName)}</p>
+                            <p className="text-sm font-bold text-white group-hover:text-sage transition-colors">{anonymizeName(res.client?.fullName)}</p>
                           </div>
                         </td>
                         <td className="px-6 py-4">
@@ -121,7 +121,7 @@ const AdminDashboard = () => {
                             res.portalStatus === 'ACCEPTED' ? 'bg-green-500/10 text-green-400 border-green-500/20' :
                             res.portalStatus === 'REJECTED' ? 'bg-red-500/10 text-red-400 border-red-500/20' :
                             res.portalStatus === 'PURCHASED' ? 'bg-gold/10 text-gold border-gold/20' :
-                            'bg-blue-500/10 text-blue-400 border-blue-500/20'
+                            'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
                           }`}>
                             {res.portalStatus}
                           </span>

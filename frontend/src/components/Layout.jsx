@@ -16,9 +16,9 @@ const Layout = ({ children, title }) => {
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#0F1E35] text-white flex flex-col">
+    <div className="min-h-screen bg-[#1E2B20] text-white flex flex-col">
       {/* Top Bar */}
-      <header className="h-16 bg-navy border-b border-teal/20 px-6 flex items-center justify-between sticky top-0 z-30">
+      <header className="h-16 bg-forest border-b border-sage/20 px-6 flex items-center justify-between sticky top-0 z-30">
         <div className="flex items-center gap-8">
           <Link
             to="/dashboard"
@@ -36,7 +36,7 @@ const Layout = ({ children, title }) => {
           <NotificationBell />
           <Link
             to="/profile"
-            className="w-8 h-8 rounded-full bg-teal/20 border border-teal/40 flex items-center justify-center text-teal hover:bg-teal/30 transition-all"
+            className="w-8 h-8 rounded-full bg-sage/20 border border-sage/40 flex items-center justify-center text-sage hover:bg-sage/30 transition-all"
             title="View Profile"
           >
             <User size={16} />

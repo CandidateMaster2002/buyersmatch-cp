@@ -124,7 +124,7 @@ const AdminPropertyDetail = () => {
     return (
       <AdminLayout title="Loading Property...">
         <div className="flex items-center justify-center min-h-[60vh]">
-          <Loader2 className="animate-spin text-teal" size={48} />
+          <Loader2 className="animate-spin text-sage" size={48} />
         </div>
       </AdminLayout>
     );
@@ -139,7 +139,7 @@ const AdminPropertyDetail = () => {
           </h2>
           <button
             onClick={() => navigate(`/admin/client/${clientId}`)}
-            className="text-teal hover:underline"
+            className="text-sage hover:underline"
           >
             Back to Client
           </button>
@@ -223,7 +223,7 @@ const AdminPropertyDetail = () => {
         {/* Back */}
         <button
           onClick={() => navigate(`/admin/client/${clientId}`)}
-          className="flex items-center gap-2 text-gray-400 hover:text-teal transition-colors mb-8 group"
+          className="flex items-center gap-2 text-gray-400 hover:text-sage transition-colors mb-8 group"
         >
           <ChevronLeft
             size={20}
@@ -234,7 +234,7 @@ const AdminPropertyDetail = () => {
 
         {/* Assignment Status Bar */}
         {assignment && (
-          <div className="flex flex-wrap items-center justify-between gap-4 mb-8 p-5 bg-navy border border-white/5 rounded-2xl">
+          <div className="flex flex-wrap items-center justify-between gap-4 mb-8 p-5 bg-forest border border-white/5 rounded-2xl">
             <div className="flex items-center gap-3">
               <span className="text-xs text-gray-500 uppercase tracking-widest font-bold">
                 Assignment Status
@@ -242,12 +242,12 @@ const AdminPropertyDetail = () => {
               <span
                 className={`px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-widest border ${
                   assignment.portalStatus === "ACCEPTED"
-                    ? "bg-teal/10 text-teal border-teal/30"
+                    ? "bg-sage/10 text-sage border-sage/30"
                     : assignment.portalStatus === "REJECTED"
                       ? "bg-red-500/10 text-red-400 border-red-500/30"
                       : assignment.portalStatus === "PURCHASED"
                         ? "bg-gold/10 text-gold border-gold/30"
-                        : "bg-blue-500/10 text-blue-400 border-blue-500/30"
+                        : "bg-emerald-500/10 text-emerald-400 border-emerald-500/30"
                 }`}
               >
                 {assignment.portalStatus || "PENDING"}
@@ -286,7 +286,7 @@ const AdminPropertyDetail = () => {
               ];
               return (
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-                  <div className="md:col-span-3 aspect-[4/3] rounded-3xl overflow-hidden border border-teal/20 bg-navy">
+                  <div className="md:col-span-3 aspect-[4/3] rounded-3xl overflow-hidden border border-sage/20 bg-forest">
                     {activeIsYoutube ? (
                       <iframe
                         width="100%"
@@ -325,7 +325,7 @@ const AdminPropertyDetail = () => {
                             setActiveIsVideo(item.mediaType === "video");
                             setActiveIsYoutube(item.mediaType === "youtube");
                           }}
-                          className={`relative flex-shrink-0 w-24 h-24 md:w-full md:h-32 rounded-2xl overflow-hidden border-2 transition-all ${isActive ? "border-teal scale-95" : "border-transparent opacity-50 hover:opacity-100"}`}
+                          className={`relative flex-shrink-0 w-24 h-24 md:w-full md:h-32 rounded-2xl overflow-hidden border-2 transition-all ${isActive ? "border-sage scale-95" : "border-transparent opacity-50 hover:opacity-100"}`}
                         >
                           {item.mediaType === "video" ? (
                             <video
@@ -341,7 +341,7 @@ const AdminPropertyDetail = () => {
                               className="w-full h-full object-cover"
                             />
                           ) : item.mediaType === "youtube" ? (
-                            <div className="w-full h-full bg-navy flex items-center justify-center">
+                            <div className="w-full h-full bg-forest flex items-center justify-center">
                               <Play className="text-white/30" size={24} />
                             </div>
                           ) : (
@@ -372,10 +372,10 @@ const AdminPropertyDetail = () => {
             })()}
 
           {/* 2. Property Information */}
-          <div className="bg-navy border border-teal/20 rounded-3xl overflow-hidden">
-            <div className="px-8 py-5 bg-white/[0.03] border-b border-teal/20 flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-teal/15 flex items-center justify-center">
-                <LayoutList className="text-teal" size={18} />
+          <div className="bg-forest border border-sage/20 rounded-3xl overflow-hidden">
+            <div className="px-8 py-5 bg-white/[0.03] border-b border-sage/20 flex items-center gap-3">
+              <div className="w-9 h-9 rounded-xl bg-sage/15 flex items-center justify-center">
+                <LayoutList className="text-sage" size={18} />
               </div>
               <h3 className="text-lg font-bold text-white">
                 Property Information
@@ -385,14 +385,14 @@ const AdminPropertyDetail = () => {
             {/* Location & Identity */}
             <div className="px-8 py-6 border-b border-white/5">
               <div className="flex items-center gap-2 mb-5">
-                <MapPin size={14} className="text-teal" />
-                <p className="text-[10px] uppercase tracking-widest text-teal font-bold">
+                <MapPin size={14} className="text-sage" />
+                <p className="text-[10px] uppercase tracking-widest text-sage font-bold">
                   Location & Identity
                 </p>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div className="sm:col-span-2 flex items-center gap-3 bg-white/[0.03] border border-white/5 rounded-xl px-4 py-3">
-                  <Home size={15} className="text-teal shrink-0" />
+                  <Home size={15} className="text-sage shrink-0" />
                   <div>
                     <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-0.5">
                       Address
@@ -416,7 +416,7 @@ const AdminPropertyDetail = () => {
                     icon: Tag,
                     badge: true,
                     color: property.status?.toLowerCase().includes("active")
-                      ? "text-teal bg-teal/10 border-teal/30"
+                      ? "text-sage bg-sage/10 border-sage/30"
                       : property.status?.toLowerCase().includes("sold")
                         ? "text-gold bg-gold/10 border-gold/30"
                         : "text-gray-300 bg-white/5 border-white/10",
@@ -451,8 +451,8 @@ const AdminPropertyDetail = () => {
             {/* Property Specs */}
             <div className="px-8 py-6 border-b border-white/5">
               <div className="flex items-center gap-2 mb-5">
-                <Home size={14} className="text-teal" />
-                <p className="text-[10px] uppercase tracking-widest text-teal font-bold">
+                <Home size={14} className="text-sage" />
+                <p className="text-[10px] uppercase tracking-widest text-sage font-bold">
                   Property Specs
                 </p>
               </div>
@@ -498,8 +498,8 @@ const AdminPropertyDetail = () => {
                     key={i}
                     className="flex flex-col items-center justify-center gap-2 bg-white/[0.03] border border-white/5 rounded-xl px-3 py-4 text-center"
                   >
-                    <div className="w-9 h-9 rounded-xl bg-teal/10 flex items-center justify-center">
-                      <Icon size={16} className="text-teal" />
+                    <div className="w-9 h-9 rounded-xl bg-sage/10 flex items-center justify-center">
+                      <Icon size={16} className="text-sage" />
                     </div>
                     <p className="text-[10px] text-gray-500 uppercase tracking-wider leading-tight">
                       {label}
@@ -515,8 +515,8 @@ const AdminPropertyDetail = () => {
             {/* Financials & Sale Info */}
             <div className="px-8 py-6 border-b border-white/5">
               <div className="flex items-center gap-2 mb-5">
-                <DollarSign size={14} className="text-teal" />
-                <p className="text-[10px] uppercase tracking-widest text-teal font-bold">
+                <DollarSign size={14} className="text-sage" />
+                <p className="text-[10px] uppercase tracking-widest text-sage font-bold">
                   Financials & Sale Info
                 </p>
               </div>
@@ -551,7 +551,7 @@ const AdminPropertyDetail = () => {
                         ? `${property.yieldPercent}%`
                         : null,
                     icon: Percent,
-                    color: "text-teal",
+                    color: "text-sage",
                   },
                   {
                     label: "Min Rent / Month",
@@ -560,7 +560,7 @@ const AdminPropertyDetail = () => {
                         ? `$${Number(property.minRentPerMonth).toLocaleString()}`
                         : null,
                     icon: PiggyBank,
-                    color: "text-teal",
+                    color: "text-sage",
                   },
                   {
                     label: "Rental Appraisal",
@@ -607,8 +607,8 @@ const AdminPropertyDetail = () => {
               property.cmaLink) && (
               <div className="px-8 py-6">
                 <div className="flex items-center gap-2 mb-5">
-                  <Link2 size={14} className="text-teal" />
-                  <p className="text-[10px] uppercase tracking-widest text-teal font-bold">
+                  <Link2 size={14} className="text-sage" />
+                  <p className="text-[10px] uppercase tracking-widest text-sage font-bold">
                     Links
                   </p>
                 </div>
@@ -618,7 +618,7 @@ const AdminPropertyDetail = () => {
                       href={property.linkToListing}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-2 px-5 py-3 bg-teal/10 border border-teal/30 hover:bg-teal/20 text-teal font-bold text-sm rounded-xl transition-all"
+                      className="flex items-center gap-2 px-5 py-3 bg-sage/10 border border-sage/30 hover:bg-sage/20 text-sage font-bold text-sm rounded-xl transition-all"
                     >
                       <ExternalLink size={15} /> View Listing
                     </a>
@@ -649,10 +649,10 @@ const AdminPropertyDetail = () => {
           </div>
 
           {/* 3. Deal Progress */}
-          <div className="bg-navy border border-teal/10 rounded-3xl p-8">
+          <div className="bg-forest border border-sage/10 rounded-3xl p-8">
             <div className="flex items-center justify-between mb-8">
               <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                <Clock className="text-teal" size={20} /> Deal Progress
+                <Clock className="text-sage" size={20} /> Deal Progress
               </h3>
               {isRejected && (
                 <span className="px-3 py-1 bg-red-500/20 text-red-400 text-xs font-bold rounded-full border border-red-500/30">
@@ -685,10 +685,10 @@ const AdminPropertyDetail = () => {
                       textColor = "text-red-400";
                       iconColor = "text-red-400";
                     } else {
-                      bgColor = "bg-teal/20";
-                      borderColor = "border-teal/50";
-                      textColor = "text-teal";
-                      iconColor = "text-teal";
+                      bgColor = "bg-sage/20";
+                      borderColor = "border-sage/50";
+                      textColor = "text-sage";
+                      iconColor = "text-sage";
                     }
                   }
                   return (
@@ -727,10 +727,10 @@ const AdminPropertyDetail = () => {
           </div>
 
           {/* 4. Financial Analysis */}
-          <div className="bg-navy border border-teal/20 rounded-3xl p-8">
+          <div className="bg-forest border border-sage/20 rounded-3xl p-8">
             <div className="flex items-center justify-between mb-8">
               <div className="flex items-center gap-3">
-                <TrendingUp className="text-teal" size={24} />
+                <TrendingUp className="text-sage" size={24} />
                 <h3 className="text-xl font-bold text-white">
                   Offer & Financial Analysis
                 </h3>
@@ -762,7 +762,7 @@ const AdminPropertyDetail = () => {
                 <p className="text-xs text-gray-500 uppercase tracking-widest mb-2">
                   Weekly Rent
                 </p>
-                <p className="text-2xl font-bold text-teal">
+                <p className="text-2xl font-bold text-sage">
                   ${weeklyRent || "N/A"}
                 </p>
               </div>
@@ -770,7 +770,7 @@ const AdminPropertyDetail = () => {
                 <p className="text-xs text-gray-500 uppercase tracking-widest mb-2">
                   Annual Income
                 </p>
-                <p className="text-2xl font-bold text-teal">
+                <p className="text-2xl font-bold text-sage">
                   ${annualIncome || "N/A"}
                 </p>
               </div>
@@ -805,7 +805,7 @@ const AdminPropertyDetail = () => {
           {hasDocuments && (
             <div className="space-y-8">
               <div className="flex items-center gap-3">
-                <FileText className="text-teal" size={22} />
+                <FileText className="text-sage" size={22} />
                 <h3 className="text-xl font-bold text-white">
                   Documents & Media
                 </h3>
@@ -814,23 +814,23 @@ const AdminPropertyDetail = () => {
 
               {(documents.pdfs.length > 0 || documents.others.length > 0) && (
                 <div className="space-y-3">
-                  <p className="text-[10px] font-bold text-teal uppercase tracking-widest flex items-center gap-2">
+                  <p className="text-[10px] font-bold text-sage uppercase tracking-widest flex items-center gap-2">
                     <FileText size={12} /> Reports & Documents
                   </p>
                   <div className="space-y-2">
                     {[...documents.pdfs, ...documents.others].map((doc) => (
                       <div
                         key={doc.id}
-                        className="flex items-center gap-4 p-4 bg-navy border border-white/5 rounded-2xl hover:border-teal/30 transition-all"
+                        className="flex items-center gap-4 p-4 bg-forest border border-white/5 rounded-2xl hover:border-sage/30 transition-all"
                       >
-                        <div className="w-10 h-10 rounded-xl bg-teal/10 flex items-center justify-center text-teal shrink-0">
+                        <div className="w-10 h-10 rounded-xl bg-sage/10 flex items-center justify-center text-sage shrink-0">
                           <FileText size={18} />
                         </div>
                         <div className="min-w-0 flex-1">
                           <p className="text-sm font-bold text-white">
                             {doc.caption || doc.fileName || "—"}
                           </p>
-                          <p className="text-[11px] text-teal/70 font-medium mt-0.5">
+                          <p className="text-[11px] text-sage/70 font-medium mt-0.5">
                             {typeLabel(doc.documentType)}
                             {fmtSize(doc.fileSizeBytes)
                               ? ` · ${fmtSize(doc.fileSizeBytes)}`
@@ -853,7 +853,7 @@ const AdminPropertyDetail = () => {
                                   setPreviewDoc(doc.url);
                                 }
                               }}
-                              className="p-2 text-teal bg-teal/10 rounded-lg hover:bg-teal hover:text-navy transition-colors"
+                              className="p-2 text-sage bg-sage/10 rounded-lg hover:bg-sage hover:text-forest transition-colors"
                               title="View Document"
                             >
                               <Eye size={16} />
@@ -880,7 +880,7 @@ const AdminPropertyDetail = () => {
                 },
               ].filter((item) => item.link).length > 0 && (
                 <div className="space-y-3">
-                  <p className="text-[10px] font-bold text-teal uppercase tracking-widest flex items-center gap-2">
+                  <p className="text-[10px] font-bold text-sage uppercase tracking-widest flex items-center gap-2">
                     <ExternalLink size={12} /> Assignment Documents
                   </p>
                   <div className="space-y-2">
@@ -907,15 +907,15 @@ const AdminPropertyDetail = () => {
                           href={item.link}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="flex items-center gap-4 p-4 bg-teal/5 border border-teal/20 rounded-2xl hover:bg-teal/10 transition-all"
+                          className="flex items-center gap-4 p-4 bg-sage/5 border border-sage/20 rounded-2xl hover:bg-sage/10 transition-all"
                         >
-                          <div className="w-10 h-10 rounded-xl bg-teal/20 flex items-center justify-center text-teal shrink-0">
+                          <div className="w-10 h-10 rounded-xl bg-sage/20 flex items-center justify-center text-sage shrink-0">
                             <ExternalLink size={18} />
                           </div>
                           <p className="text-sm font-bold text-white flex-1">
                             {item.label}
                           </p>
-                          <Download size={16} className="text-teal shrink-0" />
+                          <Download size={16} className="text-sage shrink-0" />
                         </a>
                       ))}
                   </div>
@@ -925,9 +925,9 @@ const AdminPropertyDetail = () => {
           )}
 
           {/* 7. Agent Notes (shown to admin) */}
-          <div className="bg-navy border border-teal/10 rounded-3xl p-8">
+          <div className="bg-forest border border-sage/10 rounded-3xl p-8">
             <div className="flex items-center gap-3 mb-6">
-              <MessageSquare className="text-teal" size={24} />
+              <MessageSquare className="text-sage" size={24} />
               <h3 className="text-xl font-bold text-white">
                 Buyers Match Notes
               </h3>
@@ -946,9 +946,9 @@ const AdminPropertyDetail = () => {
           </div>
 
           {/* 8. Property Notes */}
-          <div className="bg-navy border border-teal/10 rounded-3xl p-8">
+          <div className="bg-forest border border-sage/10 rounded-3xl p-8">
             <div className="flex items-center gap-3 mb-6">
-              <FileText className="text-teal" size={24} />
+              <FileText className="text-sage" size={24} />
               <h3 className="text-xl font-bold text-white">My Notes</h3>
             </div>
             <p className="text-gray-400 leading-relaxed">
@@ -982,7 +982,7 @@ const AdminPropertyDetail = () => {
                       previewImg.caption || "image",
                     )
                   }
-                  className="p-2 text-teal bg-teal/10 rounded-xl hover:bg-teal hover:text-navy transition-colors"
+                  className="p-2 text-sage bg-sage/10 rounded-xl hover:bg-sage hover:text-forest transition-colors"
                 >
                   <Download size={18} />
                 </button>
@@ -1013,10 +1013,10 @@ const AdminPropertyDetail = () => {
             className="absolute inset-0 bg-black/80 backdrop-blur-sm"
             onClick={() => setPreviewDoc(null)}
           />
-          <div className="relative bg-navy border border-teal/30 rounded-3xl p-4 w-full max-w-5xl h-[90vh] flex flex-col shadow-2xl">
+          <div className="relative bg-forest border border-sage/30 rounded-3xl p-4 w-full max-w-5xl h-[90vh] flex flex-col shadow-2xl">
             <div className="flex justify-between items-center mb-4 px-4">
               <h3 className="text-xl font-bold text-white flex items-center gap-2">
-                <FileText className="text-teal" size={24} /> Document Preview
+                <FileText className="text-sage" size={24} /> Document Preview
               </h3>
               <button
                 onClick={() => setPreviewDoc(null)}
@@ -1040,7 +1040,7 @@ const AdminPropertyDetail = () => {
                     href={previewDoc}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="px-6 py-3 bg-teal text-navy rounded-xl font-bold mt-4"
+                    className="px-6 py-3 bg-sage text-forest rounded-xl font-bold mt-4"
                   >
                     Download PDF instead
                   </a>

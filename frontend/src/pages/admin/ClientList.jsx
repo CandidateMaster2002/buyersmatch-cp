@@ -259,14 +259,14 @@ const ClientList = () => {
       <div className="space-y-8">
         {/* Control Bar */}
         <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center justify-between">
-          <div className="bg-[#1B2A4A] p-1.5 rounded-2xl border border-white/5 flex gap-1">
+          <div className="bg-[#2D3A2E] p-1.5 rounded-2xl border border-white/5 flex gap-1">
             {tabs.map((tab) => (
               <button
                 key={tab.value}
                 onClick={() => setActiveTab(tab.value)}
                 className={`px-5 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-2 ${
                   activeTab === tab.value
-                    ? "bg-teal text-navy"
+                    ? "bg-sage text-forest"
                     : "text-gray-400 hover:text-white"
                 }`}
               >
@@ -274,7 +274,7 @@ const ClientList = () => {
                 <span
                   className={`text-[10px] px-1.5 py-0.5 rounded-full font-bold ${
                     activeTab === tab.value
-                      ? "bg-navy/30 text-navy"
+                      ? "bg-forest/30 text-forest"
                       : "bg-white/10 text-gray-500"
                   }`}
                 >
@@ -292,7 +292,7 @@ const ClientList = () => {
             <input
               type="text"
               placeholder="Search by name or email..."
-              className="w-full bg-[#1B2A4A] border border-white/5 rounded-2xl py-3 pl-11 pr-4 text-sm focus:border-teal outline-none transition-all"
+              className="w-full bg-[#2D3A2E] border border-white/5 rounded-2xl py-3 pl-11 pr-4 text-sm focus:border-sage outline-none transition-all"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -300,7 +300,7 @@ const ClientList = () => {
         </div>
 
         {/* Table */}
-        <div className="bg-[#1B2A4A] border border-white/5 rounded-3xl overflow-hidden shadow-xl">
+        <div className="bg-[#2D3A2E] border border-white/5 rounded-3xl overflow-hidden shadow-xl">
           <div className="overflow-x-auto">
             <table className="w-full text-left">
               <thead>
@@ -330,7 +330,7 @@ const ClientList = () => {
                   <tr>
                     <td colSpan="6" className="px-6 py-20 text-center">
                       <Loader2
-                        className="animate-spin text-teal mx-auto"
+                        className="animate-spin text-sage mx-auto"
                         size={32}
                       />
                     </td>
@@ -353,11 +353,11 @@ const ClientList = () => {
                       {/* Name + Contact ID */}
                       <td className="px-6 py-4 pl-8">
                         <div className="flex items-center gap-3">
-                          <div className="w-9 h-9 rounded-xl bg-teal/10 flex items-center justify-center text-teal font-bold text-sm shrink-0">
+                          <div className="w-9 h-9 rounded-xl bg-sage/10 flex items-center justify-center text-sage font-bold text-sm shrink-0">
                             {(anonymizeName(client.fullName) || "?").charAt(0)}
                           </div>
                           <div>
-                            <p className="text-sm font-bold text-white group-hover:text-teal transition-colors">
+                            <p className="text-sm font-bold text-white group-hover:text-sage transition-colors">
                               {anonymizeName(client.fullName) || "Unnamed"}
                             </p>
                             {client.zohoContactId && (
@@ -379,7 +379,7 @@ const ClientList = () => {
                       {/* Active Briefs */}
                       <td className="px-6 py-4">
                         {client.activeBriefCount > 0 ? (
-                          <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-teal/10 text-teal border border-teal/20">
+                          <span className="px-2.5 py-1 rounded-full text-xs font-bold bg-sage/10 text-sage border border-sage/20">
                             {client.activeBriefCount}
                           </span>
                         ) : (
@@ -390,7 +390,7 @@ const ClientList = () => {
                       {/* Password */}
                       <td className="px-6 py-4">
                         {client.portalUser ? (
-                          <p className="text-sm font-mono text-teal bg-teal/5 px-2 py-1 rounded inline-block">
+                          <p className="text-sm font-mono text-sage bg-sage/5 px-2 py-1 rounded inline-block">
                             {client.portalUser.password || "—"}
                           </p>
                         ) : (
@@ -409,7 +409,7 @@ const ClientList = () => {
                           /* Unboarded — onboard button */
                           <button
                             onClick={() => guard(() => openOnboardModal(client), "Onboarding clients is disabled in demo mode.")}
-                            className="flex items-center gap-2 px-4 py-2 bg-teal/10 text-teal border border-teal/30 rounded-xl text-xs font-bold hover:bg-teal hover:text-navy transition-all ml-auto"
+                            className="flex items-center gap-2 px-4 py-2 bg-sage/10 text-sage border border-sage/30 rounded-xl text-xs font-bold hover:bg-sage hover:text-forest transition-all ml-auto"
                           >
                             <UserPlus size={14} /> Onboard
                           </button>
@@ -438,7 +438,7 @@ const ClientList = () => {
                             {/* Edit credentials */}
                             <button
                               onClick={() => guard(() => openCredentialsModal(client), "Editing credentials is disabled in demo mode.")}
-                              className="p-2 bg-white/5 rounded-xl text-gray-400 hover:text-teal hover:bg-teal/10 transition-all"
+                              className="p-2 bg-white/5 rounded-xl text-gray-400 hover:text-sage hover:bg-sage/10 transition-all"
                               title="Edit credentials"
                             >
                               <Key size={16} />
@@ -447,7 +447,7 @@ const ClientList = () => {
                             {/* View properties */}
                             <Link
                               to={`/admin/client/${client.id}`}
-                              className="p-2 bg-white/5 rounded-xl text-gray-400 hover:text-teal hover:bg-teal/10 transition-all"
+                              className="p-2 bg-white/5 rounded-xl text-gray-400 hover:text-sage hover:bg-sage/10 transition-all"
                               title="View properties"
                             >
                               <ArrowRight size={16} />
@@ -471,7 +471,7 @@ const ClientList = () => {
             className="absolute inset-0 bg-black/80 backdrop-blur-sm"
             onClick={() => setShowCredentialsModal(false)}
           />
-          <div className="relative bg-[#1B2A4A] border border-teal/30 rounded-3xl p-8 max-w-md w-full shadow-2xl">
+          <div className="relative bg-[#2D3A2E] border border-sage/30 rounded-3xl p-8 max-w-md w-full shadow-2xl">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-xl font-bold text-white">Edit Credentials</h3>
               <button
@@ -501,7 +501,7 @@ const ClientList = () => {
                   <input
                     type="email"
                     required
-                    className="w-full bg-navy border border-white/10 rounded-2xl py-3 pl-11 pr-4 text-sm focus:border-teal outline-none transition-all"
+                    className="w-full bg-forest border border-white/10 rounded-2xl py-3 pl-11 pr-4 text-sm focus:border-sage outline-none transition-all"
                     value={credentialForm.email}
                     onChange={(e) =>
                       setCredentialForm({
@@ -526,7 +526,7 @@ const ClientList = () => {
                       type={showCredPwd ? "text" : "password"}
                       required
                       placeholder="Enter or generate"
-                      className="w-full bg-navy border border-white/10 rounded-2xl py-3 pl-11 pr-10 text-sm font-mono focus:border-teal outline-none transition-all"
+                      className="w-full bg-forest border border-white/10 rounded-2xl py-3 pl-11 pr-10 text-sm font-mono focus:border-sage outline-none transition-all"
                       value={credentialForm.password}
                       onChange={(e) =>
                         setCredentialForm({
@@ -538,7 +538,7 @@ const ClientList = () => {
                     <button
                       type="button"
                       onClick={() => setShowCredPwd((v) => !v)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-teal"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-sage"
                     >
                       {showCredPwd ? <EyeOff size={15} /> : <Eye size={15} />}
                     </button>
@@ -552,7 +552,7 @@ const ClientList = () => {
                       }));
                       setShowCredPwd(true);
                     }}
-                    className="px-4 py-2 bg-teal/10 text-teal border border-teal/30 rounded-xl text-xs font-bold hover:bg-teal hover:text-navy transition-all whitespace-nowrap"
+                    className="px-4 py-2 bg-sage/10 text-sage border border-sage/30 rounded-xl text-xs font-bold hover:bg-sage hover:text-forest transition-all whitespace-nowrap"
                   >
                     Generate
                   </button>
@@ -566,10 +566,10 @@ const ClientList = () => {
                     checked={credSendEmail}
                     onChange={(e) => setCredSendEmail(e.target.checked)}
                   />
-                  <div className="w-5 h-5 rounded-md border border-white/20 bg-navy peer-checked:bg-teal peer-checked:border-teal transition-all flex items-center justify-center">
+                  <div className="w-5 h-5 rounded-md border border-white/20 bg-forest peer-checked:bg-sage peer-checked:border-sage transition-all flex items-center justify-center">
                     {credSendEmail && (
                       <svg
-                        className="w-3 h-3 text-navy"
+                        className="w-3 h-3 text-forest"
                         fill="none"
                         viewBox="0 0 12 12"
                       >
@@ -594,7 +594,7 @@ const ClientList = () => {
               <button
                 type="submit"
                 disabled={updating}
-                className="w-full py-3.5 bg-teal text-navy rounded-2xl text-sm font-bold hover:bg-teal/90 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                className="w-full py-3.5 bg-sage text-forest rounded-2xl text-sm font-bold hover:bg-sage/90 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
               >
                 {updating ? (
                   <Loader2 className="animate-spin" size={18} />
@@ -614,7 +614,7 @@ const ClientList = () => {
             className="absolute inset-0 bg-black/80 backdrop-blur-sm"
             onClick={() => setShowOnboardModal(false)}
           />
-          <div className="relative bg-[#1B2A4A] border border-teal/30 rounded-3xl p-8 max-w-md w-full shadow-2xl">
+          <div className="relative bg-[#2D3A2E] border border-sage/30 rounded-3xl p-8 max-w-md w-full shadow-2xl">
             <div className="flex items-center justify-between mb-6">
               <h3 className="text-xl font-bold text-white">Onboard Client</h3>
               <button
@@ -644,7 +644,7 @@ const ClientList = () => {
                   <input
                     type="email"
                     required
-                    className="w-full bg-navy border border-white/10 rounded-2xl py-3 pl-11 pr-4 text-sm focus:border-teal outline-none transition-all"
+                    className="w-full bg-forest border border-white/10 rounded-2xl py-3 pl-11 pr-4 text-sm focus:border-sage outline-none transition-all"
                     value={onboardForm.email}
                     onChange={(e) =>
                       setOnboardForm({ ...onboardForm, email: e.target.value })
@@ -666,7 +666,7 @@ const ClientList = () => {
                       type={showOnboardPwd ? "text" : "password"}
                       required
                       placeholder="Enter or generate"
-                      className="w-full bg-navy border border-white/10 rounded-2xl py-3 pl-11 pr-10 text-sm font-mono focus:border-teal outline-none transition-all"
+                      className="w-full bg-forest border border-white/10 rounded-2xl py-3 pl-11 pr-10 text-sm font-mono focus:border-sage outline-none transition-all"
                       value={onboardForm.password}
                       onChange={(e) =>
                         setOnboardForm({
@@ -678,7 +678,7 @@ const ClientList = () => {
                     <button
                       type="button"
                       onClick={() => setShowOnboardPwd((v) => !v)}
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-teal"
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-sage"
                     >
                       {showOnboardPwd ? (
                         <EyeOff size={15} />
@@ -696,7 +696,7 @@ const ClientList = () => {
                       }));
                       setShowOnboardPwd(true);
                     }}
-                    className="px-4 py-2 bg-teal/10 text-teal border border-teal/30 rounded-xl text-xs font-bold hover:bg-teal hover:text-navy transition-all whitespace-nowrap"
+                    className="px-4 py-2 bg-sage/10 text-sage border border-sage/30 rounded-xl text-xs font-bold hover:bg-sage hover:text-forest transition-all whitespace-nowrap"
                   >
                     Generate
                   </button>
@@ -710,8 +710,8 @@ const ClientList = () => {
                     checked={onboardSendEmail}
                     onChange={e => setOnboardSendEmail(e.target.checked)}
                   />
-                  <div className="w-5 h-5 rounded-md border border-white/20 bg-navy peer-checked:bg-teal peer-checked:border-teal transition-all flex items-center justify-center">
-                    {onboardSendEmail && <svg className="w-3 h-3 text-navy" fill="none" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>}
+                  <div className="w-5 h-5 rounded-md border border-white/20 bg-forest peer-checked:bg-sage peer-checked:border-sage transition-all flex items-center justify-center">
+                    {onboardSendEmail && <svg className="w-3 h-3 text-forest" fill="none" viewBox="0 0 12 12"><path d="M2 6l3 3 5-5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/></svg>}
                   </div>
                 </div>
                 <div>
@@ -722,7 +722,7 @@ const ClientList = () => {
               <button
                 type="submit"
                 disabled={onboarding}
-                className="w-full py-3.5 bg-teal text-navy rounded-2xl text-sm font-bold hover:bg-teal/90 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
+                className="w-full py-3.5 bg-sage text-forest rounded-2xl text-sm font-bold hover:bg-sage/90 transition-all disabled:opacity-50 flex items-center justify-center gap-2"
               >
                 {onboarding ? (
                   <Loader2 className="animate-spin" size={18} />

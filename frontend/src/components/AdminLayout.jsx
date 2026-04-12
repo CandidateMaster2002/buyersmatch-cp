@@ -25,9 +25,9 @@ const AdminLayout = ({ children, title }) => {
   };
 
   return (
-    <div className="min-h-screen bg-[#0A1128] text-white font-sans flex flex-col">
+    <div className="min-h-screen bg-[#182219] text-white font-sans flex flex-col">
       {/* Header */}
-      <header className="h-20 border-b border-white/5 flex items-center justify-between px-6 lg:px-10 sticky top-0 bg-[#0A1128]/80 backdrop-blur-md z-30">
+      <header className="h-20 border-b border-white/5 flex items-center justify-between px-6 lg:px-10 sticky top-0 bg-[#182219]/80 backdrop-blur-md z-30">
         <div className="flex items-center gap-6">
           <Link
             to="/admin/clients"
@@ -40,7 +40,7 @@ const AdminLayout = ({ children, title }) => {
               className="h-10 w-auto group-hover:scale-105 transition-transform" 
             /> */}
             <div className="hidden sm:block border-l border-white/10 pl-3">
-              <p className="text-[10px] text-teal uppercase tracking-widest font-bold">
+              <p className="text-[10px] text-sage uppercase tracking-widest font-bold">
                 Admin Portal
               </p>
             </div>

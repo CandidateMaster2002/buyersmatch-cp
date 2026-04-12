@@ -190,15 +190,15 @@ export const mockDocuments = [
   { id:"pd1", propertyId:"p1", documentType:"Due Diligence Image",
     caption:"Front of property", fileExtension:"png",
     fileSize:"88 KB",
-    downloadLink:"https://placehold.co/800x500/1B2A4A/2ABFBF?text=52+Powell+St" },
+    downloadLink:"https://placehold.co/800x500/2D3A2E/52B788?text=52+Powell+St" },
   { id:"pd2", propertyId:"p1", documentType:"Due Diligence Image",
     caption:"Living room", fileExtension:"png",
     fileSize:"92 KB",
-    downloadLink:"https://placehold.co/800x500/1B2A4A/2ABFBF?text=Living+Room" },
+    downloadLink:"https://placehold.co/800x500/2D3A2E/52B788?text=Living+Room" },
   { id:"pd3", propertyId:"p2", documentType:"Due Diligence Image",
     caption:"Front exterior", fileExtension:"png",
     fileSize:"76 KB",
-    downloadLink:"https://placehold.co/800x500/1B2A4A/2ABFBF?text=41+Skottowe" },
+    downloadLink:"https://placehold.co/800x500/2D3A2E/52B788?text=41+Skottowe" },
   { id:"pd4", propertyId:"p3", documentType:"Suburb / Region Report",
     caption:"Suburb Report Portland VIC", fileExtension:"pdf",
     fileSize:"6.59 MB",
@@ -210,11 +210,11 @@ export const mockDocuments = [
   { id:"pd6", propertyId:"p7", documentType:"Due Diligence Image",
     caption:"Front View", fileExtension:"png",
     fileSize:"120 KB",
-    downloadLink:"https://placehold.co/800x500/1B2A4A/2ABFBF?text=25+Face+St" },
+    downloadLink:"https://placehold.co/800x500/2D3A2E/52B788?text=25+Face+St" },
   { id:"pd7", propertyId:"p7", documentType:"Due Diligence Image",
     caption:"Backyard", fileExtension:"png",
     fileSize:"95 KB",
-    downloadLink:"https://placehold.co/800x500/1B2A4A/2ABFBF?text=Backyard" }
+    downloadLink:"https://placehold.co/800x500/2D3A2E/52B788?text=Backyard" }
 ];
 
 export const mockUsers = [

@@ -27,8 +27,8 @@ const AdminLogin = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#0A1128] text-white p-6">
-      <div className="p-8 bg-[#1B2A4A] rounded-xl border border-gold/40 shadow-2xl w-full max-w-md backdrop-blur-sm">
+    <div className="min-h-screen flex items-center justify-center bg-[#182219] text-white p-6">
+      <div className="p-8 bg-[#2D3A2E] rounded-xl border border-gold/40 shadow-2xl w-full max-w-md backdrop-blur-sm">
         <div className="mb-8 text-center">
           <div className="w-16 h-16 bg-gold/10 border border-gold/30 rounded-2xl flex items-center justify-center mx-auto mb-4">
             <ShieldCheck size={32} className="text-gold" />
@@ -55,7 +55,7 @@ const AdminLogin = () => {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full bg-[#0A1128] border border-white/10 rounded-lg py-3 pl-11 pr-4 focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold transition-all placeholder:text-gray-600"
+                className="w-full bg-[#182219] border border-white/10 rounded-lg py-3 pl-11 pr-4 focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold transition-all placeholder:text-gray-600"
                 placeholder="admin@buyermatch.com.au"
               />
             </div>
@@ -72,7 +72,7 @@ const AdminLogin = () => {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full bg-[#0A1128] border border-white/10 rounded-lg py-3 pl-11 pr-12 focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold transition-all placeholder:text-gray-600"
+                className="w-full bg-[#182219] border border-white/10 rounded-lg py-3 pl-11 pr-12 focus:outline-none focus:ring-2 focus:ring-gold/50 focus:border-gold transition-all placeholder:text-gray-600"
                 placeholder="••••••••"
               />
               <button
@@ -88,18 +88,13 @@ const AdminLogin = () => {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-gold hover:bg-gold/90 text-navy font-bold py-3 rounded-lg transition-all shadow-lg shadow-gold/20 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
+            className="w-full bg-gold hover:bg-gold/90 text-forest font-bold py-3 rounded-lg transition-all shadow-lg shadow-gold/20 flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-not-allowed"
           >
             {loading ? <Loader2 className="animate-spin" size={20} /> : 'Login as Admin'}
           </button>
         </form>
 
-        <div className="mt-8 pt-6 border-t border-white/5 text-center space-y-2">
-          <Link to="/login" className="text-xs text-gray-500 hover:text-teal transition-colors">
-            ← Back to Client Login
-          </Link>
-          <p className="text-xs text-gray-600">Secure Admin Access • Buyers Match</p>
-        </div>
+      
       </div>
     </div>
   );

@@ -72,19 +72,19 @@ const Profile = () => {
     return (
       <Layout title="My Profile">
         <div className="flex flex-col items-center justify-center min-h-[60vh]">
-          <Loader2 className="animate-spin text-teal mb-4" size={48} />
+          <Loader2 className="animate-spin text-sage mb-4" size={48} />
         </div>
       </Layout>
     );
   }
 
   const DetailRow = ({ label, value, icon: Icon }) => (
-    <div className="flex items-start gap-4 py-4 border-b border-teal/10 last:border-0">
-      <div className="mt-1 text-teal">
+    <div className="flex items-start gap-4 py-4 border-b border-sage/10 last:border-0">
+      <div className="mt-1 text-sage">
         <Icon size={18} />
       </div>
       <div>
-        <p className="text-[10px] uppercase tracking-widest text-teal font-bold mb-1">{label}</p>
+        <p className="text-[10px] uppercase tracking-widest text-sage font-bold mb-1">{label}</p>
         <p className="text-white font-medium">{value || 'N/A'}</p>
       </div>
     </div>
@@ -99,7 +99,7 @@ const Profile = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
         <Link 
           to="/dashboard" 
-          className="flex items-center gap-2 text-teal hover:text-white transition-colors font-bold uppercase tracking-widest text-xs"
+          className="flex items-center gap-2 text-sage hover:text-white transition-colors font-bold uppercase tracking-widest text-xs"
         >
           <ArrowLeft size={16} />
           Back to Properties
@@ -117,7 +117,7 @@ const Profile = () => {
       <div className="flex flex-col items-center gap-8 pb-20 max-w-2xl mx-auto">
 
         {/* Personal Details Card */}
-        <div className="bg-navy border border-teal/20 rounded-2xl p-8 shadow-xl w-full">
+        <div className="bg-forest border border-sage/20 rounded-2xl p-8 shadow-xl w-full">
           <div className="flex items-center gap-3 mb-8">
             <div className="w-10 h-10 bg-gold/10 rounded-lg flex items-center justify-center text-gold">
               <User size={24} />
@@ -139,18 +139,18 @@ const Profile = () => {
 
         {/* Buyer Brief Card */}
         {brief && (
-          <div className="bg-navy border border-teal/20 rounded-2xl p-8 shadow-xl w-full">
+          <div className="bg-forest border border-sage/20 rounded-2xl p-8 shadow-xl w-full">
             <div className="flex items-center gap-3 mb-2">
-              <div className="w-10 h-10 bg-teal/10 rounded-lg flex items-center justify-center text-teal">
+              <div className="w-10 h-10 bg-sage/10 rounded-lg flex items-center justify-center text-sage">
                 <Briefcase size={24} />
               </div>
-              <h2 className="text-xl font-bold text-teal uppercase tracking-widest">Buyer Brief</h2>
+              <h2 className="text-xl font-bold text-sage uppercase tracking-widest">Buyer Brief</h2>
             </div>
 
             {/* Status & Priority badges */}
             <div className="flex flex-wrap gap-2 mb-6">
               {brief.status && (
-                <span className="px-3 py-1 text-xs font-bold rounded-full bg-teal/10 border border-teal/30 text-teal uppercase tracking-widest">
+                <span className="px-3 py-1 text-xs font-bold rounded-full bg-sage/10 border border-sage/30 text-sage uppercase tracking-widest">
                   {brief.status}
                 </span>
               )}
@@ -172,7 +172,7 @@ const Profile = () => {
             </div>
 
             {/* Budget Section */}
-            <p className="text-[10px] uppercase tracking-widest text-teal font-bold mb-3 flex items-center gap-2">
+            <p className="text-[10px] uppercase tracking-widest text-sage font-bold mb-3 flex items-center gap-2">
               <Wallet size={12} /> Budget & Finance
             </p>
             <div className="grid grid-cols-2 gap-3 mb-6">
@@ -196,7 +196,7 @@ const Profile = () => {
             </div>
 
             {/* Property Preferences */}
-            <p className="text-[10px] uppercase tracking-widest text-teal font-bold mb-3 flex items-center gap-2">
+            <p className="text-[10px] uppercase tracking-widest text-sage font-bold mb-3 flex items-center gap-2">
               <Home size={12} /> Property Preferences
             </p>
             <div className="space-y-1 mb-6">
@@ -211,12 +211,12 @@ const Profile = () => {
             {/* Assigned Agents */}
             {brief.assignedAgents?.length > 0 && (
               <>
-                <p className="text-[10px] uppercase tracking-widest text-teal font-bold mb-3 flex items-center gap-2">
+                <p className="text-[10px] uppercase tracking-widest text-sage font-bold mb-3 flex items-center gap-2">
                   <Users size={12} /> Assigned Agents
                 </p>
                 <div className="flex flex-wrap gap-2 mb-6">
                   {brief.assignedAgents.map(agent => (
-                    <span key={agent} className="px-4 py-2 text-sm font-bold rounded-xl bg-teal/10 border border-teal/20 text-teal">
+                    <span key={agent} className="px-4 py-2 text-sm font-bold rounded-xl bg-sage/10 border border-sage/20 text-sage">
                       {agent}
                     </span>
                   ))}
@@ -227,10 +227,10 @@ const Profile = () => {
             {/* Buyer Match Notes */}
             {brief.buyerMatchNotes && (
               <>
-                <p className="text-[10px] uppercase tracking-widest text-teal font-bold mb-3 flex items-center gap-2">
+                <p className="text-[10px] uppercase tracking-widest text-sage font-bold mb-3 flex items-center gap-2">
                   <FileText size={12} /> Buyers Match Notes
                 </p>
-                <div className="p-5 bg-teal/5 border border-teal/20 rounded-2xl">
+                <div className="p-5 bg-sage/5 border border-sage/20 rounded-2xl">
                   <p className="text-gray-300 text-sm leading-relaxed whitespace-pre-wrap">{brief.buyerMatchNotes}</p>
                 </div>
               </>

@@ -69,7 +69,7 @@ const Responses = () => {
             <input 
               type="text" 
               placeholder="Search by name or address..." 
-              className="w-full bg-[#1B2A4A] border border-white/5 rounded-2xl py-3 pl-12 pr-4 text-sm focus:border-teal outline-none transition-all"
+              className="w-full bg-[#2D3A2E] border border-white/5 rounded-2xl py-3 pl-12 pr-4 text-sm focus:border-sage outline-none transition-all"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -79,7 +79,7 @@ const Responses = () => {
               <button 
                 key={f.value}
                 onClick={() => setActiveFilter(f.value)}
-                className={`px-6 py-3 rounded-2xl text-sm font-bold transition-all whitespace-nowrap ${activeFilter === f.value ? 'bg-teal text-navy' : 'bg-[#1B2A4A] border border-white/5 text-gray-400 hover:text-white'}`}
+                className={`px-6 py-3 rounded-2xl text-sm font-bold transition-all whitespace-nowrap ${activeFilter === f.value ? 'bg-sage text-forest' : 'bg-[#2D3A2E] border border-white/5 text-gray-400 hover:text-white'}`}
               >
                 {f.label}
               </button>
@@ -91,22 +91,22 @@ const Responses = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {loading ? (
             <div className="col-span-full py-20 text-center">
-              <Loader2 className="animate-spin text-teal mx-auto" size={32} />
+              <Loader2 className="animate-spin text-sage mx-auto" size={32} />
             </div>
           ) : filteredResponses.length === 0 ? (
             <div className="col-span-full py-20 text-center text-gray-500 italic">
               No responses found matching your search.
             </div>
           ) : filteredResponses.map((res) => (
-            <div key={res.id} className="bg-[#1B2A4A] border border-white/5 rounded-3xl overflow-hidden group hover:border-teal/30 transition-all">
+            <div key={res.id} className="bg-[#2D3A2E] border border-white/5 rounded-3xl overflow-hidden group hover:border-sage/30 transition-all">
               <div className="p-6 space-y-6">
                 <div className="flex justify-between items-start">
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-full bg-teal/20 flex items-center justify-center text-teal font-bold">
+                    <div className="w-10 h-10 rounded-full bg-sage/20 flex items-center justify-center text-sage font-bold">
                       {res.client?.fullName.charAt(0)}
                     </div>
                     <div>
-                      <p className="text-sm font-bold text-white group-hover:text-teal transition-colors">{res.client?.fullName}</p>
+                      <p className="text-sm font-bold text-white group-hover:text-sage transition-colors">{res.client?.fullName}</p>
                       <p className="text-[10px] text-gray-500 uppercase tracking-widest font-bold">Onboarded</p>
                     </div>
                   </div>
@@ -114,7 +114,7 @@ const Responses = () => {
                     res.portalStatus === 'ACCEPTED' ? 'bg-green-500/10 text-green-400 border-green-500/20' :
                     res.portalStatus === 'REJECTED' ? 'bg-red-500/10 text-red-400 border-red-500/20' :
                     res.portalStatus === 'PURCHASED' ? 'bg-gold/10 text-gold border-gold/20' :
-                    'bg-blue-500/10 text-blue-400 border-blue-500/20'
+                    'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
                   }`}>
                     {res.portalStatus}
                   </span>
@@ -124,7 +124,7 @@ const Responses = () => {
                   <div className="flex items-center gap-3">
                     <div className="w-12 h-12 rounded-xl overflow-hidden flex-shrink-0">
                       <img 
-                        src={`https://placehold.co/200x150/1B2A4A/2ABFBF?text=${res.property?.addressLine1}`} 
+                        src={`https://placehold.co/200x150/2D3A2E/52B788?text=${res.property?.addressLine1}`} 
                         alt="Prop" 
                         className="w-full h-full object-cover"
                         referrerPolicy="no-referrer"
@@ -138,12 +138,12 @@ const Responses = () => {
 
                   <div className="flex items-center justify-between pt-4 border-t border-white/5">
                     <div className="flex items-center gap-2 text-xs text-gray-500">
-                      <Calendar size={14} className="text-teal" />
+                      <Calendar size={14} className="text-sage" />
                       {new Date(res.assignedAt).toLocaleDateString()}
                     </div>
                     <Link 
                       to={`/admin/client/${res.client?.id}`}
-                      className="text-teal text-xs font-bold hover:underline flex items-center gap-1"
+                      className="text-sage text-xs font-bold hover:underline flex items-center gap-1"
                     >
                       Manage <ArrowRight size={12} />
                     </Link>

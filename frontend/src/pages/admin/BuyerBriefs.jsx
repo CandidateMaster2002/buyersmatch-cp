@@ -45,7 +45,7 @@ const OnboardModal = ({ brief, onClose, onSuccess }) => {
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
       <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" onClick={onClose} />
-      <div className="relative bg-[#1B2A4A] border border-teal/30 rounded-3xl p-8 max-w-md w-full shadow-2xl">
+      <div className="relative bg-[#2D3A2E] border border-sage/30 rounded-3xl p-8 max-w-md w-full shadow-2xl">
 
         {/* Header */}
         <div className="flex items-center justify-between mb-6">
@@ -65,14 +65,14 @@ const OnboardModal = ({ brief, onClose, onSuccess }) => {
               <CheckCircle2 size={32} className="text-green-400" />
             </div>
             <p className="text-white font-bold">Client Onboarded Successfully!</p>
-            <div className="bg-[#0A1128] border border-white/10 rounded-xl p-4 text-left space-y-2 text-sm">
+            <div className="bg-[#182219] border border-white/10 rounded-xl p-4 text-left space-y-2 text-sm">
               <div className="flex justify-between">
                 <span className="text-gray-400">Login Email</span>
                 <span className="text-white font-mono">{result.loginEmail || loginEmail}</span>
               </div>
               <div className="flex justify-between">
                 <span className="text-gray-400">Password</span>
-                <span className="text-teal font-mono font-bold">{password}</span>
+                <span className="text-sage font-mono font-bold">{password}</span>
               </div>
             </div>
             <p className="text-xs text-yellow-400/80">
@@ -80,7 +80,7 @@ const OnboardModal = ({ brief, onClose, onSuccess }) => {
             </p>
             <button
               onClick={onClose}
-              className="w-full py-3 bg-teal text-navy font-bold rounded-2xl hover:bg-teal/90 transition-all"
+              className="w-full py-3 bg-sage text-forest font-bold rounded-2xl hover:bg-sage/90 transition-all"
             >
               Done
             </button>
@@ -97,13 +97,13 @@ const OnboardModal = ({ brief, onClose, onSuccess }) => {
             <div className="space-y-2">
               <label className="text-xs font-bold text-gray-400 uppercase tracking-widest">Login Email</label>
               <div className="relative group">
-                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-teal" size={16} />
+                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-sage" size={16} />
                 <input
                   type="email"
                   required
                   value={loginEmail}
                   onChange={e => setLoginEmail(e.target.value)}
-                  className="w-full bg-[#0A1128] border border-white/10 rounded-xl py-3 pl-10 pr-4 text-sm focus:border-teal outline-none transition-all"
+                  className="w-full bg-[#182219] border border-white/10 rounded-xl py-3 pl-10 pr-4 text-sm focus:border-sage outline-none transition-all"
                   placeholder="client@example.com"
                 />
               </div>
@@ -114,19 +114,19 @@ const OnboardModal = ({ brief, onClose, onSuccess }) => {
               <label className="text-xs font-bold text-gray-400 uppercase tracking-widest">Password</label>
               <div className="flex gap-2">
                 <div className="relative group flex-1">
-                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-teal" size={16} />
+                  <Lock className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-500 group-focus-within:text-sage" size={16} />
                   <input
                     type={showPassword ? 'text' : 'password'}
                     required
                     value={password}
                     onChange={e => setPassword(e.target.value)}
-                    className="w-full bg-[#0A1128] border border-white/10 rounded-xl py-3 pl-10 pr-12 text-sm focus:border-teal outline-none transition-all font-mono"
+                    className="w-full bg-[#182219] border border-white/10 rounded-xl py-3 pl-10 pr-12 text-sm focus:border-sage outline-none transition-all font-mono"
                     placeholder="Enter or generate"
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-teal"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-500 hover:text-sage"
                   >
                     {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
                   </button>
@@ -134,7 +134,7 @@ const OnboardModal = ({ brief, onClose, onSuccess }) => {
                 <button
                   type="button"
                   onClick={() => { setPassword(generatePassword()); setShowPassword(true); }}
-                  className="px-4 py-3 bg-teal/10 border border-teal/30 text-teal text-xs font-bold rounded-xl hover:bg-teal/20 transition-all whitespace-nowrap flex items-center gap-1.5"
+                  className="px-4 py-3 bg-sage/10 border border-sage/30 text-sage text-xs font-bold rounded-xl hover:bg-sage/20 transition-all whitespace-nowrap flex items-center gap-1.5"
                 >
                   <RefreshCw size={13} /> Generate
                 </button>
@@ -153,7 +153,7 @@ const OnboardModal = ({ brief, onClose, onSuccess }) => {
               <button
                 type="submit"
                 disabled={loading}
-                className="flex-1 flex items-center justify-center gap-2 py-3 bg-teal text-navy rounded-2xl text-sm font-bold hover:bg-teal/90 transition-all disabled:opacity-60"
+                className="flex-1 flex items-center justify-center gap-2 py-3 bg-sage text-forest rounded-2xl text-sm font-bold hover:bg-sage/90 transition-all disabled:opacity-60"
               >
                 {loading ? <Loader2 className="animate-spin" size={16} /> : <UserPlus size={16} />}
                 Onboard
@@ -232,7 +232,7 @@ const Buyers = () => {
         {/* Stats Row */}
         <div className="grid grid-cols-3 gap-4">
           {[
-            { label: 'Total Clients', value: counts.total, color: 'text-teal', bg: 'bg-teal/10 border-teal/20' },
+            { label: 'Total Clients', value: counts.total, color: 'text-sage', bg: 'bg-sage/10 border-sage/20' },
             { label: 'Onboarded', value: counts.onboarded, color: 'text-green-400', bg: 'bg-green-500/10 border-green-500/20' },
             { label: 'Not Onboarded', value: counts.notOnboarded, color: 'text-yellow-400', bg: 'bg-yellow-500/10 border-yellow-500/20' },
           ].map(s => (
@@ -250,7 +250,7 @@ const Buyers = () => {
             <input
               type="text"
               placeholder="Search by name, email or Zoho ID..."
-              className="w-full bg-[#1B2A4A] border border-white/5 rounded-2xl py-3 pl-12 pr-4 text-sm focus:border-teal outline-none transition-all"
+              className="w-full bg-[#2D3A2E] border border-white/5 rounded-2xl py-3 pl-12 pr-4 text-sm focus:border-sage outline-none transition-all"
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
             />
@@ -262,12 +262,12 @@ const Buyers = () => {
                 onClick={() => setActiveFilter(f.value)}
                 className={`px-4 py-2.5 rounded-2xl text-xs font-bold transition-all whitespace-nowrap flex items-center gap-1.5 ${
                   activeFilter === f.value
-                    ? 'bg-teal text-navy'
-                    : 'bg-[#1B2A4A] border border-white/5 text-gray-400 hover:text-white'
+                    ? 'bg-sage text-forest'
+                    : 'bg-[#2D3A2E] border border-white/5 text-gray-400 hover:text-white'
                 }`}
               >
                 {f.label}
-                <span className={`px-1.5 py-0.5 rounded-full text-[10px] ${activeFilter === f.value ? 'bg-navy/30' : 'bg-white/10'}`}>
+                <span className={`px-1.5 py-0.5 rounded-full text-[10px] ${activeFilter === f.value ? 'bg-forest/30' : 'bg-white/10'}`}>
                   {f.count}
                 </span>
               </button>
@@ -278,12 +278,12 @@ const Buyers = () => {
         {/* Buyer List View */}
         {loading ? (
           <div className="flex items-center justify-center py-24">
-            <Loader2 className="animate-spin text-teal" size={40} />
+            <Loader2 className="animate-spin text-sage" size={40} />
           </div>
         ) : filtered.length === 0 ? (
           <div className="py-24 text-center text-gray-500 italic">No clients found.</div>
         ) : (
-          <div className="bg-[#1B2A4A] border border-white/5 rounded-3xl overflow-hidden">
+          <div className="bg-[#2D3A2E] border border-white/5 rounded-3xl overflow-hidden">
             <table className="w-full text-left border-collapse">
               <thead>
                 <tr className="border-b border-white/5 bg-white/5">
@@ -311,7 +311,7 @@ const Buyers = () => {
                         </span>
                       </td>
                       <td className="p-4">
-                        <span className="text-xs font-mono text-gray-500 group-hover:text-teal/70 transition-colors">
+                        <span className="text-xs font-mono text-gray-500 group-hover:text-sage/70 transition-colors">
                           {buyer.zohoContactId || 'NOT LINKED'}
                         </span>
                       </td>
@@ -333,7 +333,7 @@ const Buyers = () => {
                         ) : (
                           <button
                             onClick={() => setSelectedBuyer(buyer)}
-                            className="inline-flex items-center gap-2 px-4 py-2 bg-teal/10 border border-teal/30 text-teal rounded-xl text-xs font-bold hover:bg-teal hover:text-navy transition-all"
+                            className="inline-flex items-center gap-2 px-4 py-2 bg-sage/10 border border-sage/30 text-sage rounded-xl text-xs font-bold hover:bg-sage hover:text-forest transition-all"
                           >
                             <UserPlus size={14} />
                             Onboard

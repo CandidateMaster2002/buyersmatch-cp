@@ -1,7 +1,15 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { login, adminLogin } from "../api/client";
-import { Mail, Lock, Loader2, Eye, EyeOff, User, ShieldCheck } from "lucide-react";
+import {
+  Mail,
+  Lock,
+  Loader2,
+  Eye,
+  EyeOff,
+  User,
+  ShieldCheck,
+} from "lucide-react";
 import { isDemoMode, BRAND } from "../config/brand";
 
 const DEMO_CREDENTIALS = [
@@ -67,14 +75,23 @@ const Login = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-navy text-white p-6">
+    <div className="min-h-screen flex items-center justify-center bg-forest text-white p-6">
       <div className="w-full max-w-md space-y-4">
-        <div className="p-8 bg-[#24355A] rounded-xl border shadow-2xl backdrop-blur-sm" style={{ borderColor: BRAND.primary + '4D' }}>
+        <div
+          className="p-8 bg-[#2D3A2E] rounded-xl border shadow-2xl backdrop-blur-sm"
+          style={{ borderColor: BRAND.primary + "4D" }}
+        >
           <div className="mb-8 text-center">
-            <h1 className="text-4xl font-bold mb-1 tracking-tight" style={{ color: BRAND.primary }}>
+            <h1
+              className="text-4xl font-bold mb-1 tracking-tight"
+              style={{ color: BRAND.primary }}
+            >
               {BRAND.name}
             </h1>
-            <p className="font-medium uppercase tracking-widest text-sm" style={{ color: BRAND.accent }}>
+            <p
+              className="font-medium uppercase tracking-widest text-sm"
+              style={{ color: BRAND.accent }}
+            >
               {BRAND.tagline}
             </p>
           </div>
@@ -99,7 +116,7 @@ const Login = () => {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full bg-navy border border-white/10 rounded-lg py-3 pl-11 pr-4 focus:outline-none focus:ring-2 focus:border-teal transition-all placeholder:text-gray-600"
+                  className="w-full bg-forest border border-white/10 rounded-lg py-3 pl-11 pr-4 focus:outline-none focus:ring-2 focus:border-sage transition-all placeholder:text-gray-600"
                   placeholder="name@example.com"
                 />
               </div>
@@ -118,13 +135,13 @@ const Login = () => {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full bg-navy border border-white/10 rounded-lg py-3 pl-11 pr-12 focus:outline-none focus:ring-2 focus:border-teal transition-all placeholder:text-gray-600"
+                  className="w-full bg-forest border border-white/10 rounded-lg py-3 pl-11 pr-12 focus:outline-none focus:ring-2 focus:border-sage transition-all placeholder:text-gray-600"
                   placeholder="••••••••"
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-500 hover:text-teal transition-colors"
+                  className="absolute inset-y-0 right-0 pr-4 flex items-center text-gray-500 hover:text-sage transition-colors"
                 >
                   {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
@@ -141,7 +158,11 @@ const Login = () => {
                 boxShadow: `0 4px 20px ${BRAND.primary}33`,
               }}
             >
-              {loading ? <Loader2 className="animate-spin" size={20} /> : "Login"}
+              {loading ? (
+                <Loader2 className="animate-spin" size={20} />
+              ) : (
+                "Login"
+              )}
             </button>
           </form>
 
@@ -154,7 +175,10 @@ const Login = () => {
 
         {isDemoMode && (
           <div className="space-y-3">
-            <p className="text-center text-xs font-bold uppercase tracking-widest" style={{ color: BRAND.primary + 'CC' }}>
+            <p
+              className="text-center text-xs font-bold uppercase tracking-widest"
+              style={{ color: BRAND.primary + "CC" }}
+            >
               Demo Access
             </p>
             <div className="grid grid-cols-2 gap-3">
@@ -162,7 +186,7 @@ const Login = () => {
                 const Icon = cred.icon;
                 const isThisLoading = demoLoading === cred.action;
                 const isAdminCred = cred.action === "admin";
-                const borderColor = isAdminCred ? '#D4A843' : BRAND.primary;
+                const borderColor = isAdminCred ? "#D4A843" : BRAND.primary;
                 return (
                   <button
                     key={cred.action}
@@ -170,22 +194,48 @@ const Login = () => {
                     disabled={demoLoading !== null || loading}
                     onClick={() => handleDemoLogin(cred)}
                     className="text-left rounded-xl border-2 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
-                    style={{ borderColor: borderColor + '60', background: borderColor + '0D' }}
-                    onMouseEnter={e => { if (!demoLoading && !loading) e.currentTarget.style.borderColor = borderColor; }}
-                    onMouseLeave={e => { e.currentTarget.style.borderColor = borderColor + '60'; }}
+                    style={{
+                      borderColor: borderColor + "60",
+                      background: borderColor + "0D",
+                    }}
+                    onMouseEnter={(e) => {
+                      if (!demoLoading && !loading)
+                        e.currentTarget.style.borderColor = borderColor;
+                    }}
+                    onMouseLeave={(e) => {
+                      e.currentTarget.style.borderColor = borderColor + "60";
+                    }}
                   >
                     <div className="px-4 py-4">
-                      <div className="flex items-center justify-center w-9 h-9 rounded-lg mb-3" style={{ background: borderColor + '1A' }}>
-                        {isThisLoading
-                          ? <Loader2 size={18} className="animate-spin" style={{ color: borderColor }} />
-                          : <Icon size={18} style={{ color: borderColor }} />
-                        }
+                      <div
+                        className="flex items-center justify-center w-9 h-9 rounded-lg mb-3"
+                        style={{ background: borderColor + "1A" }}
+                      >
+                        {isThisLoading ? (
+                          <Loader2
+                            size={18}
+                            className="animate-spin"
+                            style={{ color: borderColor }}
+                          />
+                        ) : (
+                          <Icon size={18} style={{ color: borderColor }} />
+                        )}
                       </div>
-                      <p className="text-sm font-bold text-white leading-snug">{cred.label}</p>
-                      <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded mt-1 inline-block" style={{ color: borderColor, background: borderColor + '1A' }}>
+                      <p className="text-sm font-bold text-white leading-snug">
+                        {cred.label}
+                      </p>
+                      <span
+                        className="text-[10px] font-semibold px-1.5 py-0.5 rounded mt-1 inline-block"
+                        style={{
+                          color: borderColor,
+                          background: borderColor + "1A",
+                        }}
+                      >
                         {cred.role}
                       </span>
-                      <p className="text-[10px] text-gray-500 mt-1.5 font-mono truncate">{cred.email}</p>
+                      <p className="text-[10px] text-gray-500 mt-1.5 font-mono truncate">
+                        {cred.email}
+                      </p>
                     </div>
                   </button>
                 );

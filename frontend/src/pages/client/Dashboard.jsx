@@ -51,10 +51,10 @@ const ComparisonModal = ({ properties, onClose }) => {
         className="absolute inset-0 bg-black/80 backdrop-blur-sm"
         onClick={onClose}
       ></div>
-      <div className="relative bg-navy border border-teal/30 rounded-3xl w-full max-w-6xl max-h-[90vh] overflow-hidden shadow-2xl flex flex-col">
-        <div className="p-4 md:p-6 border-b border-teal/20 flex items-center justify-between bg-navy/50 backdrop-blur-md">
+      <div className="relative bg-forest border border-sage/30 rounded-3xl w-full max-w-6xl max-h-[90vh] overflow-hidden shadow-2xl flex flex-col">
+        <div className="p-4 md:p-6 border-b border-sage/20 flex items-center justify-between bg-forest/50 backdrop-blur-md">
           <div className="flex items-center gap-3">
-            <Scale className="text-teal" size={20} />
+            <Scale className="text-sage" size={20} />
             <h2 className="text-lg md:text-2xl font-bold text-white">
               Property Comparison
             </h2>
@@ -103,11 +103,11 @@ const ComparisonModal = ({ properties, onClose }) => {
             {/* Property Columns */}
             {properties.map((item) => (
               <div key={item.id} className="space-y-3 md:space-y-4">
-                <div className="h-[120px] md:h-[180px] rounded-xl md:rounded-2xl overflow-hidden border border-teal/20 mb-2 md:mb-4">
+                <div className="h-[120px] md:h-[180px] rounded-xl md:rounded-2xl overflow-hidden border border-sage/20 mb-2 md:mb-4">
                   <img
                     src={
                       item.firstImage ||
-                      `https://placehold.co/400x300/1B2A4A/2ABFBF?text=IMG`
+                      `https://placehold.co/400x300/2D3A2E/52B788?text=IMG`
                     }
                     className="w-full h-full object-cover"
                     referrerPolicy="no-referrer"
@@ -120,7 +120,7 @@ const ComparisonModal = ({ properties, onClose }) => {
                   ${item.property.askingPriceMin / 1000}k - $
                   {item.property.askingPriceMax / 1000}k
                 </div>
-                <div className="h-10 md:h-12 flex items-center text-xs md:text-sm font-bold text-teal px-1 md:px-2">
+                <div className="h-10 md:h-12 flex items-center text-xs md:text-sm font-bold text-sage px-1 md:px-2">
                   {item.property.yieldPercent}%
                 </div>
                 <div className="h-10 md:h-12 flex items-center text-xs md:text-sm text-gray-300 px-1 md:px-2">
@@ -139,7 +139,7 @@ const ComparisonModal = ({ properties, onClose }) => {
                   {item.property.yearBuilt || "N/A"}
                 </div>
                 <div className="h-10 md:h-12 flex items-center px-1 md:px-2">
-                  <span className="px-2 py-0.5 md:py-1 rounded-full text-[8px] md:text-[10px] font-bold uppercase tracking-wider bg-teal/10 text-teal border border-teal/30">
+                  <span className="px-2 py-0.5 md:py-1 rounded-full text-[8px] md:text-[10px] font-bold uppercase tracking-wider bg-sage/10 text-sage border border-sage/30">
                     {item.portalStatus}
                   </span>
                 </div>
@@ -162,10 +162,10 @@ const fmtArr = (arr) =>
   Array.isArray(arr) && arr.length > 0 ? arr.join(", ") : "—";
 
 const BriefSection = ({ icon: Icon, label, children }) => (
-  <div className="bg-navy border border-white/5 rounded-2xl overflow-hidden">
+  <div className="bg-forest border border-white/5 rounded-2xl overflow-hidden">
     <div className="px-6 py-4 bg-white/[0.03] border-b border-white/5 flex items-center gap-2">
-      <Icon size={15} className="text-teal" />
-      <p className="text-[11px] font-bold text-teal uppercase tracking-widest">
+      <Icon size={15} className="text-sage" />
+      <p className="text-[11px] font-bold text-sage uppercase tracking-widest">
         {label}
       </p>
     </div>
@@ -181,7 +181,7 @@ const BriefField = ({ label, value, highlight }) => (
       {label}
     </p>
     <p
-      className={`text-sm font-semibold ${highlight ? "text-teal" : "text-white"}`}
+      className={`text-sm font-semibold ${highlight ? "text-sage" : "text-white"}`}
     >
       {value}
     </p>
@@ -223,7 +223,7 @@ const BuyerBriefView = ({ brief }) => {
           <span
             className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border ${
               brief.status?.toLowerCase()?.includes("confirmed") || brief.status?.toLowerCase() === "active"
-                ? "bg-teal/10 border-teal/30 text-teal"
+                ? "bg-sage/10 border-sage/30 text-sage"
                 : "bg-white/5 border-white/10 text-gray-400"
             }`}
           >
@@ -308,8 +308,8 @@ const BuyerBriefView = ({ brief }) => {
           <div className="flex items-center gap-1.5 mt-0.5">
             {brief.preApproved === true ? (
               <>
-                <CheckCircle2 size={14} className="text-teal" />
-                <span className="text-sm font-semibold text-teal">Yes</span>
+                <CheckCircle2 size={14} className="text-sage" />
+                <span className="text-sm font-semibold text-sage">Yes</span>
               </>
             ) : brief.preApproved === false ? (
               <>
@@ -332,7 +332,7 @@ const BuyerBriefView = ({ brief }) => {
               {brief.assignedAgents.map((agent, i) => (
                 <span
                   key={i}
-                  className="px-3 py-1.5 bg-teal/10 border border-teal/20 text-teal text-xs font-semibold rounded-xl"
+                  className="px-3 py-1.5 bg-sage/10 border border-sage/20 text-sage text-xs font-semibold rounded-xl"
                 >
                   {agent}
                 </span>
@@ -343,10 +343,10 @@ const BuyerBriefView = ({ brief }) => {
 
       {/* Buyers Match Notes */}
       {brief.buyerMatchNotes && (
-        <div className="bg-navy border border-white/5 rounded-2xl overflow-hidden">
+        <div className="bg-forest border border-white/5 rounded-2xl overflow-hidden">
           <div className="px-6 py-4 bg-white/[0.03] border-b border-white/5 flex items-center gap-2">
-            <MessageSquare size={15} className="text-teal" />
-            <p className="text-[11px] font-bold text-teal uppercase tracking-widest">
+            <MessageSquare size={15} className="text-sage" />
+            <p className="text-[11px] font-bold text-sage uppercase tracking-widest">
               Buyers Match Notes
             </p>
           </div>
@@ -359,7 +359,7 @@ const BuyerBriefView = ({ brief }) => {
       )}
 
       {/* My Notes */}
-      <div className="bg-navy border border-white/5 rounded-2xl overflow-hidden">
+      <div className="bg-forest border border-white/5 rounded-2xl overflow-hidden">
         <div className="px-6 py-4 bg-white/[0.03] border-b border-white/5 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Pencil size={15} className="text-gold" />
@@ -371,7 +371,7 @@ const BuyerBriefView = ({ brief }) => {
             onClick={handleSaveNotes}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[11px] font-bold transition-all ${
               saved
-                ? "bg-teal/20 text-teal border border-teal/30"
+                ? "bg-sage/20 text-sage border border-sage/30"
                 : "bg-white/5 text-gray-400 hover:text-white hover:bg-white/10 border border-white/10"
             }`}
           >
@@ -385,7 +385,7 @@ const BuyerBriefView = ({ brief }) => {
             onChange={(e) => setMyNotes(e.target.value)}
             placeholder="Add your personal notes about this brief — goals, preferences, things to remember..."
             rows={5}
-            className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-teal/40 focus:bg-white/[0.05] transition-all resize-none"
+            className="w-full bg-white/[0.03] border border-white/10 rounded-xl px-4 py-3 text-sm text-white placeholder:text-gray-600 focus:outline-none focus:border-sage/40 focus:bg-white/[0.05] transition-all resize-none"
           />
           <p className="text-[10px] text-gray-600 mt-2">
             Notes are saved locally on this device.
@@ -515,15 +515,15 @@ const Dashboard = () => {
 
   const getStatusBadge = (item) => {
     if (isPurchasedItem(item))
-      return { cls: "bg-gold text-navy", label: "PURCHASED" };
+      return { cls: "bg-gold text-forest", label: "PURCHASED" };
     switch (item.portalStatus) {
       case "ACCEPTED":
-        return { cls: "bg-teal text-navy", label: "ACCEPTED" };
+        return { cls: "bg-sage text-forest", label: "ACCEPTED" };
       case "REJECTED":
         return { cls: "bg-red-500 text-white", label: "REJECTED" };
       case "PENDING":
         return {
-          cls: "bg-blue-500/20 text-blue-300 border border-blue-500/30",
+          cls: "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30",
           label: "ASSIGNED",
         };
       default:
@@ -563,7 +563,7 @@ const Dashboard = () => {
     return (
       <Layout title="Dashboard">
         <div className="flex flex-col items-center justify-center min-h-[60vh]">
-          <Loader2 className="animate-spin text-teal mb-4" size={48} />
+          <Loader2 className="animate-spin text-sage mb-4" size={48} />
           <p className="text-gray-400 animate-pulse">
             Loading your dashboard...
           </p>
@@ -575,10 +575,10 @@ const Dashboard = () => {
   return (
     <Layout title="Dashboard">
       {/* Welcome Banner */}
-      <div className="bg-teal/10 border border-teal/30 rounded-2xl p-6 lg:p-8 mb-8">
+      <div className="bg-sage/10 border border-sage/30 rounded-2xl p-6 lg:p-8 mb-8">
         <h1 className="text-3xl font-bold text-white mb-1">
           Welcome back,{" "}
-          <span className="text-teal">
+          <span className="text-sage">
             {anonymizeGreeting(user?.greetingName) ||
               anonymizeName(user?.fullName) ||
               "Client"}
@@ -590,7 +590,7 @@ const Dashboard = () => {
       </div>
 
       {/* Main Tabs */}
-      <div className="flex gap-1 bg-navy border border-white/10 rounded-2xl p-1 mb-8 w-fit">
+      <div className="flex gap-1 bg-forest border border-white/10 rounded-2xl p-1 mb-8 w-fit">
         {[
           { key: "PROPERTIES", label: "My Properties", icon: Building2 },
           { key: "BRIEF", label: "My Brief", icon: Briefcase },
@@ -610,7 +610,7 @@ const Dashboard = () => {
             }}
             className={`flex items-center gap-2 px-6 py-2.5 rounded-xl text-sm font-bold transition-all ${
               mainTab === key
-                ? "bg-teal text-navy shadow"
+                ? "bg-sage text-forest shadow"
                 : "text-gray-400 hover:text-white"
             }`}
           >
@@ -625,12 +625,12 @@ const Dashboard = () => {
         <div>
           {briefLoading ? (
             <div className="flex flex-col items-center justify-center py-20">
-              <Loader2 className="animate-spin text-teal mb-4" size={40} />
+              <Loader2 className="animate-spin text-sage mb-4" size={40} />
               <p className="text-gray-400 animate-pulse">Loading your brief...</p>
             </div>
           ) : !myBrief ? (
             <div className="flex flex-col items-center justify-center py-20 bg-white/5 border border-dashed border-white/10 rounded-3xl">
-              <Briefcase className="text-teal mb-4" size={40} />
+              <Briefcase className="text-sage mb-4" size={40} />
               <h3 className="text-xl font-bold text-white mb-2">
                 No active buyer brief
               </h3>
@@ -661,14 +661,14 @@ const Dashboard = () => {
                 {
                   label: "Assigned",
                   value: stats.assigned,
-                  color: "text-blue-300",
-                  bg: "bg-blue-500/10",
+                  color: "text-emerald-300",
+                  bg: "bg-emerald-500/10",
                 },
                 {
                   label: "Accepted",
                   value: stats.accepted,
-                  color: "text-teal",
-                  bg: "bg-teal/10",
+                  color: "text-sage",
+                  bg: "bg-sage/10",
                 },
                 {
                   label: "Rejected",
@@ -712,11 +712,11 @@ const Dashboard = () => {
                 placeholder="Search by address or suburb..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-navy border border-teal/20 rounded-xl py-2.5 pl-10 pr-4 text-sm text-white focus:outline-none focus:border-teal transition-all"
+                className="w-full bg-forest border border-sage/20 rounded-xl py-2.5 pl-10 pr-4 text-sm text-white focus:outline-none focus:border-sage transition-all"
               />
             </div>
 
-            <div className="flex bg-navy border border-teal/20 rounded-xl p-1">
+            <div className="flex bg-forest border border-sage/20 rounded-xl p-1">
               {[
                 { key: "ALL", label: "ALL" },
                 { key: "PENDING", label: "ASSIGNED" },
@@ -730,8 +730,8 @@ const Dashboard = () => {
                   className={`px-3 py-1.5 rounded-lg text-xs font-bold transition-all ${
                     activeTab === key
                       ? key === "PURCHASED"
-                        ? "bg-gold text-navy"
-                        : "bg-teal text-navy"
+                        ? "bg-gold text-forest"
+                        : "bg-sage text-forest"
                       : "text-gray-400 hover:text-white"
                   }`}
                 >
@@ -744,13 +744,13 @@ const Dashboard = () => {
           {/* Comparison Bar */}
           {compareList.length > 0 && (
             <div className="fixed bottom-4 md:bottom-8 left-1/2 -translate-x-1/2 z-50 w-[calc(100%-2rem)] max-w-2xl">
-              <div className="bg-navy/90 backdrop-blur-md border border-teal/50 rounded-2xl p-3 md:p-4 shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="bg-forest/90 backdrop-blur-md border border-sage/50 rounded-2xl p-3 md:p-4 shadow-2xl flex flex-col sm:flex-row items-center justify-between gap-4">
                 <div className="flex items-center gap-3 w-full sm:w-auto justify-between sm:justify-start">
                   <div className="flex -space-x-3">
                     {compareList.map((p) => (
                       <div
                         key={p.id}
-                        className="w-8 h-8 md:w-10 md:h-10 rounded-full border-2 border-navy overflow-hidden bg-teal/20 flex-shrink-0"
+                        className="w-8 h-8 md:w-10 md:h-10 rounded-full border-2 border-forest overflow-hidden bg-sage/20 flex-shrink-0"
                       >
                         <img
                           src={p.firstImage}
@@ -776,7 +776,7 @@ const Dashboard = () => {
                   <button
                     onClick={() => setShowCompareModal(true)}
                     disabled={compareList.length < 2}
-                    className="flex-1 sm:flex-none bg-teal text-navy px-4 md:px-6 py-2 rounded-xl font-bold text-xs md:text-sm hover:bg-teal/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    className="flex-1 sm:flex-none bg-sage text-forest px-4 md:px-6 py-2 rounded-xl font-bold text-xs md:text-sm hover:bg-sage/90 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                   >
                     <Scale size={16} />
                     Compare
@@ -788,11 +788,11 @@ const Dashboard = () => {
 
           {/* Properties Table */}
           {filteredProperties.length > 0 ? (
-            <div className="bg-navy border border-teal/20 rounded-2xl overflow-hidden">
+            <div className="bg-forest border border-sage/20 rounded-2xl overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full text-left border-collapse">
                   <thead>
-                    <tr className="bg-white/5 border-b border-teal/20">
+                    <tr className="bg-white/5 border-b border-sage/20">
                       <th className="px-6 py-4 w-12"></th>
                       <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">
                         Property
@@ -834,7 +834,7 @@ const Dashboard = () => {
                           onClick={() =>
                             navigate(`/property/${item.propertyId}`)
                           }
-                          className={`cursor-pointer hover:bg-teal/5 transition-colors group ${isComparing ? "bg-teal/5" : ""}`}
+                          className={`cursor-pointer hover:bg-sage/5 transition-colors group ${isComparing ? "bg-sage/5" : ""}`}
                         >
                           <td
                             className="px-6 py-4"
@@ -842,7 +842,7 @@ const Dashboard = () => {
                           >
                             <button
                               onClick={() => toggleCompare(item)}
-                              className={`w-6 h-6 rounded border flex items-center justify-center transition-all ${isComparing ? "bg-teal border-teal text-navy" : "border-white/20 text-transparent group-hover:text-gray-500"}`}
+                              className={`w-6 h-6 rounded border flex items-center justify-center transition-all ${isComparing ? "bg-sage border-sage text-forest" : "border-white/20 text-transparent group-hover:text-gray-500"}`}
                             >
                               <Check size={14} strokeWidth={3} />
                             </button>
@@ -859,7 +859,7 @@ const Dashboard = () => {
                                   </span>
                                 )}
                               </div>
-                              <p className="text-teal text-xs mt-0.5">
+                              <p className="text-sage text-xs mt-0.5">
                                 {item.property.suburb}, {item.property.state}
                               </p>
                             </div>
@@ -884,14 +884,14 @@ const Dashboard = () => {
                             </p>
                           </td>
                           <td className="px-6 py-4">
-                            <p className="text-teal font-bold text-sm">
+                            <p className="text-sage font-bold text-sm">
                               {item.property.yieldPercent != null
                                 ? `${item.property.yieldPercent}%`
                                 : "—"}
                             </p>
                           </td>
                           <td className="px-6 py-4">
-                            <p className="text-teal font-bold text-sm">
+                            <p className="text-sage font-bold text-sm">
                               {rentalYield != null ? `${rentalYield}%` : "—"}
                             </p>
                           </td>
@@ -921,8 +921,8 @@ const Dashboard = () => {
             </div>
           ) : (
             <div className="flex flex-col items-center justify-center py-20 bg-white/5 border border-dashed border-white/10 rounded-3xl">
-              <div className="w-16 h-16 bg-teal/10 rounded-full flex items-center justify-center mb-4">
-                <Building2 className="text-teal" size={32} />
+              <div className="w-16 h-16 bg-sage/10 rounded-full flex items-center justify-center mb-4">
+                <Building2 className="text-sage" size={32} />
               </div>
               <h3 className="text-xl font-bold text-white mb-2">
                 No properties found

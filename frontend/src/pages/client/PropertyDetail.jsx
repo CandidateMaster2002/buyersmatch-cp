@@ -191,7 +191,7 @@ const PropertyDetail = () => {
     return (
       <Layout title="Loading Property...">
         <div className="flex flex-col items-center justify-center min-h-[60vh]">
-          <Loader2 className="animate-spin text-teal mb-4" size={48} />
+          <Loader2 className="animate-spin text-sage mb-4" size={48} />
         </div>
       </Layout>
     );
@@ -206,7 +206,7 @@ const PropertyDetail = () => {
           </h2>
           <button
             onClick={() => navigate("/dashboard")}
-            className="text-teal hover:underline"
+            className="text-sage hover:underline"
           >
             Back to Dashboard
           </button>
@@ -305,7 +305,7 @@ const PropertyDetail = () => {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <button
           onClick={() => navigate("/dashboard")}
-          className="flex items-center gap-2 text-gray-400 hover:text-teal transition-colors mb-8 group"
+          className="flex items-center gap-2 text-gray-400 hover:text-sage transition-colors mb-8 group"
         >
           <ChevronLeft
             size={20}
@@ -316,7 +316,7 @@ const PropertyDetail = () => {
 
         {/* Assignment status bar */}
         {assignment && (
-          <div className="flex flex-wrap items-center justify-between gap-4 mb-8 p-5 bg-navy border border-white/5 rounded-2xl">
+          <div className="flex flex-wrap items-center justify-between gap-4 mb-8 p-5 bg-forest border border-white/5 rounded-2xl">
             <div className="flex items-center gap-3">
               <span className="text-xs text-gray-500 uppercase tracking-widest font-bold">
                 Assignment Status
@@ -324,12 +324,12 @@ const PropertyDetail = () => {
               <span
                 className={`px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-widest border ${
                   assignment.portalStatus === "ACCEPTED"
-                    ? "bg-teal/10 text-teal border-teal/30"
+                    ? "bg-sage/10 text-sage border-sage/30"
                     : assignment.portalStatus === "REJECTED"
                       ? "bg-red-500/10 text-red-400 border-red-500/30"
                       : assignment.portalStatus === "PURCHASED"
                         ? "bg-gold/10 text-gold border-gold/30"
-                        : "bg-blue-500/10 text-blue-400 border-blue-500/30"
+                        : "bg-emerald-500/10 text-emerald-400 border-emerald-500/30"
                 }`}
               >
                 {assignment.portalStatus || "PENDING"}
@@ -340,7 +340,7 @@ const PropertyDetail = () => {
               <div className="flex gap-3">
                 <button
                   onClick={() => guard(() => setShowConfirmModal("ACCEPT"), "Accepting properties is disabled in demo mode.")}
-                  className="flex items-center gap-2 px-5 py-2.5 bg-teal text-navy font-bold text-sm rounded-xl hover:bg-teal/90 transition-all"
+                  className="flex items-center gap-2 px-5 py-2.5 bg-sage text-forest font-bold text-sm rounded-xl hover:bg-sage/90 transition-all"
                 >
                   <CheckCircle2 size={16} /> Accept
                 </button>
@@ -386,7 +386,7 @@ const PropertyDetail = () => {
               return (
                 <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                   {/* Main viewer */}
-                  <div className="md:col-span-3 aspect-[4/3] rounded-3xl overflow-hidden border border-teal/20 bg-navy">
+                  <div className="md:col-span-3 aspect-[4/3] rounded-3xl overflow-hidden border border-sage/20 bg-forest">
                     {activeIsYoutube ? (
                       <iframe
                         width="100%"
@@ -427,7 +427,7 @@ const PropertyDetail = () => {
                             setActiveIsVideo(item.mediaType === "video");
                             setActiveIsYoutube(item.mediaType === "youtube");
                           }}
-                          className={`relative flex-shrink-0 w-24 h-24 md:w-full md:h-32 rounded-2xl overflow-hidden border-2 transition-all ${isActive ? "border-teal scale-95" : "border-transparent opacity-50 hover:opacity-100"}`}
+                          className={`relative flex-shrink-0 w-24 h-24 md:w-full md:h-32 rounded-2xl overflow-hidden border-2 transition-all ${isActive ? "border-sage scale-95" : "border-transparent opacity-50 hover:opacity-100"}`}
                         >
                           {item.mediaType === "video" ? (
                             <video
@@ -443,7 +443,7 @@ const PropertyDetail = () => {
                               className="w-full h-full object-cover"
                             />
                           ) : item.mediaType === "youtube" ? (
-                            <div className="w-full h-full bg-navy flex items-center justify-center">
+                            <div className="w-full h-full bg-forest flex items-center justify-center">
                               <Play className="text-white/30" size={24} />
                             </div>
                           ) : (
@@ -474,11 +474,11 @@ const PropertyDetail = () => {
             })()}
 
           {/* 2. Property Information Sheet */}
-          <div className="bg-navy border border-teal/20 rounded-3xl overflow-hidden">
+          <div className="bg-forest border border-sage/20 rounded-3xl overflow-hidden">
             {/* Header */}
-            <div className="px-8 py-5 bg-white/[0.03] border-b border-teal/20 flex items-center gap-3">
-              <div className="w-9 h-9 rounded-xl bg-teal/15 flex items-center justify-center">
-                <LayoutList className="text-teal" size={18} />
+            <div className="px-8 py-5 bg-white/[0.03] border-b border-sage/20 flex items-center gap-3">
+              <div className="w-9 h-9 rounded-xl bg-sage/15 flex items-center justify-center">
+                <LayoutList className="text-sage" size={18} />
               </div>
               <h3 className="text-lg font-bold text-white">
                 Property Information
@@ -488,15 +488,15 @@ const PropertyDetail = () => {
             {/* ── Location & Identity ── */}
             <div className="px-8 py-6 border-b border-white/5">
               <div className="flex items-center gap-2 mb-5">
-                <MapPin size={14} className="text-teal" />
-                <p className="text-[10px] uppercase tracking-widest text-teal font-bold">
+                <MapPin size={14} className="text-sage" />
+                <p className="text-[10px] uppercase tracking-widest text-sage font-bold">
                   Location & Identity
                 </p>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {/* Address — full width */}
                 <div className="sm:col-span-2 flex items-center gap-3 bg-white/[0.03] border border-white/5 rounded-xl px-4 py-3">
-                  <Home size={15} className="text-teal shrink-0" />
+                  <Home size={15} className="text-sage shrink-0" />
                   <div>
                     <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-0.5">
                       Address
@@ -521,7 +521,7 @@ const PropertyDetail = () => {
                     icon: Tag,
                     badge: true,
                     color: property.status?.toLowerCase().includes("active")
-                      ? "text-teal bg-teal/10 border-teal/30"
+                      ? "text-sage bg-sage/10 border-sage/30"
                       : property.status?.toLowerCase().includes("sold")
                         ? "text-gold bg-gold/10 border-gold/30"
                         : "text-gray-300 bg-white/5 border-white/10",
@@ -556,8 +556,8 @@ const PropertyDetail = () => {
             {/* ── Property Specs ── */}
             <div className="px-8 py-6 border-b border-white/5">
               <div className="flex items-center gap-2 mb-5">
-                <Home size={14} className="text-teal" />
-                <p className="text-[10px] uppercase tracking-widest text-teal font-bold">
+                <Home size={14} className="text-sage" />
+                <p className="text-[10px] uppercase tracking-widest text-sage font-bold">
                   Property Specs
                 </p>
               </div>
@@ -603,8 +603,8 @@ const PropertyDetail = () => {
                     key={i}
                     className="flex flex-col items-center justify-center gap-2 bg-white/[0.03] border border-white/5 rounded-xl px-3 py-4 text-center"
                   >
-                    <div className="w-9 h-9 rounded-xl bg-teal/10 flex items-center justify-center">
-                      <Icon size={16} className="text-teal" />
+                    <div className="w-9 h-9 rounded-xl bg-sage/10 flex items-center justify-center">
+                      <Icon size={16} className="text-sage" />
                     </div>
                     <p className="text-[10px] text-gray-500 uppercase tracking-wider leading-tight">
                       {label}
@@ -620,8 +620,8 @@ const PropertyDetail = () => {
             {/* ── Financials & Sale Info ── */}
             <div className="px-8 py-6 border-b border-white/5">
               <div className="flex items-center gap-2 mb-5">
-                <DollarSign size={14} className="text-teal" />
-                <p className="text-[10px] uppercase tracking-widest text-teal font-bold">
+                <DollarSign size={14} className="text-sage" />
+                <p className="text-[10px] uppercase tracking-widest text-sage font-bold">
                   Financials & Sale Info
                 </p>
               </div>
@@ -659,7 +659,7 @@ const PropertyDetail = () => {
                         ? `${property.yieldPercent}%`
                         : null,
                     icon: Percent,
-                    color: "text-teal",
+                    color: "text-sage",
                   },
                   {
                     label: "Min Rent / Month",
@@ -668,7 +668,7 @@ const PropertyDetail = () => {
                         ? `$${Number(property.minRentPerMonth).toLocaleString()}`
                         : null,
                     icon: PiggyBank,
-                    color: "text-teal",
+                    color: "text-sage",
                   },
                   {
                     label: "Rental Appraisal",
@@ -715,8 +715,8 @@ const PropertyDetail = () => {
               property.cmaLink) && (
               <div className="px-8 py-6">
                 <div className="flex items-center gap-2 mb-5">
-                  <Link2 size={14} className="text-teal" />
-                  <p className="text-[10px] uppercase tracking-widest text-teal font-bold">
+                  <Link2 size={14} className="text-sage" />
+                  <p className="text-[10px] uppercase tracking-widest text-sage font-bold">
                     Links
                   </p>
                 </div>
@@ -726,7 +726,7 @@ const PropertyDetail = () => {
                       href={property.linkToListing}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex items-center gap-2 px-5 py-3 bg-teal/10 border border-teal/30 hover:bg-teal/20 text-teal font-bold text-sm rounded-xl transition-all group"
+                      className="flex items-center gap-2 px-5 py-3 bg-sage/10 border border-sage/30 hover:bg-sage/20 text-sage font-bold text-sm rounded-xl transition-all group"
                     >
                       <ExternalLink size={15} />
                       View Listing
@@ -760,9 +760,9 @@ const PropertyDetail = () => {
           </div>
 
           {/* Deal Progress */}
-          <div className="bg-navy border border-teal/10 rounded-3xl p-8">
+          <div className="bg-forest border border-sage/10 rounded-3xl p-8">
             <h3 className="text-lg font-bold text-white flex items-center gap-2 mb-8">
-              <Clock className="text-teal" size={20} />
+              <Clock className="text-sage" size={20} />
               Deal Progress
             </h3>
 
@@ -782,21 +782,21 @@ const PropertyDetail = () => {
                       const leftConn = isFirstInRow
                         ? "bg-transparent"
                         : prevState === "complete"
-                          ? "bg-teal/40"
+                          ? "bg-sage/40"
                           : "bg-gray-800";
                       const rightConn = isLastInRow
                         ? "bg-transparent"
                         : state === "complete"
-                          ? "bg-teal/40"
+                          ? "bg-sage/40"
                           : "bg-gray-800";
 
                       // Dot style
                       const dotClass = isTerminal
                         ? "border-red-500 bg-red-500/20"
                         : state === "complete"
-                          ? "border-teal bg-teal"
+                          ? "border-sage bg-sage"
                           : state === "active"
-                            ? "border-teal bg-teal/10"
+                            ? "border-sage bg-sage/10"
                             : state === "unreachable"
                               ? "border-gray-800 bg-white/[0.02]"
                               : "border-gray-700 bg-white/[0.02]";
@@ -842,11 +842,11 @@ const PropertyDetail = () => {
                               ) : state === "complete" ? (
                                 <Check
                                   size={13}
-                                  className="text-navy"
+                                  className="text-forest"
                                   strokeWidth={3}
                                 />
                               ) : state === "active" ? (
-                                <div className="w-3 h-3 rounded-full bg-teal animate-pulse" />
+                                <div className="w-3 h-3 rounded-full bg-sage animate-pulse" />
                               ) : (
                                 <span className="text-[9px] text-gray-600 font-bold">
                                   {item.idx + 1}
@@ -864,7 +864,7 @@ const PropertyDetail = () => {
                               {item.label}
                             </p>
                             {state === "active" && !isTerminal && (
-                              <span className="inline-block px-1.5 py-0.5 bg-teal/10 border border-teal/30 text-teal text-[8px] font-bold rounded-full uppercase tracking-widest">
+                              <span className="inline-block px-1.5 py-0.5 bg-sage/10 border border-sage/30 text-sage text-[8px] font-bold rounded-full uppercase tracking-widest">
                                 Current
                               </span>
                             )}
@@ -888,10 +888,10 @@ const PropertyDetail = () => {
           </div>
 
           {/* 3. Financial Analysis / Offer Details */}
-          <div className="bg-navy border border-teal/20 rounded-3xl p-8">
+          <div className="bg-forest border border-sage/20 rounded-3xl p-8">
             <div className="flex items-center justify-between mb-8">
               <div className="flex items-center gap-3">
-                <TrendingUp className="text-teal" size={24} />
+                <TrendingUp className="text-sage" size={24} />
                 <h3 className="text-xl font-bold text-white">
                   Offer & Financial Analysis
                 </h3>
@@ -924,7 +924,7 @@ const PropertyDetail = () => {
                 <p className="text-xs text-gray-500 uppercase tracking-widest mb-2">
                   Weekly Rent
                 </p>
-                <p className="text-2xl font-bold text-teal">
+                <p className="text-2xl font-bold text-sage">
                   ${weeklyRent || "N/A"}
                 </p>
               </div>
@@ -932,7 +932,7 @@ const PropertyDetail = () => {
                 <p className="text-xs text-gray-500 uppercase tracking-widest mb-2">
                   Annual Income
                 </p>
-                <p className="text-2xl font-bold text-teal">
+                <p className="text-2xl font-bold text-sage">
                   ${annualIncome || "N/A"}
                 </p>
               </div>
@@ -1004,7 +1004,7 @@ const PropertyDetail = () => {
             return (
               <div className="space-y-8">
                 <div className="flex items-center gap-3">
-                  <FileText className="text-teal" size={22} />
+                  <FileText className="text-sage" size={22} />
                   <h3 className="text-xl font-bold text-white">
                     Documents & Media
                   </h3>
@@ -1013,23 +1013,23 @@ const PropertyDetail = () => {
                 {/* ── PDFs & Other Documents ── */}
                 {(documents.pdfs.length > 0 || documents.others.length > 0) && (
                   <div className="space-y-3">
-                    <p className="text-[10px] font-bold text-teal uppercase tracking-widest flex items-center gap-2">
+                    <p className="text-[10px] font-bold text-sage uppercase tracking-widest flex items-center gap-2">
                       <FileText size={12} /> Reports & Documents
                     </p>
                     <div className="space-y-2">
                       {[...documents.pdfs, ...documents.others].map((doc) => (
                         <div
                           key={doc.id}
-                          className="flex items-center gap-4 p-4 bg-navy border border-white/5 rounded-2xl hover:border-teal/30 transition-all"
+                          className="flex items-center gap-4 p-4 bg-forest border border-white/5 rounded-2xl hover:border-sage/30 transition-all"
                         >
-                          <div className="w-10 h-10 rounded-xl bg-teal/10 flex items-center justify-center text-teal shrink-0">
+                          <div className="w-10 h-10 rounded-xl bg-sage/10 flex items-center justify-center text-sage shrink-0">
                             <FileText size={18} />
                           </div>
                           <div className="min-w-0 flex-1">
                             <p className="text-sm font-bold text-white">
                               {doc.caption || doc.fileName || "—"}
                             </p>
-                            <p className="text-[11px] text-teal/70 font-medium mt-0.5">
+                            <p className="text-[11px] text-sage/70 font-medium mt-0.5">
                               {typeLabel(doc.documentType)}
                               {fmtSize(doc.fileSizeBytes)
                                 ? ` · ${fmtSize(doc.fileSizeBytes)}`
@@ -1052,7 +1052,7 @@ const PropertyDetail = () => {
                                     setPreviewDoc(doc.url);
                                   }
                                 }}
-                                className="p-2 text-teal bg-teal/10 rounded-lg hover:bg-teal hover:text-navy transition-colors"
+                                className="p-2 text-sage bg-sage/10 rounded-lg hover:bg-sage hover:text-forest transition-colors"
                                 title="View Document"
                               >
                                 <Eye size={16} />
@@ -1080,7 +1080,7 @@ const PropertyDetail = () => {
                   },
                 ].filter((item) => item.link).length > 0 && (
                   <div className="space-y-3">
-                    <p className="text-[10px] font-bold text-teal uppercase tracking-widest flex items-center gap-2">
+                    <p className="text-[10px] font-bold text-sage uppercase tracking-widest flex items-center gap-2">
                       <ExternalLink size={12} /> Assignment Documents
                     </p>
                     <div className="space-y-2">
@@ -1110,9 +1110,9 @@ const PropertyDetail = () => {
                             href={item.link}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex items-center gap-4 p-4 bg-teal/5 border border-teal/20 rounded-2xl hover:bg-teal/10 transition-all"
+                            className="flex items-center gap-4 p-4 bg-sage/5 border border-sage/20 rounded-2xl hover:bg-sage/10 transition-all"
                           >
-                            <div className="w-10 h-10 rounded-xl bg-teal/20 flex items-center justify-center text-teal shrink-0">
+                            <div className="w-10 h-10 rounded-xl bg-sage/20 flex items-center justify-center text-sage shrink-0">
                               <ExternalLink size={18} />
                             </div>
                             <p className="text-sm font-bold text-white flex-1">
@@ -1120,7 +1120,7 @@ const PropertyDetail = () => {
                             </p>
                             <Download
                               size={16}
-                              className="text-teal shrink-0"
+                              className="text-sage shrink-0"
                             />
                           </a>
                         ))}
@@ -1132,15 +1132,15 @@ const PropertyDetail = () => {
           })()}
 
           {/* Agent Notes */}
-          <div className="bg-navy border border-teal/10 rounded-3xl p-8">
+          <div className="bg-forest border border-sage/10 rounded-3xl p-8">
             <div className="flex items-center gap-3 mb-6">
-              <MessageSquare className="text-teal" size={24} />
+              <MessageSquare className="text-sage" size={24} />
               <h3 className="text-xl font-bold text-white">
                 Buyers Match Notes
               </h3>
             </div>
             {assignment?.agentNotes ? (
-              <div className="p-6 bg-teal/5 border border-teal/20 rounded-2xl">
+              <div className="p-6 bg-sage/5 border border-sage/20 rounded-2xl">
                 <p className="text-gray-300 leading-relaxed whitespace-pre-wrap">
                   {assignment.agentNotes}
                 </p>
@@ -1156,16 +1156,16 @@ const PropertyDetail = () => {
 
           {/* My Notes */}
           {assignment && (
-            <div className="bg-navy border border-teal/10 rounded-3xl p-8">
+            <div className="bg-forest border border-sage/10 rounded-3xl p-8">
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center gap-3">
-                  <StickyNote className="text-teal" size={24} />
+                  <StickyNote className="text-sage" size={24} />
                   <h3 className="text-xl font-bold text-white">My Notes</h3>
                 </div>
                 {!isEditingNotes && (
                   <button
                     onClick={() => setIsEditingNotes(true)}
-                    className="p-2 text-teal hover:bg-teal/10 rounded-xl transition-all"
+                    className="p-2 text-sage hover:bg-sage/10 rounded-xl transition-all"
                     title="Edit Notes"
                   >
                     <Pencil size={20} />
@@ -1176,7 +1176,7 @@ const PropertyDetail = () => {
               {isEditingNotes ? (
                 <>
                   <textarea
-                    className="w-full bg-white/[0.03] border border-teal/30 rounded-2xl p-4 text-sm text-white focus:border-teal outline-none transition-all resize-none h-40"
+                    className="w-full bg-white/[0.03] border border-sage/30 rounded-2xl p-4 text-sm text-white focus:border-sage outline-none transition-all resize-none h-40"
                     placeholder="Add your personal notes about this property (only visible to you)..."
                     value={clientNotes}
                     onChange={(e) => setClientNotes(e.target.value)}
@@ -1195,7 +1195,7 @@ const PropertyDetail = () => {
                     <button
                       onClick={() => guard(handleSaveNotes, "Saving notes is disabled in demo mode.")}
                       disabled={savingNotes}
-                      className="flex items-center gap-2 px-6 py-2.5 bg-teal text-navy font-bold text-sm rounded-xl hover:bg-teal/90 transition-all disabled:opacity-50"
+                      className="flex items-center gap-2 px-6 py-2.5 bg-sage text-forest font-bold text-sm rounded-xl hover:bg-sage/90 transition-all disabled:opacity-50"
                     >
                       {savingNotes ? (
                         <Loader2 className="animate-spin" size={16} />
@@ -1238,9 +1238,9 @@ const PropertyDetail = () => {
               setRemark("");
             }}
           ></div>
-          <div className="relative bg-navy border border-teal/30 rounded-3xl p-8 max-w-md w-full shadow-2xl">
+          <div className="relative bg-forest border border-sage/30 rounded-3xl p-8 max-w-md w-full shadow-2xl">
             <div
-              className={`w-16 h-16 rounded-full flex items-center justify-center mb-6 mx-auto ${showConfirmModal === "ACCEPT" ? "bg-teal/20 text-teal" : "bg-red-500/20 text-red-400"}`}
+              className={`w-16 h-16 rounded-full flex items-center justify-center mb-6 mx-auto ${showConfirmModal === "ACCEPT" ? "bg-sage/20 text-sage" : "bg-red-500/20 text-red-400"}`}
             >
               {showConfirmModal === "ACCEPT" ? (
                 <CheckCircle2 size={32} />
@@ -1259,7 +1259,7 @@ const PropertyDetail = () => {
                 : "Your agent will be notified that this property isn't right for you."}
             </p>
             <textarea
-              className="w-full bg-white/[0.03] border border-white/10 rounded-2xl p-4 text-sm text-gray-300 focus:border-teal outline-none transition-all resize-none h-24 mb-6"
+              className="w-full bg-white/[0.03] border border-white/10 rounded-2xl p-4 text-sm text-gray-300 focus:border-sage outline-none transition-all resize-none h-24 mb-6"
               placeholder="Add an optional remark for your agent..."
               value={remark}
               onChange={(e) => setRemark(e.target.value)}
@@ -1277,7 +1277,7 @@ const PropertyDetail = () => {
               <button
                 onClick={() => guard(() => handleNotify(showConfirmModal), "Sending to agent is disabled in demo mode.")}
                 disabled={actionLoading}
-                className={`flex-1 py-3 font-bold rounded-xl transition-all flex items-center justify-center gap-2 ${showConfirmModal === "ACCEPT" ? "bg-teal text-navy hover:bg-teal/90" : "bg-red-500 text-white hover:bg-red-600"}`}
+                className={`flex-1 py-3 font-bold rounded-xl transition-all flex items-center justify-center gap-2 ${showConfirmModal === "ACCEPT" ? "bg-sage text-forest hover:bg-sage/90" : "bg-red-500 text-white hover:bg-red-600"}`}
               >
                 {actionLoading ? (
                   <Loader2 className="animate-spin" size={20} />
@@ -1313,7 +1313,7 @@ const PropertyDetail = () => {
                       previewImg.caption || "image",
                     )
                   }
-                  className="p-2 text-teal bg-teal/10 rounded-xl hover:bg-teal hover:text-navy transition-colors"
+                  className="p-2 text-sage bg-sage/10 rounded-xl hover:bg-sage hover:text-forest transition-colors"
                   title="Download"
                 >
                   <Download size={18} />
@@ -1346,10 +1346,10 @@ const PropertyDetail = () => {
             className="absolute inset-0 bg-black/80 backdrop-blur-sm"
             onClick={() => setPreviewDoc(null)}
           ></div>
-          <div className="relative bg-navy border border-teal/30 rounded-3xl p-4 w-full max-w-5xl h-[90vh] flex flex-col shadow-2xl">
+          <div className="relative bg-forest border border-sage/30 rounded-3xl p-4 w-full max-w-5xl h-[90vh] flex flex-col shadow-2xl">
             <div className="flex justify-between items-center mb-4 px-4">
               <h3 className="text-xl font-bold text-white flex items-center gap-2">
-                <FileText className="text-teal" size={24} />
+                <FileText className="text-sage" size={24} />
                 Document Preview
               </h3>
               <button
@@ -1377,7 +1377,7 @@ const PropertyDetail = () => {
                     href={previewDoc}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="px-6 py-3 bg-teal text-navy rounded-xl font-bold mt-4"
+                    className="px-6 py-3 bg-sage text-forest rounded-xl font-bold mt-4"
                   >
                     Download PDF instead
                   </a>
