@@ -1,4 +1,4 @@
-import { api, USE_MOCK, delay } from './http';
+import { api, BASE_URL, USE_MOCK, delay } from './http';
 import { mockProperties, mockDocuments } from '../mock/data';
 
 // ─── All Properties ───────────────────────────────────────────────
@@ -41,7 +41,23 @@ export const getPropertyDocuments = async (propertyId) => {
     };
   }
   const { data } = await api.get(`/api/property/${propertyId}/documents`);
-  return data.data;
+  const docs = data.data;
+
+  // Replace doc.url with a backend proxy URL so images/videos render even when
+  // the file hasn't been uploaded to R2 yet (Zoho WorkDrive links require auth
+  // and can't be used directly in <img> or <video> tags).
+  const withProxyUrl = (list) => (list || []).map(doc =>
+    doc.id ? { ...doc, url: `${BASE_URL}/api/document/${doc.id}/stream` } : doc
+  );
+
+  return {
+    propertyImages: withProxyUrl(docs.propertyImages),
+    images:         withProxyUrl(docs.images),
+    videos:         withProxyUrl(docs.videos),
+    pdfs:           withProxyUrl(docs.pdfs),
+    others:         withProxyUrl(docs.others),
+    externalVideos: docs.externalVideos || [],
+  };
 };
 
 // ─── By Zoho Property ID ──────────────────────────────────────────

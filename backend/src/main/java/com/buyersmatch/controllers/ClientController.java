@@ -8,12 +8,17 @@ import com.buyersmatch.entities.PropertyDocument;
 import com.buyersmatch.repositories.*;
 import com.buyersmatch.entities.ClientPortalUser;
 import com.buyersmatch.services.EmailService;
+import com.buyersmatch.services.R2StorageService;
+import com.buyersmatch.services.ZohoAuthService;
+import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.RestTemplate;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.UUID;
@@ -31,6 +36,9 @@ public class ClientController {
     private final AssignmentRepository assignmentRepository;
     private final ClientPortalUserRepository portalUserRepository;
     private final EmailService emailService;
+    private final ZohoAuthService zohoAuthService;
+    private final R2StorageService r2StorageService;
+    private final RestTemplate restTemplate;
 
     @GetMapping("/api/client/{zohoContactId}/assignments")
     public ResponseEntity<Map<String, Object>> getAssignments(@PathVariable String zohoContactId) {
@@ -230,6 +238,75 @@ public class ClientController {
 
         List<PropertyDocument> all = propertyDocumentRepository.findAllByZohoPropertyId(property.getZohoPropertyId());
         return ResponseEntity.ok(Map.of("success", true, "data", categorizeDocuments(all, property.getPropertyVideoUrl())));
+    }
+
+    /**
+     * Proxies a document to the browser.
+     * - If r2Url is set → 302 redirect to the CDN (fast, no bandwidth cost).
+     * - Otherwise → fetch from Zoho using OAuth and stream back as binary.
+     */
+    @GetMapping("/api/document/{docId}/stream")
+    public void streamDocument(@PathVariable String docId, HttpServletResponse response) throws IOException {
+        PropertyDocument doc;
+        try {
+            UUID uuid = UUID.fromString(docId);
+            doc = propertyDocumentRepository.findById(uuid).orElse(null);
+        } catch (IllegalArgumentException e) {
+            doc = propertyDocumentRepository.findByZohoDocId(docId).orElse(null);
+        }
+
+        if (doc == null) {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND, "Document not found");
+            return;
+        }
+
+        // R2 CDN is public — just redirect the browser there directly
+        if (doc.getR2Url() != null && !doc.getR2Url().isBlank()) {
+            response.sendRedirect(doc.getR2Url());
+            return;
+        }
+
+        // Determine source URL: prefer CRM attachment (requires auth), fallback to WorkDrive
+        String sourceUrl = doc.getCrmDownloadUrl();
+        if (sourceUrl == null || sourceUrl.isBlank()) {
+            sourceUrl = doc.getDownloadLink();
+        }
+        if (sourceUrl == null || sourceUrl.isBlank()) {
+            response.sendError(HttpServletResponse.SC_NOT_FOUND, "No source URL for document");
+            return;
+        }
+
+        String contentType = r2StorageService.getContentType(doc.getFileExtension());
+        response.setContentType(contentType);
+        if (doc.getFileName() != null) {
+            response.setHeader("Content-Disposition", "inline; filename=\"" + doc.getFileName() + "\"");
+        }
+        response.setHeader("Cache-Control", "public, max-age=86400");
+
+        try {
+            String accessToken = zohoAuthService.getAccessToken();
+            HttpHeaders headers = new HttpHeaders();
+            headers.set("Authorization", "Zoho-oauthtoken " + accessToken);
+            headers.set(HttpHeaders.ACCEPT, "application/octet-stream, image/*, */*");
+
+            HttpEntity<Void> entity = new HttpEntity<>(headers);
+            ResponseEntity<byte[]> zohoResponse = restTemplate.exchange(
+                    sourceUrl, HttpMethod.GET, entity, byte[].class);
+
+            if (zohoResponse.getStatusCode().is2xxSuccessful() && zohoResponse.getBody() != null) {
+                byte[] bytes = zohoResponse.getBody();
+                response.setContentLengthLong(bytes.length);
+                response.getOutputStream().write(bytes);
+                response.flushBuffer();
+            } else {
+                response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Upstream returned: " + zohoResponse.getStatusCode());
+            }
+        } catch (Exception e) {
+            log.error("Failed to stream document {}: {}", docId, e.getMessage());
+            if (!response.isCommitted()) {
+                response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Stream error");
+            }
+        }
     }
 
     /**
