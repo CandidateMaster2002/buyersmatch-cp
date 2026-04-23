@@ -103,6 +103,7 @@ const PropertyDetail = () => {
           setAssignment({
             ...matchedItem.assignment,
             portalStatus: matchedItem.portalStatus,
+            agentNotes: matchedItem.agentNotes || matchedItem.assignment?.agentNotes,
           });
           setClientNotes(
             matchedItem.clientNotes ||

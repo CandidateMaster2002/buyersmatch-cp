@@ -17,6 +17,7 @@ import {
   CheckCircle2,
   XCircle,
   AlertCircle,
+  Check,
   ExternalLink,
   TrendingUp,
   DollarSign,
@@ -40,6 +41,7 @@ import {
   getPropertyDetail,
   getPropertyDocuments,
   getClientProperties,
+  updateAssignmentAgentNotes,
 } from "../../api/client";
 
 const AdminPropertyDetail = () => {
@@ -62,6 +64,8 @@ const AdminPropertyDetail = () => {
   const [loading, setLoading] = useState(true);
   const [activeImage, setActiveImage] = useState(null);
   const [activeIsVideo, setActiveIsVideo] = useState(false);
+  const [notesDraft, setNotesDraft] = useState("");
+  const [notesSaving, setNotesSaving] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
@@ -88,11 +92,14 @@ const AdminPropertyDetail = () => {
           (Array.isArray(clientData) ? clientData : []);
         const matched = assignments.find((a) => a.propertyId === propertyId);
         if (matched) {
-          setAssignment({
+          const assembled = {
             ...matched.assignment,
+            id: matched.assignment?.id || matched.id || matched.assignmentId,
             portalStatus: matched.portalStatus,
             agentNotes: matched.agentNotes || matched.assignment?.agentNotes,
-          });
+          };
+          setAssignment(assembled);
+          setNotesDraft(assembled.agentNotes || "");
         }
       } catch (err) {
         console.error("Error fetching property details:", err);
@@ -203,6 +210,24 @@ const AdminPropertyDetail = () => {
     DOCUMENT: "Document",
   };
   const typeLabel = (t) => TYPE_LABEL[t] || t || "Document";
+
+  const handleSaveNotes = async () => {
+    if (!assignment?.id) {
+      toast.error("Cannot save: assignment ID not found");
+      return;
+    }
+    setNotesSaving(true);
+    try {
+      await updateAssignmentAgentNotes(assignment.id, notesDraft);
+      setAssignment((prev) => ({ ...prev, agentNotes: notesDraft }));
+      toast.success("Notes saved");
+    } catch (err) {
+      console.error("Failed to save notes:", err);
+      toast.error("Failed to save notes");
+    } finally {
+      setNotesSaving(false);
+    }
+  };
 
   const hasDocuments =
     documents.videos.length > 0 ||
@@ -1070,25 +1095,38 @@ const AdminPropertyDetail = () => {
             </div>
           )}
 
-          {/* 7. Agent Notes (shown to admin) */}
+          {/* 7. Agent Notes (editable by admin) */}
           <div className="bg-navy border border-teal/10 rounded-3xl p-8">
-            <div className="flex items-center gap-3 mb-6">
-              <MessageSquare className="text-teal" size={24} />
-              <h3 className="text-xl font-bold text-white">
-                BuyersMatch Notes
-              </h3>
-            </div>
-            {assignment?.agentNotes ? (
-              <p className="text-gray-300 leading-relaxed whitespace-pre-wrap">
-                {assignment.agentNotes}
-              </p>
-            ) : (
-              <div className="p-10 border-2 border-dashed border-white/5 rounded-2xl flex flex-col items-center justify-center text-center">
-                <p className="text-gray-500 italic">
-                  No agent notes added for this property yet.
-                </p>
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-3">
+                <MessageSquare className="text-teal" size={24} />
+                <h3 className="text-xl font-bold text-white">
+                  BuyersMatch Notes
+                </h3>
               </div>
-            )}
+              <button
+                onClick={handleSaveNotes}
+                disabled={
+                  notesSaving ||
+                  notesDraft === (assignment?.agentNotes || "")
+                }
+                className="flex items-center gap-2 px-5 py-2 bg-teal text-navy font-bold text-sm rounded-xl hover:bg-teal/90 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                {notesSaving ? (
+                  <Loader2 size={15} className="animate-spin" />
+                ) : (
+                  <Check size={15} />
+                )}
+                {notesSaving ? "Saving..." : "Save Notes"}
+              </button>
+            </div>
+            <textarea
+              value={notesDraft}
+              onChange={(e) => setNotesDraft(e.target.value)}
+              placeholder="Add notes about this property for the client..."
+              rows={6}
+              className="w-full bg-white/[0.03] border border-white/10 rounded-2xl px-5 py-4 text-sm text-gray-200 placeholder:text-gray-600 focus:outline-none focus:border-teal/50 resize-y leading-relaxed transition-colors"
+            />
           </div>
 
           {/* 8. Property Notes */}

@@ -29,6 +29,7 @@ export {
   getAdminClientProfile,
   createClient,
   updateAgentNotes,
+  updateAssignmentAgentNotes,
   assignPropertyToClient,
   getAllResponses,
   resetClientPassword,
