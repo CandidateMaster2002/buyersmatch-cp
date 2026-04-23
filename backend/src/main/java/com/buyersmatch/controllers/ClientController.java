@@ -120,6 +120,7 @@ public class ClientController {
             entry.put("portalStatus", assignment.getPortalStatus());
             entry.put("zohoBriefId", assignment.getZohoBriefId());
             entry.put("clientNotes", assignment.getClientNotes());
+            entry.put("agentNotes", assignment.getAgentNotes());
             assignmentsData.add(entry);
         }
 

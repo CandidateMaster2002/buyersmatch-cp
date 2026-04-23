@@ -211,6 +211,27 @@ public class AdminClientController {
     }
 
     // -------------------------------------------------------------------------
+    // POST /api/admin/assignment/:assignmentId/agent-notes
+    // -------------------------------------------------------------------------
+
+    @PostMapping("/assignment/{assignmentId}/agent-notes")
+    public ResponseEntity<Map<String, Object>> saveAgentNotes(
+            @PathVariable UUID assignmentId,
+            @RequestBody Map<String, Object> body) {
+
+        Assignment assignment = assignmentRepository.findById(assignmentId)
+                .orElseThrow(() -> new IllegalArgumentException("Assignment not found: " + assignmentId));
+
+        String agentNotes = body.getOrDefault("agentNotes", "").toString();
+        assignment.setAgentNotes(agentNotes);
+        assignmentRepository.save(assignment);
+        log.info("Agent notes saved for assignmentId={}", assignmentId);
+
+        return ResponseEntity.ok(Map.of("success", true, "data",
+                Map.of("id", assignmentId, "agentNotes", agentNotes)));
+    }
+
+    // -------------------------------------------------------------------------
     // GET /api/admin/responses
     // -------------------------------------------------------------------------
 

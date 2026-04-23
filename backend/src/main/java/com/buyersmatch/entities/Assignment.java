@@ -72,6 +72,9 @@ public class Assignment {
     @Column(name = "client_notes", columnDefinition = "text")
     private String clientNotes;
 
+    @Column(name = "agent_notes", columnDefinition = "text")
+    private String agentNotes;
+
     private String zohoCreatedAt;
     private String zohoModifiedAt;
     private LocalDateTime syncedAt;
