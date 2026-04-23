@@ -456,22 +456,6 @@ const PropertyDetail = () => {
                 {[
                   { label: "Suburb", value: property.suburb, icon: MapPin },
                   { label: "State", value: property.state, icon: MapPin },
-                  {
-                    label: "LGA Region",
-                    value: property.lgaRegion,
-                    icon: MapPin,
-                  },
-                  {
-                    label: "Status",
-                    value: property.status,
-                    icon: Tag,
-                    badge: true,
-                    color: property.status?.toLowerCase().includes("active")
-                      ? "text-teal bg-teal/10 border-teal/30"
-                      : property.status?.toLowerCase().includes("sold")
-                        ? "text-gold bg-gold/10 border-gold/30"
-                        : "text-gray-300 bg-white/5 border-white/10",
-                  },
                 ].map(({ label, value, icon: Icon, badge, color }, i) => (
                   <div
                     key={i}
