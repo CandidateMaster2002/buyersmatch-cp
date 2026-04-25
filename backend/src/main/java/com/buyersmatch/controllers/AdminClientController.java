@@ -104,8 +104,8 @@ public class AdminClientController {
             List<BuyerBrief> group = entry.getValue();
             // Sort group by sync time desc so the most recent brief is at the top
             group.sort((a, b) -> {
-                LocalDateTime ta = a.getSyncedAt() != null ? a.getSyncedAt() : LocalDateTime.MIN;
-                LocalDateTime tb = b.getSyncedAt() != null ? b.getSyncedAt() : LocalDateTime.MIN;
+                String ta = (a.getZohoCreatedAt() != null && !a.getZohoCreatedAt().trim().isEmpty()) ? a.getZohoCreatedAt() : (a.getSyncedAt() != null ? a.getSyncedAt().toString() : "");
+                String tb = (b.getZohoCreatedAt() != null && !b.getZohoCreatedAt().trim().isEmpty()) ? b.getZohoCreatedAt() : (b.getSyncedAt() != null ? b.getSyncedAt().toString() : "");
                 return tb.compareTo(ta);
             });
 
@@ -130,6 +130,8 @@ public class AdminClientController {
             buyer.put("status", representative.getStatus());
             buyer.put("briefCount", group.size());
             buyer.put("activeBriefCount", group.stream().filter(b -> !"Closed".equalsIgnoreCase(b.getStatus())).count());
+            String zCreatedAt = representative.getZohoCreatedAt();
+            buyer.put("latestBriefDate", (zCreatedAt != null && !zCreatedAt.trim().isEmpty()) ? zCreatedAt : representative.getSyncedAt());
             
             if (activePortalUser != null) {
                 buyer.put("portalUser", Map.of(
@@ -146,6 +148,12 @@ public class AdminClientController {
         }
 
         // Final sort of buyers list by representative sync time
+        data.sort((a, b) -> {
+            String ta = a.get("latestBriefDate") != null ? a.get("latestBriefDate").toString() : "";
+            String tb = b.get("latestBriefDate") != null ? b.get("latestBriefDate").toString() : "";
+            return tb.compareTo(ta);
+        });
+
         return ResponseEntity.ok(Map.of("success", true, "data", data));
     }
 

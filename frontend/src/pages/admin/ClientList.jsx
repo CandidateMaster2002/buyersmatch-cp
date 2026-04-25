@@ -310,6 +310,9 @@ const ClientList = () => {
                     Active Briefs
                   </th>
                   <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">
+                    Date Added
+                  </th>
+                  <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">
                     Password
                   </th>
                   <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">
@@ -380,6 +383,13 @@ const ClientList = () => {
                         ) : (
                           <span className="text-sm text-gray-600">—</span>
                         )}
+                      </td>
+
+                      {/* Date Added */}
+                      <td className="px-6 py-4">
+                        <p className="text-sm text-gray-300">
+                          {client.latestBriefDate ? new Date(client.latestBriefDate).toLocaleDateString() : "—"}
+                        </p>
                       </td>
 
                       {/* Password */}

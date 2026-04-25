@@ -757,6 +757,9 @@ const ClientDetail = () => {
                           Specs
                         </th>
                         <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">
+                          Land Size
+                        </th>
+                        <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">
                           Price Range
                         </th>
                         <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-widest">
@@ -832,6 +835,13 @@ const ClientDetail = () => {
                                   <Car size={12} /> {item.property.carParking}
                                 </span>
                               </div>
+                            </td>
+                            <td className="px-6 py-4">
+                              <p className="text-sm text-gray-300">
+                                {item.property.areaSqm != null
+                                  ? `${item.property.areaSqm} m²`
+                                  : "—"}
+                              </p>
                             </td>
                             <td className="px-6 py-4">
                               <p className="text-gold font-bold text-sm">

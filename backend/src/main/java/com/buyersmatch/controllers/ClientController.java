@@ -347,6 +347,7 @@ public class ClientController {
             emailService.sendClientActionNotification(clientName, propertyAddress, action, remark);
         } catch (Exception e) {
             log.warn("Failed to send client action notification: {}", e.getMessage());
+            return ResponseEntity.status(500).body(Map.of("success", false, "error", "Failed to send email: " + e.getMessage()));
         }
 
         return ResponseEntity.ok(Map.of("success", true, "message", "Notification sent"));

@@ -446,7 +446,7 @@ const AdminPropertyDetail = () => {
                     icon: Car,
                   },
                   {
-                    label: "Area",
+                    label: "Land Size",
                     value:
                       property.areaSqm != null
                         ? `${property.areaSqm} m²`
@@ -530,7 +530,10 @@ const AdminPropertyDetail = () => {
                   },
                   {
                     label: "Weekly Rent",
-                    value: weeklyRent != null ? `$${Number(weeklyRent).toLocaleString()}` : null,
+                    value:
+                      weeklyRent != null
+                        ? `$${Number(weeklyRent).toLocaleString()}`
+                        : null,
                     icon: PiggyBank,
                     color: "text-teal",
                   },
@@ -713,7 +716,7 @@ const AdminPropertyDetail = () => {
                 </p>
               </div>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mb-8">
               <div>
                 <p className="text-xs text-gray-500 uppercase tracking-widest mb-2">
                   Min. Asking Price
@@ -738,37 +741,12 @@ const AdminPropertyDetail = () => {
                   ${weeklyRent || "N/A"}
                 </p>
               </div>
-              <div>
-                <p className="text-xs text-gray-500 uppercase tracking-widest mb-2">
-                  Annual Income
-                </p>
-                <p className="text-2xl font-bold text-teal">
-                  ${annualIncome || "N/A"}
-                </p>
-              </div>
             </div>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 border-t border-white/5 pt-8">
-              <div>
-                <p className="text-xs text-gray-500 uppercase tracking-widest mb-2">
-                  Yield (at Min Price)
-                </p>
-                <p className="text-xl font-bold text-gold">
-                  {yieldMin ? `${yieldMin}%` : "N/A"}
-                </p>
-              </div>
-              <div>
-                <p className="text-xs text-gray-500 uppercase tracking-widest mb-2">
-                  Yield (at Max Price)
-                </p>
-                <p className="text-xl font-bold text-gold">
-                  {yieldMax ? `${yieldMax}%` : "N/A"}
-                </p>
-              </div>
-            </div>
+
 
             {/* Offer Details */}
             {(assignment?.offerAmount || assignment?.offerDate) && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 border-t border-white/5 pt-8">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 border-t border-white/5 pt-8">
                 {assignment?.offerAmount && (
                   <div>
                     <p className="text-xs text-gray-500 uppercase tracking-widest mb-2">
@@ -785,7 +763,7 @@ const AdminPropertyDetail = () => {
                       Offer Date
                     </p>
                     <p className="text-xl font-bold text-white">
-                      {assignment.offerDate}
+                      {assignment.offerDate.split('T')[0].split('-').reverse().join('-')}
                     </p>
                   </div>
                 )}
@@ -1107,8 +1085,7 @@ const AdminPropertyDetail = () => {
               <button
                 onClick={handleSaveNotes}
                 disabled={
-                  notesSaving ||
-                  notesDraft === (assignment?.agentNotes || "")
+                  notesSaving || notesDraft === (assignment?.agentNotes || "")
                 }
                 className="flex items-center gap-2 px-5 py-2 bg-teal text-navy font-bold text-sm rounded-xl hover:bg-teal/90 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
               >

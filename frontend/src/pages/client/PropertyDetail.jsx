@@ -103,7 +103,8 @@ const PropertyDetail = () => {
           setAssignment({
             ...matchedItem.assignment,
             portalStatus: matchedItem.portalStatus,
-            agentNotes: matchedItem.agentNotes || matchedItem.assignment?.agentNotes,
+            agentNotes:
+              matchedItem.agentNotes || matchedItem.assignment?.agentNotes,
           });
           setClientNotes(
             matchedItem.clientNotes ||
@@ -272,13 +273,14 @@ const PropertyDetail = () => {
         items.push({ type: "terminal", label: terminal.label });
         break; // Stop rendering future points if process is stopped
       }
-      
-      const state = i < completedCount
+
+      const state =
+        i < completedCount
           ? "complete"
           : i === completedCount && completedCount < 12
             ? "active"
             : "pending";
-            
+
       items.push({ type: "stage", label: DEAL_STAGES[i], state, idx: i });
     }
     return items;
@@ -329,10 +331,10 @@ const PropertyDetail = () => {
                   <CheckCircle2 size={16} /> Accept
                 </button>
                 <button
-                  onClick={() => setShowConfirmModal("REJECT")}
-                  className="flex items-center gap-2 px-5 py-2.5 border border-red-500/50 text-red-400 font-bold text-sm rounded-xl hover:bg-red-500/10 transition-all"
+                  onClick={() => setShowConfirmModal("REQUEST_WALKTHROUGH")}
+                  className="flex items-center gap-2 px-5 py-2.5 border border-teal/50 text-teal font-bold text-sm rounded-xl hover:bg-teal/10 transition-all"
                 >
-                  <XCircle size={16} /> Reject
+                  <MessageSquare size={16} /> Request Walkthrough
                 </button>
               </div>
             )}
@@ -507,7 +509,7 @@ const PropertyDetail = () => {
                     icon: Car,
                   },
                   {
-                    label: "Area",
+                    label: "Land Size",
                     value:
                       property.areaSqm != null
                         ? `${property.areaSqm} m²`
@@ -594,7 +596,10 @@ const PropertyDetail = () => {
                   },
                   {
                     label: "Weekly Rent",
-                    value: weeklyRent != null ? `$${Number(weeklyRent).toLocaleString()}` : null,
+                    value:
+                      weeklyRent != null
+                        ? `$${Number(weeklyRent).toLocaleString()}`
+                        : null,
                     icon: PiggyBank,
                     color: "text-teal",
                   },
@@ -831,7 +836,7 @@ const PropertyDetail = () => {
               </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mb-8">
               <div>
                 <p className="text-xs text-gray-500 uppercase tracking-widest mb-2">
                   Min. Asking Price
@@ -856,38 +861,13 @@ const PropertyDetail = () => {
                   ${weeklyRent || "N/A"}
                 </p>
               </div>
-              <div>
-                <p className="text-xs text-gray-500 uppercase tracking-widest mb-2">
-                  Annual Income
-                </p>
-                <p className="text-2xl font-bold text-teal">
-                  ${annualIncome || "N/A"}
-                </p>
-              </div>
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 mb-8 border-t border-white/5 pt-8">
-              <div>
-                <p className="text-xs text-gray-500 uppercase tracking-widest mb-2">
-                  Yield (at Min Price)
-                </p>
-                <p className="text-xl font-bold text-gold">
-                  {yieldMin ? `${yieldMin}%` : "N/A"}
-                </p>
-              </div>
-              <div>
-                <p className="text-xs text-gray-500 uppercase tracking-widest mb-2">
-                  Yield (at Max Price)
-                </p>
-                <p className="text-xl font-bold text-gold">
-                  {yieldMax ? `${yieldMax}%` : "N/A"}
-                </p>
-              </div>
-            </div>
+
 
             {/* Offer Details */}
             {(assignment?.offerAmount || assignment?.offerDate) && (
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 border-t border-white/5 pt-8">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 border-t border-white/5 pt-8">
                 {assignment?.offerAmount && (
                   <div>
                     <p className="text-xs text-gray-500 uppercase tracking-widest mb-2">
@@ -904,7 +884,7 @@ const PropertyDetail = () => {
                       Offer Date
                     </p>
                     <p className="text-xl font-bold text-white">
-                      {assignment.offerDate}
+                      {assignment.offerDate.split('T')[0].split('-').reverse().join('-')}
                     </p>
                   </div>
                 )}
@@ -1349,7 +1329,7 @@ const PropertyDetail = () => {
                   </div>
                 </>
               ) : (
-                <div 
+                <div
                   className="p-6 bg-white/[0.02] border border-white/5 rounded-2xl cursor-pointer hover:bg-white/[0.04] transition-all group"
                   onClick={() => setIsEditingNotes(true)}
                 >
@@ -1359,7 +1339,7 @@ const PropertyDetail = () => {
                     </p>
                   ) : (
                     <p className="text-gray-500 italic flex items-center gap-2">
-                       No notes yet. Click to add your personal notes.
+                      No notes yet. Click to add your personal notes.
                     </p>
                   )}
                 </div>
@@ -1381,10 +1361,12 @@ const PropertyDetail = () => {
           ></div>
           <div className="relative bg-navy border border-teal/30 rounded-3xl p-8 max-w-md w-full shadow-2xl">
             <div
-              className={`w-16 h-16 rounded-full flex items-center justify-center mb-6 mx-auto ${showConfirmModal === "ACCEPT" ? "bg-teal/20 text-teal" : "bg-red-500/20 text-red-400"}`}
+              className={`w-16 h-16 rounded-full flex items-center justify-center mb-6 mx-auto ${showConfirmModal === "ACCEPT" ? "bg-teal/20 text-teal" : showConfirmModal === "REQUEST_WALKTHROUGH" ? "bg-blue-500/20 text-blue-400" : "bg-red-500/20 text-red-400"}`}
             >
               {showConfirmModal === "ACCEPT" ? (
                 <CheckCircle2 size={32} />
+              ) : showConfirmModal === "REQUEST_WALKTHROUGH" ? (
+                <Eye size={32} />
               ) : (
                 <AlertCircle size={32} />
               )}
@@ -1392,11 +1374,15 @@ const PropertyDetail = () => {
             <h3 className="text-2xl font-bold text-white text-center mb-2">
               {showConfirmModal === "ACCEPT"
                 ? "Express Interest?"
+                : showConfirmModal === "REQUEST_WALKTHROUGH"
+                ? "Request Walkthrough?"
                 : "Not Interested?"}
             </h3>
             <p className="text-gray-400 text-center mb-6">
               {showConfirmModal === "ACCEPT"
                 ? "Your agent will be notified of your interest in this property."
+                : showConfirmModal === "REQUEST_WALKTHROUGH"
+                ? "Your agent will be notified that you would like a walkthrough of this property."
                 : "Your agent will be notified that this property isn't right for you."}
             </p>
             <textarea
@@ -1418,7 +1404,7 @@ const PropertyDetail = () => {
               <button
                 onClick={() => handleNotify(showConfirmModal)}
                 disabled={actionLoading}
-                className={`flex-1 py-3 font-bold rounded-xl transition-all flex items-center justify-center gap-2 ${showConfirmModal === "ACCEPT" ? "bg-teal text-navy hover:bg-teal/90" : "bg-red-500 text-white hover:bg-red-600"}`}
+                className={`flex-1 py-3 font-bold rounded-xl transition-all flex items-center justify-center gap-2 ${showConfirmModal === "ACCEPT" ? "bg-teal text-navy hover:bg-teal/90" : showConfirmModal === "REQUEST_WALKTHROUGH" ? "bg-blue-500 text-white hover:bg-blue-600" : "bg-red-500 text-white hover:bg-red-600"}`}
               >
                 {actionLoading ? (
                   <Loader2 className="animate-spin" size={20} />

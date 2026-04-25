@@ -113,7 +113,7 @@ const Profile = () => {
               {profile?.secondaryEmail && (
                 <DetailRow label="Secondary Email" value={profile?.secondaryEmail} icon={Mail} />
               )}
-              <DetailRow label="Greeting Name" value={profile?.greetingName} icon={Users} />
+
               {profile?.jointBuyerName && (
                 <DetailRow label="Joint Buyer Name" value={profile?.jointBuyerName} icon={Users} />
               )}
