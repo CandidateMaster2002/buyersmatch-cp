@@ -806,6 +806,7 @@ public class ZohoSyncService {
         }
 
         log.info("uploadMissingR2Documents completed: {}/{} uploaded", uploaded, missing.size());
+        updateSyncState("Media", false);
         return uploaded;
     }
 
