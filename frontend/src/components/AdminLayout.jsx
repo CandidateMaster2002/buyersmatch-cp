@@ -1,8 +1,48 @@
-import React from "react";
+import React, { useState } from "react";
 import { useNavigate, Link, useLocation } from "react-router-dom";
-import { LogOut, Users, FileText, MessageSquare, RefreshCw } from "lucide-react";
+import { LogOut, Users, FileText, MessageSquare, RefreshCw, Image } from "lucide-react";
 import { adminLogout, getStoredUser } from "../api/client";
 import logo from "../assets/bm-logo-white-text-1B2A4A.jpg";
+
+const SyncButton = ({ label, icon: Icon, endpoint, colorClass, activeColorClass }) => {
+  const [state, setState] = useState("idle"); // idle | loading | done | error
+
+  const handleClick = async () => {
+    if (state === "loading") return;
+    setState("loading");
+    try {
+      const { triggerSync } = await import('../api/admin');
+      await triggerSync(endpoint);
+      setState("done");
+    } catch {
+      setState("error");
+    } finally {
+      setTimeout(() => setState("idle"), 3000);
+    }
+  };
+
+  const label_ =
+    state === "loading" ? "Starting..." :
+    state === "done"    ? "Started ✓" :
+    state === "error"   ? "Failed ✗" :
+    label;
+
+  return (
+    <button
+      onClick={handleClick}
+      disabled={state === "loading"}
+      className={`flex items-center gap-2 px-4 py-2 border rounded-xl font-bold uppercase tracking-widest text-[10px] transition-all
+        ${state === "done"    ? "bg-green-500/20 border-green-500/40 text-green-400" :
+          state === "error"   ? "bg-red-500/20 border-red-500/40 text-red-400" :
+          state === "loading" ? `${colorClass} opacity-60 cursor-wait` :
+          `${colorClass} ${activeColorClass}`}
+      `}
+    >
+      <Icon size={16} className={state === "loading" ? "animate-spin" : ""} />
+      <span className="hidden sm:inline">{label_}</span>
+    </button>
+  );
+};
 
 const AdminLayout = ({ children, title }) => {
   const navigate = useNavigate();
@@ -23,10 +63,10 @@ const AdminLayout = ({ children, title }) => {
             to="/admin/clients"
             className="flex items-center gap-3 group flex-shrink-0"
           >
-            <img 
-              src={logo} 
-              alt="BuyersMatch" 
-              className="h-10 w-auto group-hover:scale-105 transition-transform" 
+            <img
+              src={logo}
+              alt="BuyersMatch"
+              className="h-10 w-auto group-hover:scale-105 transition-transform"
             />
             <div className="hidden sm:block border-l border-white/10 pl-3">
               <p className="text-[10px] text-teal uppercase tracking-widest font-bold">
@@ -36,7 +76,7 @@ const AdminLayout = ({ children, title }) => {
           </Link>
         </div>
 
-        <div className="flex items-center gap-6">
+        <div className="flex items-center gap-4">
           <div className="hidden md:flex flex-col items-end">
             <p className="text-sm font-bold truncate max-w-[150px]">
               {user?.email}
@@ -45,28 +85,22 @@ const AdminLayout = ({ children, title }) => {
               Administrator
             </p>
           </div>
-          
-          <button
-            onClick={async (e) => {
-              const btn = e.currentTarget;
-              const originalText = btn.innerHTML;
-              btn.innerHTML = '<span class="animate-spin inline-block mr-2">↻</span>Syncing...';
-              btn.disabled = true;
-              try {
-                const { triggerSync } = await import('../api/admin');
-                await triggerSync('delta');
-                btn.innerHTML = '<span class="text-green-400">✓</span> Synced';
-                setTimeout(() => { btn.innerHTML = originalText; btn.disabled = false; }, 2000);
-              } catch (err) {
-                btn.innerHTML = '<span class="text-red-400">✗</span> Failed';
-                setTimeout(() => { btn.innerHTML = originalText; btn.disabled = false; }, 2000);
-              }
-            }}
-            className="flex items-center gap-2 px-4 py-2 bg-teal/10 border border-teal/30 text-teal rounded-xl hover:bg-teal hover:text-navy transition-all font-bold uppercase tracking-widest text-[10px]"
-          >
-            <RefreshCw size={16} />
-            <span className="hidden sm:inline">Sync Zoho</span>
-          </button>
+
+          <SyncButton
+            label="Sync Data"
+            icon={RefreshCw}
+            endpoint="data"
+            colorClass="bg-teal/10 border-teal/30 text-teal"
+            activeColorClass="hover:bg-teal hover:text-navy"
+          />
+
+          <SyncButton
+            label="Sync Media"
+            icon={Image}
+            endpoint="media"
+            colorClass="bg-purple-500/10 border-purple-500/30 text-purple-400"
+            activeColorClass="hover:bg-purple-500 hover:text-white"
+          />
 
           <button
             onClick={handleLogout}

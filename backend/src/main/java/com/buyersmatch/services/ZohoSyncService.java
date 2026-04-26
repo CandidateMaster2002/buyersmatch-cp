@@ -453,6 +453,10 @@ public class ZohoSyncService {
     // -------------------------------------------------------------------------
 
     public void syncPropertyDocuments(boolean fullSync, Integer limit) {
+        syncPropertyDocuments(fullSync, limit, false);
+    }
+
+    public void syncPropertyDocuments(boolean fullSync, Integer limit, boolean skipR2) {
         String syncType = fullSync ? (limit != null ? "FULL (LIMIT " + limit + ")" : "FULL") : "DELTA";
         SyncLog syncLog = startLog("PropertyDocuments", syncType);
         int count = 0;
@@ -513,31 +517,29 @@ public class ZohoSyncService {
                         }
                     }
 
-                    String zohoPropertyId = doc.getZohoPropertyId();
-                    if (!allowedPropertyIds.contains(zohoPropertyId)) {
-                        log.debug("Skipping R2 upload for property {} - not assigned to any portal client", zohoPropertyId);
-                        // Save metadata only; preserve any existing r2Url
-                        propertyDocumentRepository.save(doc);
-                        count++;
-                        continue;
-                    }
+                    if (!skipR2) {
+                        String zohoPropertyId = doc.getZohoPropertyId();
+                        if (allowedPropertyIds.contains(zohoPropertyId)) {
+                            String fileName = doc.getFileName();
+                            String fileExtension = doc.getFileExtension();
+                            String fileKey = r2StorageService.generateFileKey(zohoDocId, fileName);
+                            String contentType = r2StorageService.getContentType(fileExtension);
 
-                    String fileName = doc.getFileName();
-                    String fileExtension = doc.getFileExtension();
-                    String fileKey = r2StorageService.generateFileKey(zohoDocId, fileName);
-                    String contentType = r2StorageService.getContentType(fileExtension);
-
-                    if (r2StorageService.fileExists(fileKey)) {
-                        doc.setR2Url(r2StorageService.getPublicUrl(fileKey));
-                        log.info("Already in R2, skipping: {}", fileKey);
-                    } else {
-                        String r2Url = tryUploadWithFallback(doc, fileKey, contentType);
-                        if (r2Url != null) {
-                            doc.setR2Url(r2Url);
-                            log.info("Uploaded to R2: {}", fileKey);
+                            if (r2StorageService.fileExists(fileKey)) {
+                                doc.setR2Url(r2StorageService.getPublicUrl(fileKey));
+                                log.info("Already in R2, skipping: {}", fileKey);
+                            } else {
+                                String r2Url = tryUploadWithFallback(doc, fileKey, contentType);
+                                if (r2Url != null) {
+                                    doc.setR2Url(r2Url);
+                                    log.info("Uploaded to R2: {}", fileKey);
+                                } else {
+                                    doc.setR2Url(null);
+                                    log.warn("Failed to upload to R2: {}", fileKey);
+                                }
+                            }
                         } else {
-                            doc.setR2Url(null);
-                            log.warn("Failed to upload to R2: {}", fileKey);
+                            log.debug("Skipping R2 upload for property {} - not assigned to any portal client", doc.getZohoPropertyId());
                         }
                     }
 
@@ -661,15 +663,42 @@ public class ZohoSyncService {
     }
 
     // -------------------------------------------------------------------------
-    // METHOD 6: Delta Sync
+    // METHOD 6: Data Sync — text only, no R2 uploads, runs in parallel
+    // Used by the 5-minute scheduler and the "Sync Data" button.
+    // -------------------------------------------------------------------------
+
+    public void runDataSync() {
+        log.info("Starting data sync (parallel, no R2)");
+        java.util.concurrent.CompletableFuture<Void> briefs =
+                java.util.concurrent.CompletableFuture.runAsync(() -> syncBuyerBriefs(false, null));
+        java.util.concurrent.CompletableFuture<Void> properties =
+                java.util.concurrent.CompletableFuture.runAsync(() -> syncProperties(false, null));
+        java.util.concurrent.CompletableFuture<Void> docs =
+                java.util.concurrent.CompletableFuture.runAsync(() -> syncPropertyDocuments(false, null, true));
+        java.util.concurrent.CompletableFuture<Void> clients =
+                java.util.concurrent.CompletableFuture.runAsync(() -> syncClientManagement(false, null));
+        java.util.concurrent.CompletableFuture.allOf(briefs, properties, docs, clients).join();
+        log.info("Data sync completed");
+    }
+
+    // -------------------------------------------------------------------------
+    // METHOD 7: Media Sync — upload missing R2 files for onboarded clients
+    // Used by the "Sync Media" button.
+    // -------------------------------------------------------------------------
+
+    public void runMediaSync() {
+        log.info("Starting media sync (R2 uploads only)");
+        uploadMissingR2Documents();
+        log.info("Media sync completed");
+    }
+
+    // -------------------------------------------------------------------------
+    // METHOD 8: Delta Sync (legacy — data + media together)
     // -------------------------------------------------------------------------
 
     public void runDeltaSync() {
         log.info("Starting delta sync");
-        syncBuyerBriefs(false, null);
-        syncProperties(false, null);
-        syncPropertyDocuments(false, null);
-        syncClientManagement(false, null);
+        runDataSync();
         uploadMissingR2Documents();
         log.info("Delta sync completed");
     }
@@ -786,8 +815,8 @@ public class ZohoSyncService {
 
     @Scheduled(fixedRate = 300000)
     public void scheduledDeltaSync() {
-        log.info("Scheduled delta sync started");
-        runDeltaSync(); // uploadMissingR2Documents is called at end of runDeltaSync
+        log.info("Scheduled data sync started");
+        runDataSync();
     }
 
     // -------------------------------------------------------------------------

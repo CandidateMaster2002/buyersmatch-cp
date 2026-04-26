@@ -47,11 +47,25 @@ public class SyncController {
         return ResponseEntity.ok(Map.of("success", true, "message", "Full sync started in background" + (limit != null ? " with limit " + limit : "")));
     }
 
+    @PostMapping("/data")
+    public ResponseEntity<Map<String, Object>> dataSync() {
+        log.info("Data sync triggered via API");
+        CompletableFuture.runAsync(zohoSyncService::runDataSync);
+        return ResponseEntity.ok(Map.of("success", true, "message", "Data sync started in background"));
+    }
+
+    @PostMapping("/media")
+    public ResponseEntity<Map<String, Object>> mediaSync() {
+        log.info("Media sync triggered via API");
+        CompletableFuture.runAsync(zohoSyncService::runMediaSync);
+        return ResponseEntity.ok(Map.of("success", true, "message", "Media sync started in background"));
+    }
+
     @PostMapping("/delta")
     public ResponseEntity<Map<String, Object>> deltaSync() {
         log.info("Delta sync triggered via API");
-        zohoSyncService.runDeltaSync();
-        return ResponseEntity.ok(Map.of("success", true, "message", "Delta sync completed"));
+        CompletableFuture.runAsync(zohoSyncService::runDeltaSync);
+        return ResponseEntity.ok(Map.of("success", true, "message", "Delta sync started in background"));
     }
 
     @GetMapping("/status")
