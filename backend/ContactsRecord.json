@@ -1,0 +1,94 @@
+{
+    "data": [
+        {
+            "Owner": {
+                "name": "Vish Kungwani",
+                "id": "86680000000547898",
+                "email": "vish@buyersmatch.com.au"
+            },
+            "Company": "Priority Legal services",
+            "Email": "chantel@prioritylegalservices.com.au",
+            "Invoice": null,
+            "$currency_symbol": "$",
+            "Suppress_Comms": false,
+            "$field_states": null,
+            "Mailing_State": null,
+            "Last_Activity_Time": "2026-04-24T09:06:50+05:30",
+            "Department": null,
+            "Joint_Buyers_Full_Name": null,
+            "$state": "save",
+            "Unsubscribed_Mode": null,
+            "$process_flow": false,
+            "Assistant": null,
+            "$locked_for_me": false,
+            "id": "86680000001079109",
+            "$approved": true,
+            "Reporting_To": null,
+            "$approval": {
+                "delegate": false,
+                "takeover": false,
+                "approve": false,
+                "reject": false,
+                "resubmit": false
+            },
+            "Created_Time": "2025-06-23T10:21:17+05:30",
+            "$editable": true,
+            "Secondary_Client_Mobile": null,
+            "Role": "Conveyancer",
+            "Preferred": false,
+            "Region": null,
+            "Created_By": {
+                "name": "Vish Kungwani",
+                "id": "86680000000547898",
+                "email": "vish@buyersmatch.com.au"
+            },
+            "$zia_owner_assignment": null,
+            "Secondary_Email": null,
+            "$is_duplicate": false,
+            "Mailing_Zip": null,
+            "$review_process": {
+                "approve": false,
+                "reject": false,
+                "resubmit": false
+            },
+            "Twitter": null,
+            "Mailing_Street": null,
+            "$layout_id": {
+                "display_label": "Standard",
+                "name": "Standard",
+                "id": "86680000000000629"
+            },
+            "Contact_Greeting_Name": "Chantel",
+            "Salutation": null,
+            "Secondary_Client_Last_Name": null,
+            "First_Name": "Chantel",
+            "Full_Name": "Chantel Priddey",
+            "Asst_Phone": null,
+            "Secondary_Client_First_Name": null,
+            "Modified_By": {
+                "name": "Vish Kungwani",
+                "id": "86680000000547898",
+                "email": "vish@buyersmatch.com.au"
+            },
+            "$review": null,
+            "Skype_ID": "Unknown",
+            "Secondary_Client_Email": null,
+            "Email_Opt_Out": false,
+            "Legal_Name": null,
+            "Mailing_Suburb": null,
+            "Modified_Time": "2026-04-23T04:57:55+05:30",
+            "Date_of_Birth": null,
+            "Unsubscribed_Time": null,
+            "Mobile": "07 3808 2026",
+            "$orchestration": false,
+            "Agreement": null,
+            "Last_Name": "Priddey",
+            "$in_merge": false,
+            "Locked__s": false,
+            "Lead_Source": null,
+            "Tag": [],
+            "Fax": null,
+            "$approval_state": "approved"
+        }
+    ]
+}

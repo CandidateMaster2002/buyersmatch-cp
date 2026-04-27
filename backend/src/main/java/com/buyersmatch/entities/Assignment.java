@@ -72,6 +72,10 @@ public class Assignment {
     @Column(name = "walkthrough_requested", nullable = false)
     private boolean walkthroughRequested = false;
 
+    private String conveyancerZohoId;
+    private String conveyancerName;
+    private String conveyancerEmail;
+
     @Column(name = "client_notes", columnDefinition = "text")
     private String clientNotes;
 

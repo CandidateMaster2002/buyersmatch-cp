@@ -49,7 +49,10 @@ public class Property {
     private String saleType;
     private String rentalSituation;
     private String lgaRegion;
+
+    @Column(columnDefinition = "text")
     private String rentalAppraisal;
+
     private String dateOfListing;
 
     @Column(columnDefinition = "text")

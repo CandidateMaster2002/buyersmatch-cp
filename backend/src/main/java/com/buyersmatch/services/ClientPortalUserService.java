@@ -131,6 +131,7 @@ public class ClientPortalUserService {
         user.setLockedUntil(null);
         portalUserRepository.save(user);
         log.info("Reactivated portal user: buyerBriefId={}", buyerBriefId);
+        CompletableFuture.runAsync(zohoSyncService::uploadMissingR2Documents);
         return ClientPortalUserResponse.from(user);
     }
 

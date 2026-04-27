@@ -794,6 +794,7 @@ const Dashboard = () => {
                       const isOffMarket = /off.?market/i.test(
                         item.property.saleType || "",
                       );
+                      const isDualOcc = item.property.pool === true;
                       const rentalYield =
                         item.assignment?.rentalYield ??
                         item.property.yieldPercent;
@@ -825,6 +826,11 @@ const Dashboard = () => {
                                 {isOffMarket && (
                                   <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-purple-500/20 border border-purple-400/40 text-purple-300 text-[8px] font-bold rounded tracking-widest shrink-0">
                                     <Lock size={8} /> OFF MARKET
+                                  </span>
+                                )}
+                                {isDualOcc && (
+                                  <span className="inline-flex items-center gap-1 px-1.5 py-0.5 bg-blue-500/20 border border-blue-400/40 text-blue-300 text-[8px] font-bold rounded tracking-widest shrink-0">
+                                    <Users size={8} /> DUAL OCCUPANCY
                                   </span>
                                 )}
                               </div>

@@ -537,7 +537,7 @@ const PropertyDetail = () => {
                     icon: Calendar,
                   },
                   {
-                    label: "Pool",
+                    label: "Dual Occupancy",
                     value:
                       property.pool === true
                         ? "Yes"
@@ -1268,6 +1268,47 @@ const PropertyDetail = () => {
               </div>
             );
           })()}
+
+          {/* Conveyancer */}
+          {assignment && (assignment.conveyancerName || assignment.conveyancerEmail) && (
+            <div className="bg-navy border border-teal/10 rounded-3xl p-8">
+              <div className="flex items-center gap-3 mb-6">
+                <BookOpen className="text-teal" size={24} />
+                <h3 className="text-xl font-bold text-white">Conveyancer</h3>
+              </div>
+              <div className="flex flex-col sm:flex-row gap-6">
+                {assignment.conveyancerName && (
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-teal/10 border border-teal/20 flex items-center justify-center flex-shrink-0">
+                      <span className="text-teal font-bold text-sm">
+                        {assignment.conveyancerName.charAt(0).toUpperCase()}
+                      </span>
+                    </div>
+                    <div>
+                      <p className="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-0.5">Name</p>
+                      <p className="text-white font-semibold">{assignment.conveyancerName}</p>
+                    </div>
+                  </div>
+                )}
+                {assignment.conveyancerEmail && (
+                  <div className="flex items-center gap-3">
+                    <div className="w-10 h-10 rounded-full bg-teal/10 border border-teal/20 flex items-center justify-center flex-shrink-0">
+                      <ExternalLink className="text-teal" size={16} />
+                    </div>
+                    <div>
+                      <p className="text-[10px] text-gray-500 uppercase tracking-widest font-bold mb-0.5">Email</p>
+                      <a
+                        href={`mailto:${assignment.conveyancerEmail}`}
+                        className="text-teal hover:underline font-semibold"
+                      >
+                        {assignment.conveyancerEmail}
+                      </a>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+          )}
 
           {/* Agent Notes */}
           <div className="bg-navy border border-teal/10 rounded-3xl p-8">

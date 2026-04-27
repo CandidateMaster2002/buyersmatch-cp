@@ -95,7 +95,7 @@ public class ClientController {
 
         // 1. Determine the Zoho Contact ID to use for fetching all records
         String contactId = brief.getZohoContactId();
-        
+
         List<BuyerBrief> allBriefs;
         List<Assignment> allAssignments;
 
@@ -179,7 +179,7 @@ public class ClientController {
         // Fill from portal user if still missing
         portalUserRepository.findByBuyerBriefId(brief.getId()).ifPresent(pu -> {
             if (profile.get("fullName") == null || "N/A".equals(profile.get("fullName"))) {
-                // If portal user has no fullName concept, maybe we can't do much, 
+                // If portal user has no fullName concept, maybe we can't do much,
                 // but let's at least ensure email is there.
             }
             if (profile.get("email") == null) {
@@ -241,7 +241,8 @@ public class ClientController {
         }
 
         List<PropertyDocument> all = propertyDocumentRepository.findAllByZohoPropertyId(property.getZohoPropertyId());
-        return ResponseEntity.ok(Map.of("success", true, "data", categorizeDocuments(all, property.getPropertyVideoUrl())));
+        return ResponseEntity
+                .ok(Map.of("success", true, "data", categorizeDocuments(all, property.getPropertyVideoUrl())));
     }
 
     /**
@@ -270,7 +271,8 @@ public class ClientController {
             return;
         }
 
-        // Determine source URL: prefer CRM attachment (requires auth), fallback to WorkDrive
+        // Determine source URL: prefer CRM attachment (requires auth), fallback to
+        // WorkDrive
         String sourceUrl = doc.getCrmDownloadUrl();
         if (sourceUrl == null || sourceUrl.isBlank()) {
             sourceUrl = doc.getDownloadLink();
@@ -303,7 +305,8 @@ public class ClientController {
                 response.getOutputStream().write(bytes);
                 response.flushBuffer();
             } else {
-                response.sendError(HttpServletResponse.SC_BAD_GATEWAY, "Upstream returned: " + zohoResponse.getStatusCode());
+                response.sendError(HttpServletResponse.SC_BAD_GATEWAY,
+                        "Upstream returned: " + zohoResponse.getStatusCode());
             }
         } catch (Exception e) {
             log.error("Failed to stream document {}: {}", docId, e.getMessage());
@@ -316,7 +319,7 @@ public class ClientController {
     /**
      * Handles client response to a property assignment.
      * For ACCEPT: Zoho CRM must be updated successfully first, then email is sent.
-     *             Local DB is NOT touched — portalStatus syncs back via regular Zoho sync.
+     * Local DB is NOT touched — portalStatus syncs back via regular Zoho sync.
      * For REQUEST_WALKTHROUGH: email only, no Zoho write.
      */
     @PostMapping("/api/client/assignment/{assignmentId}/notify")
@@ -336,10 +339,12 @@ public class ClientController {
         String propertyAddress = "Unknown Property";
         if (assignment.getZohoPropertyId() != null) {
             Property prop = propertyRepository.findByZohoPropertyId(assignment.getZohoPropertyId()).orElse(null);
-            if (prop != null && prop.getAddress() != null) propertyAddress = prop.getAddress();
+            if (prop != null && prop.getAddress() != null)
+                propertyAddress = prop.getAddress();
         }
 
-        // Resolve client name from brief (contact may have multiple briefs — any will do)
+        // Resolve client name from brief (contact may have multiple briefs — any will
+        // do)
         String clientName = "Client";
         if (assignment.getZohoContactId() != null) {
             List<BuyerBrief> briefs = buyerBriefRepository.findAllByZohoContactId(assignment.getZohoContactId());
@@ -354,38 +359,125 @@ public class ClientController {
         if ("ACCEPT".equalsIgnoreCase(action)) {
             if (assignment.getZohoAssignmentId() == null) {
                 log.error("Cannot accept assignment {} — zohoAssignmentId is null", assignmentId);
-                return ResponseEntity.status(500).body(Map.of("success", false, "error", "Assignment has no Zoho ID — cannot update CRM"));
+                return ResponseEntity.status(500)
+                        .body(Map.of("success", false, "error", "Assignment has no Zoho ID — cannot update CRM"));
             }
             try {
                 String accessToken = zohoAuthService.getAccessToken();
                 HttpHeaders zh = new HttpHeaders();
                 zh.set("Authorization", "Zoho-oauthtoken " + accessToken);
                 zh.setContentType(MediaType.APPLICATION_JSON);
-                Map<String, Object> zohoBody = Map.of("data", List.of(Map.of("Status", "Property Accepted")));
+                Map<String, Object> zohoBody = Map.of("data", List.of(Map.of("Status", "PROPERTY ACCEPTED")));
                 ResponseEntity<String> zohoResp = restTemplate.exchange(
                         zohoBaseUrl + "/Client_Management/" + assignment.getZohoAssignmentId(),
                         HttpMethod.PUT,
                         new HttpEntity<>(zohoBody, zh),
                         String.class);
-                log.info("Zoho CRM updated to 'Property Accepted' for assignment {} — HTTP {}", assignmentId, zohoResp.getStatusCode());
+
+                String respBody = zohoResp.getBody();
+                boolean isError = respBody != null
+                        && (respBody.contains("\"status\":\"error\"") || respBody.contains("\"status\": \"error\""));
+
+                if (isError) {
+                    boolean blueprintResolved = false;
+
+                    if (respBody.contains("RECORD_IN_BLUEPRINT")) {
+                        log.warn("Record is in Blueprint. Fetching available transitions...");
+                        try {
+                            ResponseEntity<Map> bpResp = restTemplate.exchange(
+                                    zohoBaseUrl + "/Client_Management/" + assignment.getZohoAssignmentId()
+                                            + "/actions/blueprint",
+                                    HttpMethod.GET,
+                                    new HttpEntity<>(zh),
+                                    Map.class);
+
+                            Map<String, Object> bpBody = bpResp.getBody();
+                            if (bpBody != null && bpBody.containsKey("blueprint")) {
+                                Map<String, Object> blueprint = (Map<String, Object>) bpBody.get("blueprint");
+                                List<Map<String, Object>> transitions = (List<Map<String, Object>>) blueprint
+                                        .get("transitions");
+
+                                String transitionId = null;
+                                if (transitions != null) {
+                                    for (Map<String, Object> t : transitions) {
+                                        String tName = t.get("name") != null ? t.get("name").toString() : "";
+                                        if (tName.equalsIgnoreCase("Property Accepted")) {
+                                            transitionId = t.get("id").toString();
+                                            break;
+                                        }
+                                    }
+                                }
+
+                                if (transitionId != null) {
+                                    log.info("Found Blueprint transition 'Property Accepted' with ID: {}",
+                                            transitionId);
+                                    Map<String, Object> bpPutData = Map.of(
+                                            "blueprint", List.of(
+                                                    Map.of("transition_id", transitionId, "data", Map.of())));
+                                    ResponseEntity<String> bpExecResp = restTemplate.exchange(
+                                            zohoBaseUrl + "/Client_Management/" + assignment.getZohoAssignmentId()
+                                                    + "/actions/blueprint",
+                                            HttpMethod.PUT,
+                                            new HttpEntity<>(bpPutData, zh),
+                                            String.class);
+                                    String execBody = bpExecResp.getBody();
+                                    if (execBody != null && execBody.contains("\"status\":\"error\"")) {
+                                        return ResponseEntity.status(400).body(Map.of("success", false, "error",
+                                                "Blueprint execution failed: " + execBody));
+                                    }
+                                    log.info("Successfully executed Blueprint transition {}", transitionId);
+                                    blueprintResolved = true;
+                                } else {
+                                    log.error("Blueprint transition 'Property Accepted' not found. Available: {}",
+                                            transitions);
+                                    return ResponseEntity.status(400).body(Map.of("success", false, "error",
+                                            "Blueprint transition 'Property Accepted' not found."));
+                                }
+                            }
+                        } catch (Exception bpEx) {
+                            log.error("Failed to execute blueprint transition", bpEx);
+                            return ResponseEntity.status(500).body(Map.of("success", false, "error",
+                                    "Failed to execute blueprint: " + bpEx.getMessage()));
+                        }
+                    }
+
+                    if (!blueprintResolved) {
+                        log.error("Zoho CRM update returned error: {}", respBody);
+                        return ResponseEntity.status(400)
+                                .body(Map.of("success", false, "error", "Zoho update rejected: " + respBody));
+                    }
+                }
+
+                log.info("Zoho CRM updated to 'PROPERTY ACCEPTED' for assignment {} — HTTP {} - Body {}", assignmentId,
+                        zohoResp.getStatusCode(), respBody);
+
+                // Update local DB instantly so UI refreshes without waiting for sync
+                assignment.setZohoStatus("Property Accepted");
+                assignment.setPortalStatus("ACCEPTED");
+                assignmentRepository.save(assignment);
+
             } catch (Exception e) {
                 log.error("Zoho CRM update failed for assignment {}: {}", assignmentId, e.getMessage());
-                return ResponseEntity.status(500).body(Map.of("success", false, "error", "Failed to update CRM: " + e.getMessage()));
+                return ResponseEntity.status(500)
+                        .body(Map.of("success", false, "error", "Failed to update CRM: " + e.getMessage()));
             }
         }
 
-        // For REQUEST_WALKTHROUGH: store locally (no Zoho write, so we track it ourselves)
+        // For REQUEST_WALKTHROUGH: store locally (no Zoho write, so we track it
+        // ourselves)
         if ("REQUEST_WALKTHROUGH".equalsIgnoreCase(action)) {
             assignment.setWalkthroughRequested(true);
             assignmentRepository.save(assignment);
         }
 
-        // Email fires only after Zoho succeeds (or for REQUEST_WALKTHROUGH which doesn't need Zoho)
+        // Email fires only after Zoho succeeds (or for REQUEST_WALKTHROUGH which
+        // doesn't need Zoho)
         try {
             emailService.sendClientActionNotification(clientName, propertyAddress, action, remark);
         } catch (Exception e) {
             log.warn("Email failed for assignment {}: {}", assignmentId, e.getMessage());
-            return ResponseEntity.status(500).body(Map.of("success", false, "error", "Email failed: " + e.getMessage()));
+            return ResponseEntity.status(500)
+                    .body(Map.of("success", false, "error", "Email failed: " + e.getMessage()));
         }
 
         return ResponseEntity.ok(Map.of("success", true, "message", "Done"));
@@ -424,37 +516,37 @@ public class ClientController {
     private Map<String, Object> projectDoc(PropertyDocument doc) {
         String url = doc.getR2Url() != null ? doc.getR2Url() : doc.getDownloadLink();
         Map<String, Object> m = new LinkedHashMap<>();
-        m.put("id",            doc.getId());
-        m.put("documentType",  doc.getDocumentType());
-        m.put("caption",       doc.getCaption());
-        m.put("fileName",      doc.getFileName());
+        m.put("id", doc.getId());
+        m.put("documentType", doc.getDocumentType());
+        m.put("caption", doc.getCaption());
+        m.put("fileName", doc.getFileName());
         m.put("fileExtension", doc.getFileExtension());
         m.put("fileSizeBytes", doc.getFileSizeBytes());
-        m.put("url",           url);
+        m.put("url", url);
         return m;
     }
 
     private Map<String, Object> categorizeDocuments(List<PropertyDocument> all, String propertyVideoUrl) {
         List<Map<String, Object>> propertyImages = new ArrayList<>(); // gallery at top
-        List<Map<String, Object>> images         = new ArrayList<>(); // Due Diligence etc. — docs section
-        List<Map<String, Object>> videos         = new ArrayList<>();
-        List<Map<String, Object>> pdfs           = new ArrayList<>();
-        List<Map<String, Object>> others         = new ArrayList<>();
-        List<String> externalVideos              = new ArrayList<>();
+        List<Map<String, Object>> images = new ArrayList<>(); // Due Diligence etc. — docs section
+        List<Map<String, Object>> videos = new ArrayList<>();
+        List<Map<String, Object>> pdfs = new ArrayList<>();
+        List<Map<String, Object>> others = new ArrayList<>();
+        List<String> externalVideos = new ArrayList<>();
 
         if (propertyVideoUrl != null && !propertyVideoUrl.isBlank()) {
             externalVideos.add(propertyVideoUrl);
         }
 
-        Set<String> imgExts   = Set.of("png", "jpg", "jpeg", "webp", "gif");
+        Set<String> imgExts = Set.of("png", "jpg", "jpeg", "webp", "gif");
         Set<String> videoExts = Set.of("mp4", "mov", "movie", "webm");
 
         for (PropertyDocument doc : all) {
             if (doc.getPropertyVideoUrl() != null && !doc.getPropertyVideoUrl().isBlank()) {
                 externalVideos.add(doc.getPropertyVideoUrl());
             }
-            String ext  = doc.getFileExtension() != null ? doc.getFileExtension().toLowerCase() : "";
-            String type = doc.getDocumentType()  != null ? doc.getDocumentType()  : "";
+            String ext = doc.getFileExtension() != null ? doc.getFileExtension().toLowerCase() : "";
+            String type = doc.getDocumentType() != null ? doc.getDocumentType() : "";
             Map<String, Object> projected = projectDoc(doc);
 
             // PROPERTY_IMAGE / IMAGE (legacy) → top gallery
@@ -473,10 +565,10 @@ public class ClientController {
 
         Map<String, Object> result = new LinkedHashMap<>();
         result.put("propertyImages", propertyImages);
-        result.put("images",         images);
-        result.put("videos",         videos);
-        result.put("pdfs",           pdfs);
-        result.put("others",         others);
+        result.put("images", images);
+        result.put("videos", videos);
+        result.put("pdfs", pdfs);
+        result.put("others", others);
         result.put("externalVideos", externalVideos.stream().distinct().toList());
         return result;
     }

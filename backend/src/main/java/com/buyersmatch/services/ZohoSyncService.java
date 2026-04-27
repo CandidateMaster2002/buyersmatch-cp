@@ -568,6 +568,7 @@ public class ZohoSyncService {
         String syncType = fullSync ? (limit != null ? "FULL (LIMIT " + limit + ")" : "FULL") : "DELTA";
         SyncLog syncLog = startLog("ClientManagement", syncType);
         int count = 0;
+        Map<String, String> contactEmailCache = new HashMap<>(); // zohoContactId → email, shared across the sync run
 
         try {
             LocalDateTime since = fullSync ? null : getLastSyncedAt("ClientManagement");
@@ -598,8 +599,18 @@ public class ZohoSyncService {
 
                     String zohoStatus = r.get("Status") != null ? r.get("Status").toString() : null;
                     assignment.setZohoStatus(zohoStatus);
-                    // Only set portalStatus on first creation — never overwrite client portal choices
-                    if (isNew) {
+                    
+                    // Sync portalStatus from Zoho Status so CRM changes reflect in UI automatically
+                    if (zohoStatus != null) {
+                        String zs = zohoStatus.toLowerCase();
+                        if (zs.contains("reject") || zs.contains("withdraw")) {
+                            assignment.setPortalStatus("REJECTED");
+                        } else if (zs.contains("accept") || zs.contains("offer") || zs.contains("contract") || zs.contains("bnp") || zs.contains("finance") || zs.contains("settlement") || zs.contains("done") || zs.contains("tenanted") || zs.contains("psi")) {
+                            assignment.setPortalStatus("ACCEPTED");
+                        } else if (zs.contains("assigned")) {
+                            assignment.setPortalStatus("PENDING");
+                        }
+                    } else if (isNew) {
                         assignment.setPortalStatus("PENDING");
                     }
 
@@ -626,6 +637,14 @@ public class ZohoSyncService {
                     assignment.setCurrentWeeklyRent(toBigDecimal(r.get("Current_Weekly_Rent")));
                     assignment.setRentalYield(toDouble(r.get("Rental_Yield")));
                     assignment.setRealEstateAgentName(getNestedName(r, "Real_Estate_Agent"));
+
+                    // Conveyancer — name from nested lookup, email via Contacts API
+                    String conveyancerId = getNestedId(r, "Conveyancer");
+                    String conveyancerName = getNestedName(r, "Conveyancer");
+                    assignment.setConveyancerZohoId(conveyancerId);
+                    assignment.setConveyancerName(conveyancerName);
+                    assignment.setConveyancerEmail(fetchContactEmail(conveyancerId, contactEmailCache));
+
                     assignment.setZohoCreatedAt(r.get("Created_Time") != null ? r.get("Created_Time").toString() : null);
                     assignment.setZohoModifiedAt(r.get("Modified_Time") != null ? r.get("Modified_Time").toString() : null);
                     assignment.setSyncedAt(LocalDateTime.now());
@@ -736,6 +755,33 @@ public class ZohoSyncService {
                 .collect(Collectors.toSet());
         log.info("getPortalClientPropertyIds: {} eligible property IDs (onboarded clients, non-rejected assignments)", propertyIds.size());
         return propertyIds;
+    }
+
+    // -------------------------------------------------------------------------
+    // CONTACT EMAIL LOOKUP — cached per sync run to avoid duplicate API calls
+    // -------------------------------------------------------------------------
+
+    @SuppressWarnings("unchecked")
+    private String fetchContactEmail(String zohoContactId, Map<String, String> cache) {
+        if (zohoContactId == null) return null;
+        if (cache.containsKey(zohoContactId)) return cache.get(zohoContactId);
+        try {
+            String url = baseUrl + "/Contacts/" + zohoContactId;
+            ResponseEntity<Map> response = restTemplate.exchange(url, HttpMethod.GET, new HttpEntity<>(getZohoHeaders()), Map.class);
+            if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
+                List<Map<String, Object>> data = (List<Map<String, Object>>) response.getBody().get("data");
+                if (data != null && !data.isEmpty()) {
+                    Object email = data.get(0).get("Email");
+                    String result = email != null ? email.toString() : null;
+                    cache.put(zohoContactId, result);
+                    return result;
+                }
+            }
+        } catch (Exception e) {
+            log.warn("Failed to fetch contact email for {}: {}", zohoContactId, e.getMessage());
+        }
+        cache.put(zohoContactId, null);
+        return null;
     }
 
     // -------------------------------------------------------------------------

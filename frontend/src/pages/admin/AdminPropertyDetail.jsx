@@ -459,7 +459,7 @@ const AdminPropertyDetail = () => {
                     icon: Calendar,
                   },
                   {
-                    label: "Pool",
+                    label: "Dual Occupancy",
                     value:
                       property.pool === true
                         ? "Yes"

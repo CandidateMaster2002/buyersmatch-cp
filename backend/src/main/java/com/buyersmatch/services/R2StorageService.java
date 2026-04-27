@@ -336,6 +336,9 @@ public class R2StorageService {
     // R2 HELPERS
     // -------------------------------------------------------------------------
 
+    public S3Client getS3Client() { return s3; }
+    public String getBucketName() { return bucketName; }
+
     public boolean fileExists(String fileKey) {
         try {
             s3.headObject(HeadObjectRequest.builder()

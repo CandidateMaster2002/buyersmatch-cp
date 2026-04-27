@@ -27,6 +27,7 @@ public class SyncController {
     private final PropertyDocumentRepository propertyDocumentRepository;
     private final AssignmentRepository assignmentRepository;
     private final SyncStateRepository syncStateRepository;
+    private final SyncLogRepository syncLogRepository;
     private final R2StorageService r2StorageService;
 
     @PostMapping("/full")
@@ -71,6 +72,11 @@ public class SyncController {
     @GetMapping("/status")
     public ResponseEntity<Map<String, Object>> syncStatus() {
         return ResponseEntity.ok(Map.of("success", true, "data", syncStateRepository.findAll()));
+    }
+
+    @GetMapping("/logs")
+    public ResponseEntity<Map<String, Object>> syncLogs() {
+        return ResponseEntity.ok(Map.of("success", true, "data", syncLogRepository.findAll()));
     }
 
     @PostMapping("/buyer-briefs")
@@ -133,6 +139,40 @@ public class SyncController {
         propertyDocumentRepository.saveAll(allDocs);
         
         return ResponseEntity.ok(Map.of("success", true, "message", "R2 bucket cleared and database URLs reset"));
+    }
+
+    @PostMapping("/test-r2")
+    public ResponseEntity<Map<String, Object>> testR2Connection() {
+        try {
+            // Minimal valid 1×1 white PNG (67 bytes) — no file path needed
+            byte[] png = new byte[]{
+                (byte)0x89,0x50,0x4E,0x47,0x0D,0x0A,0x1A,0x0A, // PNG signature
+                0x00,0x00,0x00,0x0D,0x49,0x48,0x44,0x52,        // IHDR chunk
+                0x00,0x00,0x00,0x01,0x00,0x00,0x00,0x01,
+                0x08,0x02,0x00,0x00,0x00,(byte)0x90,0x77,0x53,(byte)0xDE,
+                0x00,0x00,0x00,0x0C,0x49,0x44,0x41,0x54,        // IDAT chunk
+                0x08,(byte)0xD7,0x63,(byte)0xF8,(byte)0xCF,(byte)0xC0,0x00,0x00,
+                0x00,0x02,0x00,0x01,(byte)0xE2,0x21,(byte)0xBC,0x33,
+                0x00,0x00,0x00,0x00,0x49,0x45,0x4E,0x44,        // IEND chunk
+                (byte)0xAE,0x42,0x60,(byte)0x82
+            };
+
+            software.amazon.awssdk.core.sync.RequestBody body =
+                    software.amazon.awssdk.core.sync.RequestBody.fromBytes(png);
+            software.amazon.awssdk.services.s3.model.PutObjectRequest req =
+                    software.amazon.awssdk.services.s3.model.PutObjectRequest.builder()
+                            .bucket(r2StorageService.getBucketName())
+                            .key("test/connectivity-check.png")
+                            .contentType("image/png")
+                            .build();
+            r2StorageService.getS3Client().putObject(req, body);
+            String url = r2StorageService.getPublicUrl("test/connectivity-check.png");
+            log.info("R2 connectivity test passed — uploaded test/connectivity-check.png");
+            return ResponseEntity.ok(Map.of("success", true, "url", url));
+        } catch (Exception e) {
+            log.error("R2 connectivity test FAILED: {}", e.getMessage(), e);
+            return ResponseEntity.status(500).body(Map.of("success", false, "error", e.getMessage()));
+        }
     }
 
     @PostMapping("/test-upload")
