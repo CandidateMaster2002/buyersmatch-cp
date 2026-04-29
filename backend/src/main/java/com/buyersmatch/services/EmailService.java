@@ -1,21 +1,26 @@
 package com.buyersmatch.services;
 
-import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
+
+import java.util.List;
+import java.util.Map;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class EmailService {
 
-  private final JavaMailSender mailSender;
+  private final RestTemplate restTemplate;
 
-  @Value("${spring.mail.username}")
+  @Value("${brevo.api.key}")
+  private String brevoApiKey;
+
+  @Value("${brevo.from.email}")
   private String fromEmail;
 
   @Value("${mail.from.name:Buyers Match Portal}")
@@ -30,24 +35,52 @@ public class EmailService {
   @Value("${keep.alive.alert.email:boltblazers.tech@gmail.com}")
   private String keepAliveAlertEmail;
 
+  private static final String BREVO_URL = "https://api.brevo.com/v3/smtp/email";
+
+  // -------------------------------------------------------------------------
+  // CORE SEND — calls Brevo REST API (HTTPS, never blocked by Render)
+  // -------------------------------------------------------------------------
+
+  private void send(String to, String subject, String html) {
+    send(new String[]{to}, subject, html);
+  }
+
+  private void send(String[] to, String subject, String html) {
+    try {
+      HttpHeaders headers = new HttpHeaders();
+      headers.setContentType(MediaType.APPLICATION_JSON);
+      headers.set("api-key", brevoApiKey);
+
+      List<Map<String, String>> toList = java.util.Arrays.stream(to)
+          .map(email -> Map.of("email", email))
+          .toList();
+
+      Map<String, Object> body = Map.of(
+          "sender", Map.of("name", fromName, "email", fromEmail),
+          "to", toList,
+          "subject", subject,
+          "htmlContent", html
+      );
+
+      ResponseEntity<String> response = restTemplate.exchange(
+          BREVO_URL, HttpMethod.POST, new HttpEntity<>(body, headers), String.class);
+
+      if (!response.getStatusCode().is2xxSuccessful()) {
+        throw new RuntimeException("Brevo API returned: " + response.getStatusCode() + " — " + response.getBody());
+      }
+    } catch (Exception e) {
+      log.error("Failed to send email via Brevo to {}: {}", to, e.getMessage());
+      throw new RuntimeException("Failed to send email: " + e.getMessage());
+    }
+  }
+
   // -------------------------------------------------------------------------
   // ONBOARDING EMAIL
   // -------------------------------------------------------------------------
 
   public void sendPortalOnboardingEmail(String toEmail, String clientName, String password) {
-    try {
-      MimeMessage message = mailSender.createMimeMessage();
-      MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-      helper.setFrom(fromEmail, fromName);
-      helper.setTo(toEmail);
-      helper.setSubject("Welcome to Buyers Match Client Portal");
-      helper.setText(buildOnboardingHtml(clientName, toEmail, password), true);
-      mailSender.send(message);
-      log.info("Onboarding email sent to {}", toEmail);
-    } catch (Exception e) {
-      log.error("Failed to send onboarding email to {}: {}", toEmail, e.getMessage());
-      throw new RuntimeException("Failed to send onboarding email: " + e.getMessage());
-    }
+    send(toEmail, "Welcome to Buyers Match Client Portal", buildOnboardingHtml(clientName, toEmail, password));
+    log.info("Onboarding email sent to {}", toEmail);
   }
 
   // -------------------------------------------------------------------------
@@ -55,19 +88,8 @@ public class EmailService {
   // -------------------------------------------------------------------------
 
   public void sendCredentialsUpdateEmail(String toEmail, String clientName, String newPassword) {
-    try {
-      MimeMessage message = mailSender.createMimeMessage();
-      MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-      helper.setFrom(fromEmail, fromName);
-      helper.setTo(toEmail);
-      helper.setSubject("Your Buyers Match Portal Credentials Have Been Updated");
-      helper.setText(buildCredentialsUpdateHtml(clientName, toEmail, newPassword), true);
-      mailSender.send(message);
-      log.info("Credentials update email sent to {}", toEmail);
-    } catch (Exception e) {
-      log.error("Failed to send credentials update email to {}: {}", toEmail, e.getMessage());
-      throw new RuntimeException("Failed to send credentials update email: " + e.getMessage());
-    }
+    send(toEmail, "Your Buyers Match Portal Credentials Have Been Updated", buildCredentialsUpdateHtml(clientName, toEmail, newPassword));
+    log.info("Credentials update email sent to {}", toEmail);
   }
 
   // -------------------------------------------------------------------------
@@ -75,22 +97,11 @@ public class EmailService {
   // -------------------------------------------------------------------------
 
   public void sendClientActionNotification(String clientName, String propertyAddress, String action, String remark) {
-    try {
-      MimeMessage message = mailSender.createMimeMessage();
-      MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-      helper.setFrom(fromEmail, fromName);
-      String[] emails = java.util.Arrays.stream(adminNotifyEmail.split(","))
-          .map(String::trim)
-          .toArray(String[]::new);
-      helper.setTo(emails);
-      helper.setSubject("Client Response – " + propertyAddress);
-      helper.setText(buildClientActionHtml(clientName, propertyAddress, action, remark), true);
-      mailSender.send(message);
-      log.info("Client action notification sent to admin for {} – {}", clientName, action);
-    } catch (Exception e) {
-      log.error("Failed to send client action notification: {}", e.getMessage());
-      throw new RuntimeException("Failed to send notification email: " + e.getMessage());
-    }
+    String[] emails = java.util.Arrays.stream(adminNotifyEmail.split(","))
+        .map(String::trim)
+        .toArray(String[]::new);
+    send(emails, "Client Response – " + propertyAddress, buildClientActionHtml(clientName, propertyAddress, action, remark));
+    log.info("Client action notification sent to admin for {} – {}", clientName, action);
   }
 
   // -------------------------------------------------------------------------
@@ -99,13 +110,7 @@ public class EmailService {
 
   public void sendKeepAliveAlert(String errorMessage) {
     try {
-      MimeMessage message = mailSender.createMimeMessage();
-      MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-      helper.setFrom(fromEmail, fromName);
-      helper.setTo(keepAliveAlertEmail);
-      helper.setSubject("🚨 Buyers Match Backend is DOWN");
-      helper.setText(buildKeepAliveAlertHtml(errorMessage), true);
-      mailSender.send(message);
+      send(keepAliveAlertEmail, "🚨 Buyers Match Backend is DOWN", buildKeepAliveAlertHtml(errorMessage));
       log.warn("Keep-alive alert email sent to {}", keepAliveAlertEmail);
     } catch (Exception e) {
       log.error("Failed to send keep-alive alert: {}", e.getMessage());
