@@ -157,9 +157,7 @@ const AdminPropertyDetail = () => {
   }
 
   // Financial Calculations
-  const weeklyRent = property.minRentPerMonth
-    ? (property.minRentPerMonth / 4.33).toFixed(0)
-    : null;
+  const weeklyRent = property.minRentPerMonth ?? null;
   const annualIncome = weeklyRent ? (weeklyRent * 52).toFixed(0) : null;
   const yieldMin = property.askingPriceMin
     ? ((annualIncome / property.askingPriceMin) * 100).toFixed(2)
