@@ -51,7 +51,7 @@ jobs:
       - name: Deploy to Cloud Run
         uses: google-github-actions/deploy-cloudrun@v2
         with:
-          service: buyers-match-api
+          service: buyersmatch-cp
           region: ${{ env.GCP_REGION }}
           image: ${{ env.GCP_REGION }}-docker.pkg.dev/${{ env.GCP_PROJECT_ID }}/${{ env.REPO_NAME }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
           flags: >-
@@ -64,4 +64,4 @@ jobs:
             --timeout=60
 
       - name: Show deployed URL
-        run: echo "Deployed to $(gcloud run services describe buyers-match-api --region=${{ env.GCP_REGION }} --format='value(status.url)')"
+        run: echo "Deployed to $(gcloud run services describe buyersmatch-cp --region=${{ env.GCP_REGION }} --format='value(status.url)')"
