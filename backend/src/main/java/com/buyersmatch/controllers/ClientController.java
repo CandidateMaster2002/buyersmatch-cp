@@ -452,10 +452,9 @@ public class ClientController {
                 log.info("Zoho CRM updated to 'PROPERTY ACCEPTED' for assignment {} — HTTP {} - Body {}", assignmentId,
                         zohoResp.getStatusCode(), respBody);
 
-                // Update local DB instantly so UI refreshes without waiting for sync
+                // Stage DB update — will be saved after email succeeds
                 assignment.setZohoStatus("Property Accepted");
                 assignment.setPortalStatus("ACCEPTED");
-                assignmentRepository.save(assignment);
 
             } catch (Exception e) {
                 log.error("Zoho CRM update failed for assignment {}: {}", assignmentId, e.getMessage());
@@ -464,21 +463,22 @@ public class ClientController {
             }
         }
 
-        // For REQUEST_WALKTHROUGH: store locally (no Zoho write, so we track it
-        // ourselves)
+        // Stage walkthrough flag — will be saved after email succeeds
         if ("REQUEST_WALKTHROUGH".equalsIgnoreCase(action)) {
             assignment.setWalkthroughRequested(true);
-            assignmentRepository.save(assignment);
         }
 
-        // Email fires only after Zoho succeeds (or for REQUEST_WALKTHROUGH which
-        // doesn't need Zoho)
         try {
             emailService.sendClientActionNotification(clientName, propertyAddress, action, remark);
         } catch (Exception e) {
             log.warn("Email failed for assignment {}: {}", assignmentId, e.getMessage());
             return ResponseEntity.status(500)
                     .body(Map.of("success", false, "error", "Email failed: " + e.getMessage()));
+        }
+
+        // Persist DB changes only after email succeeds
+        if ("ACCEPT".equalsIgnoreCase(action) || "REQUEST_WALKTHROUGH".equalsIgnoreCase(action)) {
+            assignmentRepository.save(assignment);
         }
 
         return ResponseEntity.ok(Map.of("success", true, "message", "Done"));

@@ -130,8 +130,8 @@ const PropertyDetail = () => {
       await notifyPropertyAction(assignment.id, type, remark);
       toast(
         type === "ACCEPT"
-          ? "Interest registered! Our team has been notified."
-          : "Feedback sent. Our team has been notified.",
+          ? "Property marked as accepted. Our team will contact you shortly."
+          : "Our team has been notified about your walkthrough request.",
       );
       if (type === "ACCEPT") {
         setAssignment((prev) => ({ ...prev, portalStatus: "ACCEPTED" }));
@@ -772,8 +772,10 @@ const PropertyDetail = () => {
                           "done",
                           "settlement done",
                           "psi",
-                          "social media & gift completed"
-                        ].includes((assignment?.zohoStatus || "").toLowerCase().trim());
+                          "social media & gift completed",
+                        ].includes(
+                          (assignment?.zohoStatus || "").toLowerCase().trim(),
+                        );
                       const cellOpacity =
                         state === "unreachable" && !isTerminal
                           ? "opacity-40"
@@ -1022,8 +1024,15 @@ const PropertyDetail = () => {
                             if (u.hostname.includes("youtube.com")) {
                               videoId = u.searchParams.get("v");
                               if (!videoId) {
-                                const seg = u.pathname.split("/").filter(Boolean);
-                                if (seg.length >= 2 && ["shorts", "live", "embed", "v"].includes(seg[0])) {
+                                const seg = u.pathname
+                                  .split("/")
+                                  .filter(Boolean);
+                                if (
+                                  seg.length >= 2 &&
+                                  ["shorts", "live", "embed", "v"].includes(
+                                    seg[0],
+                                  )
+                                ) {
                                   videoId = seg[1];
                                 }
                               }
@@ -1034,23 +1043,26 @@ const PropertyDetail = () => {
                               return {
                                 embedUrl: `https://www.youtube.com/embed/${videoId}`,
                                 thumbnailUrl: `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`,
-                                caption: vid.caption
+                                caption: vid.caption,
                               };
                             }
                           } catch {}
                           return { rawUrl: raw, caption: vid.caption };
                         };
 
-                        const videoInfos = documents.externalVideos.map(getEmbedInfo).filter(Boolean);
+                        const videoInfos = documents.externalVideos
+                          .map(getEmbedInfo)
+                          .filter(Boolean);
                         if (videoInfos.length === 0) return null;
 
-                        const activeInfo = videoInfos[activeExternalVideoIndex] || videoInfos[0];
+                        const activeInfo =
+                          videoInfos[activeExternalVideoIndex] || videoInfos[0];
 
                         return (
                           <div className="flex flex-col gap-4">
                             {activeInfo.embedUrl ? (
                               <div className="space-y-3">
-                                <div className="aspect-video rounded-2xl overflow-hidden border border-teal/20 bg-navy">
+                                <div className="aspect-video rounded-2xl overflow-hidden border border-teal/20 bg-navy max-w-2xl">
                                   <iframe
                                     width="100%"
                                     height="100%"
@@ -1062,7 +1074,9 @@ const PropertyDetail = () => {
                                   />
                                 </div>
                                 {activeInfo.caption && (
-                                  <p className="text-sm font-medium text-white px-1">{activeInfo.caption}</p>
+                                  <p className="text-sm font-medium text-white px-1">
+                                    {activeInfo.caption}
+                                  </p>
                                 )}
                               </div>
                             ) : (
@@ -1077,13 +1091,17 @@ const PropertyDetail = () => {
                                 </div>
                                 <div className="min-w-0 flex-1">
                                   <p className="text-sm font-bold text-white">
-                                    {activeInfo.caption || "Property Video Link"}
+                                    {activeInfo.caption ||
+                                      "Property Video Link"}
                                   </p>
                                   <p className="text-xs text-teal truncate">
                                     {activeInfo.rawUrl}
                                   </p>
                                 </div>
-                                <ExternalLink size={16} className="text-gray-500 shrink-0" />
+                                <ExternalLink
+                                  size={16}
+                                  className="text-gray-500 shrink-0"
+                                />
                               </a>
                             )}
 
@@ -1093,14 +1111,23 @@ const PropertyDetail = () => {
                                 {videoInfos.map((info, idx) => (
                                   <button
                                     key={idx}
-                                    onClick={() => setActiveExternalVideoIndex(idx)}
-                                    className={`relative shrink-0 w-32 aspect-video rounded-xl overflow-hidden border-2 transition-all ${activeExternalVideoIndex === idx ? 'border-teal' : 'border-transparent opacity-60 hover:opacity-100'}`}
+                                    onClick={() =>
+                                      setActiveExternalVideoIndex(idx)
+                                    }
+                                    className={`relative shrink-0 w-32 aspect-video rounded-xl overflow-hidden border-2 transition-all ${activeExternalVideoIndex === idx ? "border-teal" : "border-transparent opacity-60 hover:opacity-100"}`}
                                   >
                                     {info.thumbnailUrl ? (
                                       <>
-                                        <img src={info.thumbnailUrl} alt={`Video ${idx+1}`} className="w-full h-full object-cover" />
+                                        <img
+                                          src={info.thumbnailUrl}
+                                          alt={`Video ${idx + 1}`}
+                                          className="w-full h-full object-cover"
+                                        />
                                         <div className="absolute inset-0 flex items-center justify-center bg-black/30">
-                                          <Play size={20} className="text-white drop-shadow-md" />
+                                          <Play
+                                            size={20}
+                                            className="text-white drop-shadow-md"
+                                          />
                                         </div>
                                       </>
                                     ) : (
