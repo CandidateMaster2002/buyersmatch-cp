@@ -593,18 +593,15 @@ public class ZohoSyncService {
 
     public void runDataSync() {
         log.info("Starting data sync (no R2)");
-        // Properties must finish first so docs/assignments can validate property existence
+        // Sequential — avoids fork-join pool starvation on single-CPU Cloud Run
         syncProperties(false, null);
-        java.util.concurrent.CompletableFuture<Void> briefs =
-                java.util.concurrent.CompletableFuture.runAsync(() -> syncBuyerBriefs(false, null));
-        java.util.concurrent.CompletableFuture<Void> docs =
-                java.util.concurrent.CompletableFuture.runAsync(() -> syncPropertyDocuments(true, null, true));
-        java.util.concurrent.CompletableFuture<Void> clients =
-                java.util.concurrent.CompletableFuture.runAsync(() -> syncClientManagement(false, null));
-        java.util.concurrent.CompletableFuture.allOf(briefs, docs, clients).join();
+        syncBuyerBriefs(false, null);
+        syncPropertyDocuments(true, null, true);
+        syncClientManagement(false, null);
+        updateSyncState("DataSync", false);
         log.info("Data sync completed");
 
-        // Option B: if data sync found new documents without R2 URLs, upload them immediately in background
+        // If data sync found new docs without R2 URLs, upload them in the background
         long pending = propertyDocumentRepository.findAllByR2UrlIsNullAndCrmDownloadUrlIsNotNull().size()
                 + propertyDocumentRepository.findAllByR2UrlIsNullAndCrmDownloadUrlIsNullAndDownloadLinkIsNotNull().size();
         if (pending > 0) {
@@ -621,6 +618,7 @@ public class ZohoSyncService {
     public void runMediaSync() {
         log.info("Starting media sync (R2 uploads only)");
         uploadMissingR2Documents();
+        updateSyncState("MediaSync", false);
         log.info("Media sync completed");
     }
 

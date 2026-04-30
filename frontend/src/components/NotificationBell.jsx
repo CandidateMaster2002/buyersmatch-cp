@@ -3,12 +3,24 @@ import { Bell, Check, CheckCheck, Clock } from 'lucide-react';
 import { getNotifications, getUnreadCount, markAllRead, markOneRead, getStoredUser } from '../api/client';
 import { motion, AnimatePresence } from 'motion/react';
 
-const formatTimeAgo = (dateString) => {
-  const diffInSeconds = Math.floor((Date.now() - new Date(dateString)) / 1000);
-  if (diffInSeconds < 60)    return 'Just now';
-  if (diffInSeconds < 3600)  return `${Math.floor(diffInSeconds / 60)} minutes ago`;
-  if (diffInSeconds < 86400) return `${Math.floor(diffInSeconds / 3600)} hours ago`;
-  return `${Math.floor(diffInSeconds / 86400)} days ago`;
+// Backend stores LocalDateTime in UTC without TZ offset — append Z so JS parses as UTC
+const toUtcDate = (s) => {
+  if (!s) return null;
+  if (typeof s !== 'string') return new Date(s);
+  return new Date(s.includes('Z') || s.includes('+') ? s : s + 'Z');
+};
+
+const formatIST = (dateString) => {
+  const d = toUtcDate(dateString);
+  if (!d || isNaN(d.getTime())) return '';
+  return d.toLocaleString('en-IN', {
+    timeZone: 'Asia/Kolkata',
+    day: 'numeric',
+    month: 'short',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: true,
+  });
 };
 
 const NotificationBell = () => {
@@ -127,7 +139,7 @@ const NotificationBell = () => {
                             {n.title}
                           </p>
                           <span className="text-[10px] text-gray-500 whitespace-nowrap">
-                            {formatTimeAgo(n.createdAt)}
+                            {formatIST(n.createdAt)}
                           </span>
                         </div>
                         <p className="text-xs text-gray-400 mt-1 leading-relaxed">

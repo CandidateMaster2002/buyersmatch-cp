@@ -4,9 +4,17 @@ import { LogOut, RefreshCw, Image, X, CheckCircle2, AlertCircle } from "lucide-r
 import { adminLogout, getStoredUser } from "../api/client";
 import logo from "../assets/bm-logo-white-text-1B2A4A.jpg";
 
+// Backend stores LocalDateTime (no TZ) in UTC — append Z so JS parses as UTC, then convert to IST
+const toUtcDate = (isoString) => {
+  if (!isoString) return null;
+  if (typeof isoString !== "string") return new Date(isoString);
+  return new Date(isoString.includes("Z") || isoString.includes("+") ? isoString : isoString + "Z");
+};
+
 const formatIST = (isoString) => {
-  if (!isoString) return "Never";
-  return new Date(isoString).toLocaleString("en-IN", {
+  const d = toUtcDate(isoString);
+  if (!d || isNaN(d.getTime())) return "Never";
+  return d.toLocaleString("en-IN", {
     timeZone: "Asia/Kolkata",
     day: "numeric",
     month: "short",
@@ -26,7 +34,7 @@ const SyncResultPopup = ({ label, logs, onClose }) => {
   const lastCompleted = completedLogs[0];
 
   return (
-    <div className="fixed bottom-6 right-6 z-[200] w-80 bg-[#0D1B35] border border-teal/30 rounded-2xl shadow-2xl overflow-hidden animate-fade-in">
+    <div className="fixed top-24 right-6 z-[200] w-80 bg-[#0D1B35] border border-teal/30 rounded-2xl shadow-2xl overflow-hidden animate-fade-in">
       <div className="flex items-center justify-between px-4 py-3 bg-teal/10 border-b border-teal/20">
         <div className="flex items-center gap-2">
           <CheckCircle2 size={16} className="text-teal" />
@@ -73,7 +81,7 @@ const SyncResultPopup = ({ label, logs, onClose }) => {
 };
 
 // watchModules: array of sync_state module names to poll for completion
-const SyncButton = ({ label, icon: Icon, endpoint, colorClass, activeColorClass, lastSyncedAt, watchModules, onDone }) => {
+const SyncButton = ({ label, icon: Icon, endpoint, colorClass, activeColorClass, lastSyncedAt, watchModules, logModules, onDone }) => {
   const [state, setState] = useState("idle"); // idle | syncing | done | error
   const [resultLogs, setResultLogs] = useState(null);
   const pollRef    = useRef(null);
@@ -89,7 +97,7 @@ const SyncButton = ({ label, icon: Icon, endpoint, colorClass, activeColorClass,
   const handleClick = async () => {
     if (state === "syncing") return;
 
-    snapshotRef.current = lastSyncedAt ? new Date(lastSyncedAt).getTime() : 0;
+    snapshotRef.current = lastSyncedAt ? (toUtcDate(lastSyncedAt)?.getTime() ?? 0) : 0;
     clickTimeRef.current = Date.now();
     setState("syncing");
     setResultLogs(null);
@@ -98,7 +106,7 @@ const SyncButton = ({ label, icon: Icon, endpoint, colorClass, activeColorClass,
       const { triggerSync, getSyncStatus, getSyncLogs } = await import('../api/admin');
       await triggerSync(endpoint);
 
-      const deadline = Date.now() + 5 * 60 * 1000;
+      const deadline = Date.now() + 10 * 60 * 1000;
 
       pollRef.current = setInterval(async () => {
         if (Date.now() > deadline) {
@@ -113,16 +121,16 @@ const SyncButton = ({ label, icon: Icon, endpoint, colorClass, activeColorClass,
           (Array.isArray(modules) ? modules : []).forEach(m => { map[m.module] = m.lastSyncedAt; });
 
           const latest = watchModules
-            .map(mod => map[mod] ? new Date(map[mod]).getTime() : 0)
+            .map(mod => map[mod] ? (toUtcDate(map[mod])?.getTime() ?? 0) : 0)
             .reduce((a, b) => Math.max(a, b), 0);
 
           if (latest > snapshotRef.current) {
             stopPolling();
             setState("done");
-            if (onDone) onDone();
+            if (onDone) onDone(map); // pass map directly — no second fetch needed
             // Fetch sync logs for popup
             try {
-              const logs = await getSyncLogs(watchModules, clickTimeRef.current);
+              const logs = await getSyncLogs(logModules ?? watchModules, clickTimeRef.current);
               setResultLogs(logs);
             } catch { /* non-critical */ }
             setTimeout(() => setState("idle"), 10000);
@@ -180,7 +188,8 @@ const AdminLayout = ({ children, title }) => {
   const user = getStoredUser("ADMIN");
   const [syncStatus, setSyncStatus] = useState({});
 
-  const loadSyncStatus = async () => {
+  const loadSyncStatus = async (directMap) => {
+    if (directMap) { setSyncStatus(directMap); return; }
     try {
       const { getSyncStatus } = await import('../api/admin');
       const modules = await getSyncStatus();
@@ -196,13 +205,8 @@ const AdminLayout = ({ children, title }) => {
     return () => clearInterval(id);
   }, []);
 
-  // Data last sync = most recent across the 4 text modules
-  const dataModules = ["BuyerBriefs", "Properties", "PropertyDocuments", "ClientManagement"];
-  const dataLastSync = dataModules
-    .map(m => syncStatus[m])
-    .filter(Boolean)
-    .sort()
-    .at(-1) ?? null;
+  // DataSync state is stamped by the backend only after ALL 4 modules finish
+  const dataLastSync = syncStatus["DataSync"] ?? null;
 
   const handleLogout = async () => {
     await adminLogout();
@@ -248,7 +252,8 @@ const AdminLayout = ({ children, title }) => {
             colorClass="bg-teal/10 border-teal/30 text-teal"
             activeColorClass="hover:bg-teal hover:text-navy"
             lastSyncedAt={dataLastSync}
-            watchModules={["BuyerBriefs", "Properties", "PropertyDocuments", "ClientManagement"]}
+            watchModules={["DataSync"]}
+            logModules={["BuyerBriefs", "Properties", "PropertyDocuments", "ClientManagement"]}
             onDone={loadSyncStatus}
           />
 
@@ -258,8 +263,9 @@ const AdminLayout = ({ children, title }) => {
             endpoint="media"
             colorClass="bg-purple-500/10 border-purple-500/30 text-purple-400"
             activeColorClass="hover:bg-purple-500 hover:text-white"
-            lastSyncedAt={syncStatus["Media"] ?? null}
-            watchModules={["Media"]}
+            lastSyncedAt={syncStatus["MediaSync"] ?? null}
+            watchModules={["MediaSync"]}
+            logModules={["Media"]}
             onDone={loadSyncStatus}
           />
 
