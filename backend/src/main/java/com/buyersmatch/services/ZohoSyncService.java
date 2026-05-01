@@ -1001,10 +1001,10 @@ public class ZohoSyncService {
     }
 
     // -------------------------------------------------------------------------
-    // SCHEDULER — media sync every 60 minutes (safety net for missed uploads)
+    // SCHEDULER — media sync every 10 minutes (safety net for missed uploads)
     // -------------------------------------------------------------------------
 
-    @Scheduled(fixedDelay = 3600000)
+    @Scheduled(fixedDelay = 600000)
     public void scheduledMediaSync() {
         log.info("Scheduled media sync started");
         runMediaSync();
