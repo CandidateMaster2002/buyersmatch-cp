@@ -13,7 +13,7 @@ const toUtcDate = (s) => {
 const formatBrisbane = (dateString) => {
   const d = toUtcDate(dateString);
   if (!d || isNaN(d.getTime())) return '';
-  return d.toLocaleString('en-AU', {
+  return d.toLocaleString('en-GB', {
     timeZone: 'Australia/Brisbane',
     day: 'numeric',
     month: 'short',

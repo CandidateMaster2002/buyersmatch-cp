@@ -14,7 +14,7 @@ const toUtcDate = (isoString) => {
 const formatBrisbane = (isoString) => {
   const d = toUtcDate(isoString);
   if (!d || isNaN(d.getTime())) return "Never";
-  return d.toLocaleString("en-AU", {
+  return d.toLocaleString("en-GB", {
     timeZone: "Australia/Brisbane",
     day: "numeric",
     month: "short",
