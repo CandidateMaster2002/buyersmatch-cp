@@ -474,9 +474,7 @@ public class ZohoSyncService {
                 return;
             }
 
-            Set<String> allowedPropertyIds = getPortalClientPropertyIds();
-
-            // Only save docs for properties that exist in our DB (rejected/missing ones excluded)
+            // All properties in DB are valid (rejected ones are cascade-deleted on sync)
             Set<String> validPropertyIds = propertyRepository.findAll().stream()
                     .map(Property::getZohoPropertyId)
                     .filter(Objects::nonNull)
@@ -495,7 +493,7 @@ public class ZohoSyncService {
                         continue;
                     }
 
-                    savePropertyDocumentRecord(r, zohoDocId, allowedPropertyIds, skipR2);
+                    savePropertyDocumentRecord(r, zohoDocId, validPropertyIds, skipR2);
                     count++;
                 } catch (Exception e) {
                     log.error("Error mapping PropertyDocument record {}: {}", r.get("id"), e.getMessage());
@@ -646,6 +644,13 @@ public class ZohoSyncService {
      * - assigned to at least one ONBOARDED portal user
      * - assignment is NOT rejected (zohoStatus contains "reject" or portalStatus = "REJECTED")
      */
+    private Set<String> getAllValidPropertyIds() {
+        return propertyRepository.findAll().stream()
+                .map(Property::getZohoPropertyId)
+                .filter(Objects::nonNull)
+                .collect(Collectors.toSet());
+    }
+
     private Set<String> getPortalClientPropertyIds() {
         List<String> contactIds = clientPortalUserRepository.findAllResolvedZohoContactIdsByStatus("onboarded");
         log.info("getPortalClientPropertyIds: {} contact IDs from onboarded portal users", contactIds.size());
@@ -825,7 +830,7 @@ public class ZohoSyncService {
             List<Map<String, Object>> records = (List<Map<String, Object>>) response.getBody().get("data");
             if (records == null || records.isEmpty()) return;
 
-            Set<String> allowedPropertyIds = getPortalClientPropertyIds();
+            Set<String> allowedPropertyIds = getAllValidPropertyIds();
             for (Map<String, Object> r : records) {
                 try {
                     String zohoDocId = r.get("id") != null ? r.get("id").toString() : null;
@@ -947,7 +952,7 @@ public class ZohoSyncService {
         log.info("uploadMissingR2Documents: {} docs without r2Url ({} CRM, {} WorkDrive-only)",
                 missing.size(), missingCrm.size(), missingWorkDrive.size());
 
-        Set<String> allowedPropertyIds = getPortalClientPropertyIds();
+        Set<String> allowedPropertyIds = getAllValidPropertyIds();
 
         int uploaded = 0;
         for (PropertyDocument doc : missing) {
@@ -957,7 +962,7 @@ public class ZohoSyncService {
                     continue;
                 }
                 if (!allowedPropertyIds.contains(doc.getZohoPropertyId())) {
-                    log.info("Skipping R2 upload for doc {} property {} - not assigned to any portal user", doc.getZohoDocId(), doc.getZohoPropertyId());
+                    log.info("Skipping R2 upload for doc {} — property not in DB", doc.getZohoDocId());
                     continue;
                 }
 
@@ -1020,7 +1025,7 @@ public class ZohoSyncService {
                 return;
             }
 
-            Set<String> allowedPropertyIds = getPortalClientPropertyIds();
+            Set<String> allowedPropertyIds = getAllValidPropertyIds();
             savePropertyDocumentRecord(record, zohoId, allowedPropertyIds, false);
             log.info("Webhook: processed PropertyDocument {} ({})", zohoId, operation);
         } catch (Exception e) {
