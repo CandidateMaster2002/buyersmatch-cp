@@ -991,6 +991,82 @@ public class ZohoSyncService {
     }
 
     // -------------------------------------------------------------------------
+    // WEBHOOK HANDLERS — called by ZohoWebhookController for real-time events
+    // -------------------------------------------------------------------------
+
+    @SuppressWarnings("unchecked")
+    public void handleDocumentWebhook(String zohoId, String operation) {
+        try {
+            if ("delete".equalsIgnoreCase(operation)) {
+                propertyDocumentRepository.findByZohoDocId(zohoId).ifPresent(doc -> {
+                    if (doc.getFileName() != null) {
+                        r2StorageService.deleteObject(r2StorageService.generateFileKey(doc.getZohoDocId(), doc.getFileName()));
+                    }
+                    propertyDocumentRepository.delete(doc);
+                    log.info("Webhook: deleted PropertyDocument {} from DB and R2", zohoId);
+                });
+                return;
+            }
+
+            Map<String, Object> record = fetchRecordById("Property_Documents", zohoId);
+            if (record == null) {
+                log.warn("Webhook: PropertyDocument {} not found in Zoho", zohoId);
+                return;
+            }
+
+            String docPropertyId = getNestedId(record, "Property");
+            if (docPropertyId != null && propertyRepository.findByZohoPropertyId(docPropertyId).isEmpty()) {
+                log.info("Webhook: PropertyDocument {} belongs to unknown property {} — skipping", zohoId, docPropertyId);
+                return;
+            }
+
+            Set<String> allowedPropertyIds = getPortalClientPropertyIds();
+            savePropertyDocumentRecord(record, zohoId, allowedPropertyIds, false);
+            log.info("Webhook: processed PropertyDocument {} ({})", zohoId, operation);
+        } catch (Exception e) {
+            log.error("Webhook: failed to handle PropertyDocument {} ({}): {}", zohoId, operation, e.getMessage());
+        }
+    }
+
+    public void handleAssignmentWebhook(String zohoId, String operation) {
+        try {
+            if ("delete".equalsIgnoreCase(operation)) {
+                assignmentRepository.findByZohoAssignmentId(zohoId).ifPresent(assignment -> {
+                    assignmentRepository.delete(assignment);
+                    log.info("Webhook: deleted Assignment {} from DB", zohoId);
+                });
+                return;
+            }
+
+            Map<String, Object> record = fetchRecordById("Client_Management", zohoId);
+            if (record == null) {
+                log.warn("Webhook: Assignment {} not found in Zoho", zohoId);
+                return;
+            }
+
+            saveAssignmentRecord(record, zohoId, new HashMap<>());
+            log.info("Webhook: processed Assignment {} ({})", zohoId, operation);
+        } catch (Exception e) {
+            log.error("Webhook: failed to handle Assignment {} ({}): {}", zohoId, operation, e.getMessage());
+        }
+    }
+
+    @SuppressWarnings("unchecked")
+    private Map<String, Object> fetchRecordById(String module, String id) {
+        try {
+            String url = baseUrl + "/" + module + "/" + id;
+            ResponseEntity<Map> response = restTemplate.exchange(url, HttpMethod.GET, new HttpEntity<>(getZohoHeaders()), Map.class);
+            if (response.getStatusCode() == HttpStatus.OK && response.getBody() != null) {
+                List<Map<String, Object>> data = (List<Map<String, Object>>) response.getBody().get("data");
+                return (data != null && !data.isEmpty()) ? data.get(0) : null;
+            }
+        } catch (Exception e) {
+            log.error("Failed to fetch {} record {}: {}", module, id, e.getMessage());
+        }
+        return null;
+    }
+
+    // -------------------------------------------------------------------------
     // SCHEDULER — runs every 5 minutes
     // -------------------------------------------------------------------------
 
