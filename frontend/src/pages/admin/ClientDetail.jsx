@@ -26,11 +26,13 @@ import {
   FileText,
   Briefcase,
   ChevronDown,
+  RefreshCw,
 } from "lucide-react";
 import {
   getAdminClientProfile,
   getClientProperties,
   getPropertyDocuments,
+  refreshClientSync,
 } from "../../api/client";
 
 // ─── Formatting helpers ────────────────────────────────────────────────────────
@@ -328,6 +330,10 @@ const ClientDetail = () => {
   const [compareList, setCompareList] = useState([]);
   const [showCompareModal, setShowCompareModal] = useState(false);
 
+  // Refresh
+  const [refreshing, setRefreshing] = useState(false);
+  const [refreshMsg, setRefreshMsg] = useState(null);
+
   const activeBriefs = useMemo(
     () => briefs.filter((b) => b.status?.toLowerCase() !== "closed"),
     [briefs],
@@ -458,6 +464,37 @@ const ClientDetail = () => {
     });
   };
 
+  const handleRefresh = async () => {
+    if (!id || refreshing) return;
+    setRefreshing(true);
+    setRefreshMsg(null);
+    try {
+      await refreshClientSync(id);
+      const responseData = await getClientProperties(id);
+      const { assignments, briefs: userBriefs } = responseData;
+      const loaded = userBriefs || [];
+      setBriefs(loaded);
+      const propertiesWithImages = await Promise.all(
+        assignments.map(async (item) => {
+          if (!item.propertyId) return { ...item, firstImage: null };
+          try {
+            const docs = await getPropertyDocuments(item.propertyId);
+            return { ...item, firstImage: docs.propertyImages?.[0]?.url || null };
+          } catch {
+            return { ...item, firstImage: null };
+          }
+        }),
+      );
+      setProperties(propertiesWithImages);
+      setRefreshMsg("Updated");
+    } catch {
+      setRefreshMsg("Failed");
+    } finally {
+      setRefreshing(false);
+      setTimeout(() => setRefreshMsg(null), 3000);
+    }
+  };
+
   const clientName =
     client?.fullName || client?.buyerBrief?.fullName || "Client";
 
@@ -488,22 +525,39 @@ const ClientDetail = () => {
 
         {/* Client banner */}
         <div className="bg-teal/10 border border-teal/30 rounded-2xl p-6 lg:p-8">
-          <div className="flex items-center gap-5">
-            <div className="w-16 h-16 rounded-2xl bg-teal/20 flex items-center justify-center text-teal text-2xl font-bold shrink-0">
-              {clientName.charAt(0)}
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold text-white">{clientName}</h1>
-              <p className="text-gray-400 text-sm mt-1">
-                {client?.loginEmail ||
-                  client?.email ||
-                  client?.buyerBrief?.email ||
-                  ""}
-              </p>
-              {client?.zohoContactId && (
-                <p className="text-xs font-mono text-gray-500 mt-0.5">
-                  {client.zohoContactId}
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-5">
+              <div className="w-16 h-16 rounded-2xl bg-teal/20 flex items-center justify-center text-teal text-2xl font-bold shrink-0">
+                {clientName.charAt(0)}
+              </div>
+              <div>
+                <h1 className="text-2xl font-bold text-white">{clientName}</h1>
+                <p className="text-gray-400 text-sm mt-1">
+                  {client?.loginEmail ||
+                    client?.email ||
+                    client?.buyerBrief?.email ||
+                    ""}
                 </p>
+                {client?.zohoContactId && (
+                  <p className="text-xs font-mono text-gray-500 mt-0.5">
+                    {client.zohoContactId}
+                  </p>
+                )}
+              </div>
+            </div>
+            <div className="flex flex-col items-end gap-1 shrink-0">
+              <button
+                onClick={handleRefresh}
+                disabled={refreshing}
+                className="flex items-center gap-2 px-4 py-2 bg-teal/10 border border-teal/30 text-teal rounded-xl text-sm font-bold hover:bg-teal/20 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+              >
+                <RefreshCw size={15} className={refreshing ? "animate-spin" : ""} />
+                {refreshing ? "Syncing..." : "Refresh Client"}
+              </button>
+              {refreshMsg && (
+                <span className={`text-xs font-semibold ${refreshMsg === "Updated" ? "text-teal" : "text-red-400"}`}>
+                  {refreshMsg === "Updated" ? "Data updated" : "Sync failed"}
+                </span>
               )}
             </div>
           </div>

@@ -123,3 +123,10 @@ export const markOneRead = async (notificationId) => {
   const { data } = await api.patch(`/api/client/notifications/${notificationId}/read`);
   return data;
 };
+
+/** POST /api/client/:zohoContactId/refresh — re-syncs assignments for this client */
+export const refreshClientData = async (zohoContactId) => {
+  if (USE_MOCK) { await delay(800); return { success: true }; }
+  const { data } = await api.post(`/api/client/${zohoContactId}/refresh`);
+  return data;
+};

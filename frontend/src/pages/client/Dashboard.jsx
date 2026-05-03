@@ -4,6 +4,7 @@ import {
   getClientProperties,
   getStoredUser,
   getPropertyDocuments,
+  refreshClientData,
 } from "../../api/client";
 import Layout from "../../components/Layout";
 import {
@@ -30,6 +31,7 @@ import {
   XCircle,
   FileText,
   Briefcase,
+  RefreshCw,
 } from "lucide-react";
 
 const ComparisonModal = ({ properties, onClose }) => {
@@ -336,6 +338,8 @@ const Dashboard = () => {
   const [activeTab, setActiveTab] = useState("ALL");
   const [compareList, setCompareList] = useState([]);
   const [showCompareModal, setShowCompareModal] = useState(false);
+  const [refreshing, setRefreshing] = useState(false);
+  const [refreshMsg, setRefreshMsg] = useState(null);
 
   // Main page tabs
   const [mainTab, setMainTab] = useState("PROPERTIES"); // 'BRIEF' | 'PROPERTIES'
@@ -411,6 +415,37 @@ const Dashboard = () => {
 
     fetchProperties();
   }, []);
+
+  const handleRefresh = async () => {
+    if (!user?.clientId || refreshing) return;
+    setRefreshing(true);
+    setRefreshMsg(null);
+    try {
+      await refreshClientData(user.clientId);
+      // Re-fetch properties after sync completes
+      const responseData = await getClientProperties(user.clientId);
+      const { assignments, briefs: userBriefs } = responseData;
+      const propertiesWithImages = await Promise.all(
+        assignments.map(async (item) => {
+          if (!item.propertyId) return { ...item, firstImage: null };
+          try {
+            const docs = await getPropertyDocuments(item.propertyId);
+            return { ...item, firstImage: docs.propertyImages?.[0]?.url || null };
+          } catch {
+            return { ...item, firstImage: null };
+          }
+        }),
+      );
+      setProperties(propertiesWithImages);
+      setBriefs(userBriefs || []);
+      setRefreshMsg("Updated");
+    } catch {
+      setRefreshMsg("Failed");
+    } finally {
+      setRefreshing(false);
+      setTimeout(() => setRefreshMsg(null), 3000);
+    }
+  };
 
   const stats = useMemo(() => {
     const relevant = properties.filter(
@@ -504,16 +539,33 @@ const Dashboard = () => {
   return (
     <Layout title="Dashboard">
       {/* Welcome Banner */}
-      <div className="bg-teal/10 border border-teal/30 rounded-2xl p-6 lg:p-8 mb-8">
-        <h1 className="text-3xl font-bold text-white mb-1">
-          Welcome back,{" "}
-          <span className="text-teal">
-            {user?.greetingName || user?.fullName || "Client"}
-          </span>
-        </h1>
-        <p className="text-gray-400">
-          Here's your BuyersMatch portal overview.
-        </p>
+      <div className="bg-teal/10 border border-teal/30 rounded-2xl p-6 lg:p-8 mb-8 flex items-start justify-between gap-4">
+        <div>
+          <h1 className="text-3xl font-bold text-white mb-1">
+            Welcome back,{" "}
+            <span className="text-teal">
+              {user?.greetingName || user?.fullName || "Client"}
+            </span>
+          </h1>
+          <p className="text-gray-400">
+            Here's your BuyersMatch portal overview.
+          </p>
+        </div>
+        <div className="flex flex-col items-end gap-1 shrink-0">
+          <button
+            onClick={handleRefresh}
+            disabled={refreshing}
+            className="flex items-center gap-2 px-4 py-2 bg-teal/10 border border-teal/30 text-teal rounded-xl text-sm font-bold hover:bg-teal/20 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+          >
+            <RefreshCw size={15} className={refreshing ? "animate-spin" : ""} />
+            {refreshing ? "Syncing..." : "Refresh"}
+          </button>
+          {refreshMsg && (
+            <span className={`text-xs font-semibold ${refreshMsg === "Updated" ? "text-teal" : "text-red-400"}`}>
+              {refreshMsg === "Updated" ? "Data updated" : "Sync failed"}
+            </span>
+          )}
+        </div>
       </div>
 
       {/* Main Tabs */}

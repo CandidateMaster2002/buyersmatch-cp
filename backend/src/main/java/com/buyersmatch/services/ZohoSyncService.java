@@ -1118,6 +1118,14 @@ public class ZohoSyncService {
             }
 
             saveAssignmentRecord(record, zohoId, new HashMap<>());
+
+            // Ensure property documents are in R2 so the client sees media immediately
+            String zohoPropertyId = getNestedId(record, "Property");
+            if (zohoPropertyId != null) {
+                log.info("Webhook: Assignment {} — ensuring R2 docs for property {}", zohoId, zohoPropertyId);
+                syncDocumentsForSingleProperty(zohoPropertyId);
+            }
+
             log.info("Webhook: processed Assignment {} ({})", zohoId, operation);
         } catch (Exception e) {
             log.error("Webhook: failed to handle Assignment {} ({}): {}", zohoId, operation, e.getMessage());

@@ -203,6 +203,13 @@ export const triggerSync = async (module = 'full') => {
   return data;
 };
 
+/** POST /api/admin/sync/client/:zohoContactId — re-syncs assignments for one client */
+export const refreshClientSync = async (zohoContactId) => {
+  if (USE_MOCK) { await delay(800); return { success: true }; }
+  const { data } = await adminApi.post(`/api/admin/sync/client/${zohoContactId}`);
+  return data;
+};
+
 /** GET /api/admin/sync/logs/recent?modules=A&modules=B&since=<epochMs> */
 export const getSyncLogs = async (modules, sinceMs) => {
   if (USE_MOCK) { await delay(); return []; }

@@ -41,6 +41,7 @@ export {
   setClientPassword,
   getSyncStatus,
   triggerSync,
+  refreshClientSync,
 } from './admin';
 
 // Client Portal — Briefs, Assignments & Actions
@@ -59,6 +60,7 @@ export {
   getUnreadCount,
   markAllRead,
   markOneRead,
+  refreshClientData,
 } from './clientPortal';
 
 // Properties
