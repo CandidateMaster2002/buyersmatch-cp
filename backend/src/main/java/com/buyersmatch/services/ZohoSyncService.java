@@ -822,6 +822,14 @@ public class ZohoSyncService {
 
     @SuppressWarnings("unchecked")
     private void savePropertyDocumentRecord(Map<String, Object> r, String zohoDocId, Set<String> allowedPropertyIds, boolean skipR2) {
+        String docType = r.get("Document_Type") != null ? r.get("Document_Type").toString().trim() : null;
+        if ("Property Video".equals(docType)) {
+            log.debug("Ignoring Property Video doc {}", zohoDocId);
+            propertyDocumentRepository.findByZohoDocId(zohoDocId)
+                    .ifPresent(propertyDocumentRepository::delete);
+            return;
+        }
+
         PropertyDocument doc = propertyDocumentRepository.findByZohoDocId(zohoDocId)
                 .orElse(PropertyDocument.builder().build());
 
