@@ -33,6 +33,7 @@ import {
   getClientProperties,
   getPropertyDocuments,
   refreshClientSync,
+  refreshClientMediaSync,
 } from "../../api/client";
 
 // ─── Formatting helpers ────────────────────────────────────────────────────────
@@ -467,8 +468,9 @@ const ClientDetail = () => {
   const handleRefresh = async () => {
     if (!id || refreshing) return;
     setRefreshing(true);
-    setRefreshMsg(null);
+    setRefreshMsg("Refreshing...");
     try {
+      // Phase 1: sync assignments
       await refreshClientSync(id);
       const responseData = await getClientProperties(id);
       const { assignments, briefs: userBriefs } = responseData;
@@ -486,12 +488,16 @@ const ClientDetail = () => {
         }),
       );
       setProperties(propertiesWithImages);
-      setRefreshMsg("Updated");
+      setRefreshMsg("Data updated, updating media...");
+
+      // Phase 2: upload missing R2 docs
+      await refreshClientMediaSync(id);
+      setRefreshMsg("Data & media updated");
     } catch {
-      setRefreshMsg("Failed");
+      setRefreshMsg("error");
     } finally {
       setRefreshing(false);
-      setTimeout(() => setRefreshMsg(null), 3000);
+      setTimeout(() => setRefreshMsg(null), 4000);
     }
   };
 
@@ -552,11 +558,15 @@ const ClientDetail = () => {
                 className="flex items-center gap-2 px-4 py-2 bg-teal/10 border border-teal/30 text-teal rounded-xl text-sm font-bold hover:bg-teal/20 transition-all disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 <RefreshCw size={15} className={refreshing ? "animate-spin" : ""} />
-                {refreshing ? "Syncing..." : "Refresh"}
+                Refresh
               </button>
               {refreshMsg && (
-                <span className={`text-xs font-semibold ${refreshMsg === "Updated" ? "text-teal" : "text-red-400"}`}>
-                  {refreshMsg === "Updated" ? "Data updated" : "Sync failed"}
+                <span className={`text-xs font-semibold ${
+                  refreshMsg === "error" ? "text-red-400" :
+                  refreshMsg === "Data & media updated" ? "text-teal" :
+                  "text-yellow-400"
+                }`}>
+                  {refreshMsg === "error" ? "Sync failed" : refreshMsg}
                 </span>
               )}
             </div>

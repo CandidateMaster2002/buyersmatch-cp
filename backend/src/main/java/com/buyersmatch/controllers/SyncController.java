@@ -136,8 +136,15 @@ public class SyncController {
     @PostMapping("/client/{zohoContactId}")
     public ResponseEntity<Map<String, Object>> refreshClient(@PathVariable String zohoContactId) {
         log.info("Admin triggered client refresh for contact {}", zohoContactId);
-        CompletableFuture.runAsync(() -> zohoSyncService.refreshClientData(zohoContactId));
-        return ResponseEntity.ok(Map.of("success", true, "message", "Client refresh started for " + zohoContactId));
+        zohoSyncService.refreshClientData(zohoContactId);
+        return ResponseEntity.ok(Map.of("success", true));
+    }
+
+    @PostMapping("/client/{zohoContactId}/media")
+    public ResponseEntity<Map<String, Object>> refreshClientMedia(@PathVariable String zohoContactId) {
+        log.info("Admin triggered client media refresh for contact {}", zohoContactId);
+        zohoSyncService.refreshClientMedia(zohoContactId);
+        return ResponseEntity.ok(Map.of("success", true));
     }
 
     @PostMapping("/documents/missing-r2")

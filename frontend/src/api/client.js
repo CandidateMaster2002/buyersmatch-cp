@@ -42,6 +42,7 @@ export {
   getSyncStatus,
   triggerSync,
   refreshClientSync,
+  refreshClientMediaSync,
 } from './admin';
 
 // Client Portal — Briefs, Assignments & Actions
@@ -61,6 +62,7 @@ export {
   markAllRead,
   markOneRead,
   refreshClientData,
+  refreshClientMedia,
 } from './clientPortal';
 
 // Properties

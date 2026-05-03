@@ -130,3 +130,10 @@ export const refreshClientData = async (zohoContactId) => {
   const { data } = await api.post(`/api/client/${zohoContactId}/refresh`);
   return data;
 };
+
+/** POST /api/client/:zohoContactId/refresh-media — uploads missing R2 docs for this client's properties */
+export const refreshClientMedia = async (zohoContactId) => {
+  if (USE_MOCK) { await delay(1500); return { success: true }; }
+  const { data } = await api.post(`/api/client/${zohoContactId}/refresh-media`);
+  return data;
+};

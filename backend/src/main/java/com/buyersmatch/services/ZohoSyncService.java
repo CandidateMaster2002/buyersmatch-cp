@@ -640,10 +640,13 @@ public class ZohoSyncService {
     // -------------------------------------------------------------------------
 
     public void refreshClientData(String zohoContactId) {
-        log.info("Client refresh started for contact {}", zohoContactId);
+        log.info("Client refresh: syncing assignments for {}", zohoContactId);
         syncAssignmentsForSingleContact(zohoContactId);
+        log.info("Client refresh: assignments synced for {}", zohoContactId);
+    }
 
-        // For each property assigned to this client, upload any missing R2 documents
+    public void refreshClientMedia(String zohoContactId) {
+        log.info("Client refresh: checking R2 docs for {}", zohoContactId);
         List<String> propertyIds = assignmentRepository.findAllByZohoContactId(zohoContactId)
                 .stream()
                 .map(Assignment::getZohoPropertyId)
@@ -661,8 +664,7 @@ public class ZohoSyncService {
                 syncDocumentsForSingleProperty(zohoPropertyId);
             }
         }
-
-        log.info("Client refresh completed for contact {}", zohoContactId);
+        log.info("Client refresh: R2 uploads completed for {}", zohoContactId);
     }
 
     @SuppressWarnings("unchecked")

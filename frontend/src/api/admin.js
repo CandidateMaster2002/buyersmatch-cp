@@ -210,6 +210,13 @@ export const refreshClientSync = async (zohoContactId) => {
   return data;
 };
 
+/** POST /api/admin/sync/client/:zohoContactId/media — uploads missing R2 docs for one client */
+export const refreshClientMediaSync = async (zohoContactId) => {
+  if (USE_MOCK) { await delay(1500); return { success: true }; }
+  const { data } = await adminApi.post(`/api/admin/sync/client/${zohoContactId}/media`);
+  return data;
+};
+
 /** GET /api/admin/sync/logs/recent?modules=A&modules=B&since=<epochMs> */
 export const getSyncLogs = async (modules, sinceMs) => {
   if (USE_MOCK) { await delay(); return []; }

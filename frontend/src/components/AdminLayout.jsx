@@ -80,13 +80,23 @@ const SyncResultPopup = ({ label, logs, onClose }) => {
   );
 };
 
-// watchModules: array of sync_state module names to poll for completion
-const SyncButton = ({ label, icon: Icon, endpoint, colorClass, activeColorClass, lastSyncedAt, watchModules, logModules, onDone }) => {
-  const [state, setState] = useState("idle"); // idle | syncing | done | error
+// watchModules: array of sync_state module names to poll for phase 1 completion
+// phase2Modules: optional array to poll after phase 1 — e.g. ["Media"] for R2 uploads
+// phase2Label:   text shown while phase 2 is in progress
+// phase2Timeout: ms to wait for phase 2 before giving up (default 90s)
+const SyncButton = ({
+  label, icon: Icon, endpoint, colorClass, activeColorClass,
+  lastSyncedAt, watchModules, logModules, onDone,
+  phase2Modules, phase2Label, phase2Timeout,
+}) => {
+  const [state, setState] = useState("idle"); // idle | syncing | phase2 | done | error
   const [resultLogs, setResultLogs] = useState(null);
-  const pollRef    = useRef(null);
-  const snapshotRef  = useRef(0); // lastSyncedAt value before click
-  const clickTimeRef = useRef(0); // epoch ms when button was clicked
+  const pollRef          = useRef(null);
+  const snapshotRef      = useRef(0);
+  const clickTimeRef     = useRef(0);
+  const phaseRef         = useRef(1);
+  const phase2SnapRef    = useRef(0);
+  const phase2DeadlineRef = useRef(0);
 
   const stopPolling = () => {
     if (pollRef.current) { clearInterval(pollRef.current); pollRef.current = null; }
@@ -94,11 +104,16 @@ const SyncButton = ({ label, icon: Icon, endpoint, colorClass, activeColorClass,
 
   useEffect(() => () => stopPolling(), []);
 
+  const getLatest = (mods, map) =>
+    mods.map(m => map[m] ? (toUtcDate(map[m])?.getTime() ?? 0) : 0)
+        .reduce((a, b) => Math.max(a, b), 0);
+
   const handleClick = async () => {
-    if (state === "syncing") return;
+    if (state === "syncing" || state === "phase2") return;
 
     snapshotRef.current = lastSyncedAt ? (toUtcDate(lastSyncedAt)?.getTime() ?? 0) : 0;
     clickTimeRef.current = Date.now();
+    phaseRef.current = 1;
     setState("syncing");
     setResultLogs(null);
 
@@ -110,8 +125,7 @@ const SyncButton = ({ label, icon: Icon, endpoint, colorClass, activeColorClass,
 
       pollRef.current = setInterval(async () => {
         if (Date.now() > deadline) {
-          stopPolling();
-          setState("error");
+          stopPolling(); setState("error");
           setTimeout(() => setState("idle"), 3000);
           return;
         }
@@ -120,52 +134,72 @@ const SyncButton = ({ label, icon: Icon, endpoint, colorClass, activeColorClass,
           const map = {};
           (Array.isArray(modules) ? modules : []).forEach(m => { map[m.module] = m.lastSyncedAt; });
 
-          const latest = watchModules
-            .map(mod => map[mod] ? (toUtcDate(map[mod])?.getTime() ?? 0) : 0)
-            .reduce((a, b) => Math.max(a, b), 0);
-
-          if (latest > snapshotRef.current) {
-            stopPolling();
-            setState("done");
-            if (onDone) onDone(map); // pass map directly — no second fetch needed
-            // Fetch sync logs for popup
-            try {
-              const logs = await getSyncLogs(logModules ?? watchModules, clickTimeRef.current);
-              setResultLogs(logs);
-            } catch { /* non-critical */ }
-            setTimeout(() => setState("idle"), 10000);
+          if (phaseRef.current === 1) {
+            const latest = getLatest(watchModules, map);
+            if (latest > snapshotRef.current) {
+              if (phase2Modules?.length) {
+                phaseRef.current = 2;
+                phase2SnapRef.current = getLatest(phase2Modules, map);
+                phase2DeadlineRef.current = Date.now() + (phase2Timeout ?? 90000);
+                setState("phase2");
+                if (onDone) onDone(map);
+                try {
+                  const logs = await getSyncLogs(logModules ?? watchModules, clickTimeRef.current);
+                  setResultLogs(logs);
+                } catch { /* non-critical */ }
+              } else {
+                stopPolling(); setState("done");
+                if (onDone) onDone(map);
+                try {
+                  const logs = await getSyncLogs(logModules ?? watchModules, clickTimeRef.current);
+                  setResultLogs(logs);
+                } catch { /* non-critical */ }
+                setTimeout(() => setState("idle"), 10000);
+              }
+            }
+          } else {
+            const latest2 = getLatest(phase2Modules, map);
+            const timedOut = Date.now() > phase2DeadlineRef.current;
+            if (latest2 > phase2SnapRef.current || timedOut) {
+              stopPolling(); setState("done");
+              if (onDone) onDone(map);
+              setTimeout(() => setState("idle"), 10000);
+            }
           }
         } catch { /* ignore transient poll errors */ }
       }, 3000);
 
     } catch {
-      stopPolling();
-      setState("error");
+      stopPolling(); setState("error");
       setTimeout(() => setState("idle"), 3000);
     }
   };
 
-  const label_ =
+  const labelText =
     state === "syncing" ? "Syncing..." :
+    state === "phase2"  ? (phase2Label ?? "Updating...") :
     state === "done"    ? "Done ✓" :
     state === "error"   ? "Failed ✗" :
     label;
+
+  const isActive = state === "syncing" || state === "phase2";
 
   return (
     <>
       <div className="flex flex-col items-center gap-0.5">
         <button
           onClick={handleClick}
-          disabled={state === "syncing"}
+          disabled={isActive}
           className={`flex items-center gap-2 px-4 py-2 border rounded-xl font-bold uppercase tracking-widest text-[10px] transition-all
-            ${state === "done"    ? "bg-green-500/20 border-green-500/40 text-green-400" :
-              state === "error"   ? "bg-red-500/20 border-red-500/40 text-red-400" :
-              state === "syncing" ? `${colorClass} opacity-60 cursor-wait` :
+            ${state === "done"   ? "bg-green-500/20 border-green-500/40 text-green-400" :
+              state === "error"  ? "bg-red-500/20 border-red-500/40 text-red-400" :
+              state === "phase2" ? "bg-yellow-500/20 border-yellow-500/40 text-yellow-400 cursor-wait" :
+              isActive           ? `${colorClass} opacity-60 cursor-wait` :
               `${colorClass} ${activeColorClass}`}
           `}
         >
-          <Icon size={16} className={state === "syncing" ? "animate-spin" : ""} />
-          <span className="hidden sm:inline">{label_}</span>
+          <Icon size={16} className={isActive ? "animate-spin" : ""} />
+          <span className="hidden sm:inline">{labelText}</span>
         </button>
         <span className="text-[9px] text-gray-500 hidden sm:block">
           Last: {formatBrisbane(lastSyncedAt)}
@@ -255,6 +289,9 @@ const AdminLayout = ({ children, title }) => {
             lastSyncedAt={dataLastSync}
             watchModules={["BuyerBriefs", "Properties", "PropertyDocuments", "ClientManagement"]}
             logModules={["BuyerBriefs", "Properties", "PropertyDocuments", "ClientManagement"]}
+            phase2Modules={["Media"]}
+            phase2Label="Data updated, updating media..."
+            phase2Timeout={90000}
             onDone={loadSyncStatus}
           />
 

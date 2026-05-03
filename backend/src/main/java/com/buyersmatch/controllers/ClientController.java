@@ -69,8 +69,15 @@ public class ClientController {
     @PostMapping("/api/client/{zohoContactId}/refresh")
     public ResponseEntity<Map<String, Object>> refreshClient(@PathVariable String zohoContactId) {
         log.info("Client refresh requested for contact {}", zohoContactId);
-        CompletableFuture.runAsync(() -> zohoSyncService.refreshClientData(zohoContactId));
-        return ResponseEntity.ok(Map.of("success", true, "message", "Refresh started"));
+        zohoSyncService.refreshClientData(zohoContactId);
+        return ResponseEntity.ok(Map.of("success", true));
+    }
+
+    @PostMapping("/api/client/{zohoContactId}/refresh-media")
+    public ResponseEntity<Map<String, Object>> refreshClientMedia(@PathVariable String zohoContactId) {
+        log.info("Client media refresh requested for contact {}", zohoContactId);
+        zohoSyncService.refreshClientMedia(zohoContactId);
+        return ResponseEntity.ok(Map.of("success", true));
     }
 
     // Accepts both buyer_brief.id (UUID) and zohoContactId (string)
