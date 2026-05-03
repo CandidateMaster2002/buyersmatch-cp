@@ -642,6 +642,26 @@ public class ZohoSyncService {
     public void refreshClientData(String zohoContactId) {
         log.info("Client refresh started for contact {}", zohoContactId);
         syncAssignmentsForSingleContact(zohoContactId);
+
+        // For each property assigned to this client, upload any missing R2 documents
+        List<String> propertyIds = assignmentRepository.findAllByZohoContactId(zohoContactId)
+                .stream()
+                .map(Assignment::getZohoPropertyId)
+                .filter(Objects::nonNull)
+                .distinct()
+                .collect(Collectors.toList());
+
+        for (String zohoPropertyId : propertyIds) {
+            boolean hasMissing = propertyDocumentRepository.findAllByZohoPropertyId(zohoPropertyId)
+                    .stream()
+                    .anyMatch(doc -> doc.getR2Url() == null && !isVideoDoc(doc)
+                            && (doc.getCrmDownloadUrl() != null || doc.getDownloadLink() != null));
+            if (hasMissing) {
+                log.info("Client refresh: property {} has missing R2 docs — uploading", zohoPropertyId);
+                syncDocumentsForSingleProperty(zohoPropertyId);
+            }
+        }
+
         log.info("Client refresh completed for contact {}", zohoContactId);
     }
 
