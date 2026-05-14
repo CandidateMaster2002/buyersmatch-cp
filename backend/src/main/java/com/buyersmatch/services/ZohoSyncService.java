@@ -989,7 +989,7 @@ public class ZohoSyncService {
 
         brief.setZohoBriefId(zohoBriefId);
         brief.setZohoContactId(getNestedId(r, "Buyer_Name"));
-        brief.setZohoName(getNestedName(r, "Buyer_Name"));
+        brief.setZohoName(r.get("Name") != null ? r.get("Name").toString() : null);
         brief.setFullName(getNestedName(r, "Buyer_Name"));
         brief.setEmail(r.get("Buyer_Email") != null ? r.get("Buyer_Email").toString() : null);
         brief.setSecondaryEmail(r.get("Secondary_Client_Email") != null ? r.get("Secondary_Client_Email").toString() : null);

@@ -48,7 +48,9 @@ import {
   Save,
   StickyNote,
   Pencil,
+  User,
 } from "lucide-react";
+import DealProgress from "../../components/shared/DealProgress";
 
 const PropertyDetail = () => {
   const { id } = useParams();
@@ -104,7 +106,9 @@ const PropertyDetail = () => {
         } else if (firstYt?.url) {
           try {
             const u = new URL(firstYt.url.trim());
-            const id = u.searchParams.get("v") || (u.hostname === "youtu.be" ? u.pathname.slice(1) : null);
+            const id =
+              u.searchParams.get("v") ||
+              (u.hostname === "youtu.be" ? u.pathname.slice(1) : null);
             if (id) {
               setActiveImage(`https://www.youtube.com/embed/${id}`);
               setActiveIsVideo(false);
@@ -234,78 +238,7 @@ const PropertyDetail = () => {
     : null;
 
   // Auto-generated Overview
-  const overview = `This ${property.propertyType || "property"} in ${property.suburb || "the area"} features ${property.bedrooms ?? "N/A"} bedrooms, ${property.bathrooms ?? "N/A"} bathrooms, and space for ${property.carParking ?? "N/A"} vehicles. Situated on a ${property.areaSqm ? `${property.areaSqm}sqm` : "generous"} block, this property was ${property.yearBuilt ? `built in ${property.yearBuilt}` : "expertly maintained"}${property.rentalSituation ? ` and is currently ${property.rentalSituation.toLowerCase()}` : ""}. Offered as a ${property.saleType ? property.saleType.toLowerCase() : "market"} opportunity, it presents a strong investment option in the ${property.state || "Australian"} market.`;
 
-  const DEAL_STAGES = [
-    "Property Assigned",
-    "Property Accepted",
-    "Offer Submitted",
-    "Offer Accepted",
-    "Contract Signed",
-    "BNP Done",
-    "Finance Done",
-    "Contract Unconditional",
-    "PSI",
-    "Settlement Done",
-    "Tenanted",
-    "Done",
-  ];
-
-  const getDealProgress = () => {
-    if (!assignment) return { completedCount: 1, terminal: null };
-    const zs = (assignment.zohoStatus || "").toLowerCase();
-    const ps = assignment.portalStatus || "";
-
-    if (ps === "REJECTED" || /property.{0,15}reject/.test(zs))
-      return { completedCount: 1, terminal: { label: "Property Rejected" } };
-    if (/offer.{0,15}(withdraw|reject)/.test(zs))
-      return {
-        completedCount: 3,
-        terminal: { label: "Offer Withdrawn by Seller" },
-      };
-
-    if (/\bdone\b/.test(zs) && !/bnp|finance|settle/.test(zs))
-      return { completedCount: 12, terminal: null };
-    if (/tenant/.test(zs)) return { completedCount: 11, terminal: null };
-    if (/settle/.test(zs)) return { completedCount: 10, terminal: null };
-    if (/\bpsi\b/.test(zs)) return { completedCount: 9, terminal: null };
-    if (/unconditional/.test(zs)) return { completedCount: 8, terminal: null };
-    if (/finance/.test(zs)) return { completedCount: 7, terminal: null };
-    if (/\bbnp\b/.test(zs)) return { completedCount: 6, terminal: null };
-    if (/contract.{0,5}sign/.test(zs))
-      return { completedCount: 5, terminal: null };
-    if (/offer.{0,15}(accept|approv)/.test(zs))
-      return { completedCount: 4, terminal: null };
-    if (/offer/.test(zs)) return { completedCount: 3, terminal: null };
-    if (/property.{0,15}accept/.test(zs) || ps === "ACCEPTED")
-      return { completedCount: 2, terminal: null };
-
-    return { completedCount: 1, terminal: null };
-  };
-
-  const progress = getDealProgress();
-
-  // Build flat list: completed stages, then optional terminal node, then remaining stages
-  const stageItems = (() => {
-    const { completedCount, terminal } = progress;
-    const items = [];
-    for (let i = 0; i < DEAL_STAGES.length; i++) {
-      if (terminal && i === completedCount) {
-        items.push({ type: "terminal", label: terminal.label });
-        break; // Stop rendering future points if process is stopped
-      }
-
-      const state =
-        i < completedCount
-          ? "complete"
-          : i === completedCount && completedCount < 12
-            ? "active"
-            : "pending";
-
-      items.push({ type: "stage", label: DEAL_STAGES[i], state, idx: i });
-    }
-    return items;
-  })();
 
   return (
     <Layout title={property.address}>
@@ -321,33 +254,13 @@ const PropertyDetail = () => {
           Back to Dashboard
         </button>
 
-        {/* Assignment status bar */}
-        {assignment && (
-          <div className="flex flex-wrap items-center justify-between gap-4 mb-8 p-5 bg-navy border border-white/5 rounded-2xl">
-            <div className="flex items-center gap-3">
-              <span className="text-xs text-gray-500 uppercase tracking-widest font-bold">
-                Status
-              </span>
-              {assignment.portalStatus !== "PENDING" &&
-                assignment.portalStatus && (
-                  <span
-                    className={`px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-widest border ${
-                      assignment.portalStatus === "ACCEPTED"
-                        ? "bg-teal/10 text-teal border-teal/30"
-                        : assignment.portalStatus === "REJECTED"
-                          ? "bg-red-500/10 text-red-400 border-red-500/30"
-                          : assignment.portalStatus === "PURCHASED"
-                            ? "bg-gold/10 text-gold border-gold/30"
-                            : "bg-white/5 text-gray-400 border-white/10"
-                    }`}
-                  >
-                    {assignment.zohoStatus || assignment.portalStatus}
-                  </span>
-                )}
-            </div>
+        <DealProgress assignment={assignment} />
 
-            {assignment.portalStatus === "PENDING" ||
-            !assignment.portalStatus ? (
+        {/* Action bar */}
+        {assignment &&
+          (assignment.portalStatus === "PENDING" ||
+            !assignment.portalStatus) && (
+            <div className="flex items-center justify-end gap-4 mb-8 p-5 bg-navy border border-white/5 rounded-2xl">
               <div className="flex gap-3">
                 <button
                   onClick={() => setShowConfirmModal("ACCEPT")}
@@ -371,9 +284,8 @@ const PropertyDetail = () => {
                   </button>
                 )}
               </div>
-            ) : null}
-          </div>
-        )}
+            </div>
+          )}
 
         <div className="space-y-12">
           {/* 1. Property Gallery — images + YouTube videos */}
@@ -390,7 +302,11 @@ const PropertyDetail = () => {
                     id = u.searchParams.get("v");
                     if (!id) {
                       const seg = u.pathname.split("/").filter(Boolean);
-                      if (seg.length >= 2 && ["shorts","live","embed","v"].includes(seg[0])) id = seg[1];
+                      if (
+                        seg.length >= 2 &&
+                        ["shorts", "live", "embed", "v"].includes(seg[0])
+                      )
+                        id = seg[1];
                     }
                   } else if (u.hostname === "youtu.be") {
                     id = u.pathname.slice(1);
@@ -402,11 +318,16 @@ const PropertyDetail = () => {
                     caption: vid.caption,
                     mediaType: "youtube",
                   };
-                } catch { return null; }
+                } catch {
+                  return null;
+                }
               };
 
               const galleryItems = [
-                ...documents.propertyImages.map((d) => ({ ...d, mediaType: "image" })),
+                ...documents.propertyImages.map((d) => ({
+                  ...d,
+                  mediaType: "image",
+                })),
                 ...documents.videos.map((d) => ({ ...d, mediaType: "video" })),
                 ...documents.externalVideos.map(parseYt).filter(Boolean),
               ];
@@ -445,9 +366,10 @@ const PropertyDetail = () => {
                   {/* Thumbnails */}
                   <div className="flex md:flex-col gap-4 overflow-x-auto md:overflow-y-auto max-h-[500px] scrollbar-hide">
                     {galleryItems.map((item, idx) => {
-                      const isActive = item.mediaType === "youtube"
-                        ? activeImage === item.embedUrl
-                        : activeImage === item.url;
+                      const isActive =
+                        item.mediaType === "youtube"
+                          ? activeImage === item.embedUrl
+                          : activeImage === item.url;
                       return (
                         <button
                           key={idx}
@@ -485,10 +407,15 @@ const PropertyDetail = () => {
                               referrerPolicy="no-referrer"
                             />
                           )}
-                          {(item.mediaType === "video" || item.mediaType === "youtube") && (
+                          {(item.mediaType === "video" ||
+                            item.mediaType === "youtube") && (
                             <div className="absolute inset-0 flex items-center justify-center bg-black/30">
                               <div className="w-8 h-8 rounded-full bg-white/20 backdrop-blur-sm flex items-center justify-center">
-                                <Play size={14} className="text-white ml-0.5" fill="white" />
+                                <Play
+                                  size={14}
+                                  className="text-white ml-0.5"
+                                  fill="white"
+                                />
                               </div>
                             </div>
                           )}
@@ -770,141 +697,7 @@ const PropertyDetail = () => {
             )}
           </div>
 
-          {/* Deal Progress */}
-          <div className="bg-navy border border-teal/10 rounded-3xl p-8">
-            <h3 className="text-lg font-bold text-white flex items-center gap-2 mb-8">
-              <Clock className="text-teal" size={20} />
-              Deal Progress
-            </h3>
 
-            <div className="space-y-10">
-              {[stageItems.slice(0, 6), stageItems.slice(6)]
-                .filter((row) => row.length > 0)
-                .map((row, rowIdx) => (
-                  <div key={rowIdx} className="flex items-start">
-                    {row.map((item, cellIdx) => {
-                      const isTerminal = item.type === "terminal";
-                      const state = item.state;
-                      const isFirstInRow = cellIdx === 0;
-                      const isLastInRow = cellIdx === row.length - 1;
-                      const prevState = row[cellIdx - 1]?.state;
-
-                      // Connector colors
-                      const leftConn = isFirstInRow
-                        ? "bg-transparent"
-                        : prevState === "complete"
-                          ? "bg-teal/40"
-                          : "bg-gray-800";
-                      const rightConn = isLastInRow
-                        ? "bg-transparent"
-                        : state === "complete"
-                          ? "bg-teal/40"
-                          : "bg-gray-800";
-
-                      // Dot style
-                      const dotClass = isTerminal
-                        ? "border-red-500 bg-red-500/20"
-                        : state === "complete"
-                          ? "border-teal bg-teal"
-                          : state === "active"
-                            ? "border-teal bg-teal/10"
-                            : state === "unreachable"
-                              ? "border-gray-800 bg-white/[0.02]"
-                              : "border-gray-700 bg-white/[0.02]";
-
-                      // Label style
-                      const labelClass = isTerminal
-                        ? "text-red-400 font-bold"
-                        : state === "complete"
-                          ? "text-gray-400"
-                          : state === "active"
-                            ? "text-white font-bold"
-                            : state === "unreachable"
-                              ? "text-gray-700"
-                              : "text-gray-500";
-
-                      const isPurchasedMark =
-                        !isTerminal &&
-                        item.idx === 7 &&
-                        [
-                          "contract unconditional",
-                          "tenanted",
-                          "done",
-                          "settlement done",
-                          "psi",
-                          "social media & gift completed",
-                        ].includes(
-                          (assignment?.zohoStatus || "").toLowerCase().trim(),
-                        );
-                      const cellOpacity =
-                        state === "unreachable" && !isTerminal
-                          ? "opacity-40"
-                          : "";
-
-                      return (
-                        <div
-                          key={isTerminal ? `t-${cellIdx}` : item.idx}
-                          className={`flex-1 min-w-0 flex flex-col items-center ${cellOpacity}`}
-                        >
-                          {/* Dot row */}
-                          <div className="flex items-center w-full">
-                            <div className={`h-0.5 flex-1 ${leftConn}`} />
-                            <div
-                              className={`w-8 h-8 rounded-full border-2 flex items-center justify-center shrink-0 ${dotClass}`}
-                            >
-                              {isTerminal ? (
-                                <X
-                                  size={13}
-                                  className="text-red-400"
-                                  strokeWidth={2.5}
-                                />
-                              ) : state === "complete" ? (
-                                <Check
-                                  size={13}
-                                  className="text-navy"
-                                  strokeWidth={3}
-                                />
-                              ) : state === "active" ? (
-                                <div className="w-3 h-3 rounded-full bg-teal animate-pulse" />
-                              ) : (
-                                <span className="text-[9px] text-gray-600 font-bold">
-                                  {item.idx + 1}
-                                </span>
-                              )}
-                            </div>
-                            <div className={`h-0.5 flex-1 ${rightConn}`} />
-                          </div>
-
-                          {/* Label + badges */}
-                          <div className="text-center mt-2.5 px-0.5 space-y-1">
-                            <p
-                              className={`text-[10px] leading-tight ${labelClass}`}
-                            >
-                              {item.label}
-                            </p>
-                            {state === "active" && !isTerminal && (
-                              <span className="inline-block px-1.5 py-0.5 bg-teal/10 border border-teal/30 text-teal text-[8px] font-bold rounded-full uppercase tracking-widest">
-                                Current
-                              </span>
-                            )}
-                            {isTerminal && (
-                              <span className="inline-block px-1.5 py-0.5 bg-red-500/10 border border-red-500/30 text-red-400 text-[8px] font-bold rounded-full uppercase tracking-widest">
-                                Stopped
-                              </span>
-                            )}
-                            {isPurchasedMark && (
-                              <span className="inline-block px-1.5 py-0.5 bg-gold/10 border border-gold/20 text-gold text-[8px] font-bold rounded-full uppercase tracking-widest">
-                                Purchased
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                ))}
-            </div>
-          </div>
 
           {/* 3. Financial Analysis / Offer Details */}
           <div className="bg-navy border border-teal/20 rounded-3xl p-8">
@@ -957,7 +750,7 @@ const PropertyDetail = () => {
                     <p className="text-xs text-gray-500 uppercase tracking-widest mb-2">
                       Offer Price
                     </p>
-                    <p className="text-xl font-bold text-gold">
+                    <p className="text-2xl font-bold text-gold">
                       ${Number(assignment.offerAmount).toLocaleString()}
                     </p>
                   </div>
@@ -967,7 +760,7 @@ const PropertyDetail = () => {
                     <p className="text-xs text-gray-500 uppercase tracking-widest mb-2">
                       Offer Date
                     </p>
-                    <p className="text-xl font-bold text-white">
+                    <p className="text-2xl font-bold text-white">
                       {assignment.offerDate
                         .split("T")[0]
                         .split("-")
@@ -978,12 +771,6 @@ const PropertyDetail = () => {
                 )}
               </div>
             )}
-          </div>
-
-          {/* 4. Property Overview */}
-          <div className="space-y-4">
-            <h3 className="text-xl font-bold text-white">Property Overview</h3>
-            <p className="text-gray-400 leading-relaxed text-lg">{overview}</p>
           </div>
 
           {/* Conveyancer */}
@@ -1066,7 +853,6 @@ const PropertyDetail = () => {
                     Documents & Media
                   </h3>
                 </div>
-
 
                 {/* ── Non-property Images (Due Diligence etc — always inline) ── */}
                 {documents.images.length > 0 && (

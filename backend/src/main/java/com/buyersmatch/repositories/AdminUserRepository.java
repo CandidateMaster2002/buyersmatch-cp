@@ -8,5 +8,5 @@ import java.util.UUID;
 
 public interface AdminUserRepository extends JpaRepository<AdminUser, UUID> {
     Optional<AdminUser> findByEmail(String email);
-    Optional<AdminUser> findBySessionToken(String sessionToken);
+    Optional<AdminUser> findBySessionTokensContaining(String sessionToken);
 }

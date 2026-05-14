@@ -30,7 +30,7 @@ public class AdminAuthService {
         }
 
         String sessionToken = UUID.randomUUID().toString();
-        admin.setSessionToken(sessionToken);
+        admin.getSessionTokens().add(sessionToken);
         adminUserRepository.save(admin);
 
         log.info("Admin logged in: {}", admin.getEmail());
@@ -44,8 +44,8 @@ public class AdminAuthService {
     }
 
     public void logout(String sessionToken) {
-        adminUserRepository.findBySessionToken(sessionToken).ifPresent(admin -> {
-            admin.setSessionToken(null);
+        adminUserRepository.findBySessionTokensContaining(sessionToken).ifPresent(admin -> {
+            admin.getSessionTokens().remove(sessionToken);
             adminUserRepository.save(admin);
             log.info("Admin logged out: {}", admin.getEmail());
         });
@@ -55,7 +55,7 @@ public class AdminAuthService {
         if (sessionToken == null || sessionToken.isBlank()) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Missing session token");
         }
-        return adminUserRepository.findBySessionToken(sessionToken)
+        return adminUserRepository.findBySessionTokensContaining(sessionToken)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid or expired session token"));
     }
 
@@ -67,7 +67,7 @@ public class AdminAuthService {
         }
 
         admin.setPasswordHash(passwordEncoder.encode(newPassword));
-        admin.setSessionToken(null); // invalidate session after password change
+        admin.getSessionTokens().clear(); // invalidate all sessions after password change
         adminUserRepository.save(admin);
         log.info("Admin changed password: {}", admin.getEmail());
     }

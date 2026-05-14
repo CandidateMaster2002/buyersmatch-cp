@@ -6,6 +6,8 @@ import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Entity
@@ -29,8 +31,11 @@ public class AdminUser {
     @Column(name = "full_name")
     private String fullName;
 
+    @ElementCollection(fetch = FetchType.EAGER)
+    @CollectionTable(name = "admin_user_sessions", joinColumns = @JoinColumn(name = "admin_user_id"))
     @Column(name = "session_token")
-    private String sessionToken;
+    @Builder.Default
+    private List<String> sessionTokens = new ArrayList<>();
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)

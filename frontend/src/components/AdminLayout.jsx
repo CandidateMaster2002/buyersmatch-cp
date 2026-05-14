@@ -270,7 +270,7 @@ const AdminLayout = ({ children, title }) => {
           </Link>
         </div>
 
-        <div className="flex items-center gap-4">
+        <div className="flex items-start gap-4">
           <div className="hidden md:flex flex-col items-end">
             <p className="text-sm font-bold truncate max-w-[150px]">
               {user?.email}

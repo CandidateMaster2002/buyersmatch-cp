@@ -21,7 +21,6 @@ import {
   ExternalLink,
   TrendingUp,
   DollarSign,
-  Clock,
   MessageSquare,
   Eye,
   MapPin,
@@ -34,9 +33,9 @@ import {
   Percent,
   ArrowUpDown,
   Link2,
-  BookOpen,
   LayoutList,
 } from "lucide-react";
+import DealProgress from "../../components/shared/DealProgress";
 import {
   getPropertyDetail,
   getPropertyDocuments,
@@ -166,26 +165,6 @@ const AdminPropertyDetail = () => {
     ? ((annualIncome / property.askingPriceMax) * 100).toFixed(2)
     : null;
 
-  const overview = `This ${property.propertyType || "property"} in ${property.suburb || "the area"} features ${property.bedrooms ?? "N/A"} bedrooms, ${property.bathrooms ?? "N/A"} bathrooms, and space for ${property.carParking ?? "N/A"} vehicles. Situated on a ${property.areaSqm ? `${property.areaSqm}sqm` : "generous"} block, this property was ${property.yearBuilt ? `built in ${property.yearBuilt}` : "expertly maintained"}${property.rentalSituation ? ` and is currently ${property.rentalSituation.toLowerCase()}` : ""}. Offered as a ${property.saleType ? property.saleType.toLowerCase() : "market"} opportunity, it presents a strong investment option in the ${property.state || "Australian"} market.`;
-
-  const dealStages = [
-    "Property Assigned",
-    "Due Diligence",
-    "Offer Made",
-    "Contract Signed",
-    "Finance Approved",
-    "Settlement",
-  ];
-
-  const getActiveStage = () => {
-    const status = assignment?.zohoStatus;
-    if (status === "Settled") return 6;
-    if (status === "Contract Signed") return 4;
-    if (status === "Offer Made") return 3;
-    return 1;
-  };
-  const activeStage = getActiveStage();
-  const isRejected = assignment?.zohoStatus === "Property Rejected";
 
   const fmtSize = (bytes) => {
     if (!bytes || bytes <= 0) return null;
@@ -243,29 +222,7 @@ const AdminPropertyDetail = () => {
           Back to Client
         </button>
 
-        {/* Assignment Status Bar */}
-        {assignment && (
-          <div className="flex flex-wrap items-center justify-between gap-4 mb-8 p-5 bg-navy border border-white/5 rounded-2xl">
-            <div className="flex items-center gap-3">
-              <span className="text-xs text-gray-500 uppercase tracking-widest font-bold">
-                Assignment Status
-              </span>
-              <span
-                className={`px-3 py-1 rounded-full text-[11px] font-bold uppercase tracking-widest border ${
-                  assignment.portalStatus === "ACCEPTED"
-                    ? "bg-teal/10 text-teal border-teal/30"
-                    : assignment.portalStatus === "REJECTED"
-                      ? "bg-red-500/10 text-red-400 border-red-500/30"
-                      : assignment.portalStatus === "PURCHASED"
-                        ? "bg-gold/10 text-gold border-gold/30"
-                        : "bg-blue-500/10 text-blue-400 border-blue-500/30"
-                }`}
-              >
-                {assignment.zohoStatus || (assignment.portalStatus === "PENDING" ? "ASSIGNED" : assignment.portalStatus)}
-              </span>
-            </div>
-          </div>
-        )}
+        <DealProgress assignment={assignment} />
 
         <div className="space-y-12">
           {/* 1. Gallery */}
@@ -606,83 +563,7 @@ const AdminPropertyDetail = () => {
             )}
           </div>
 
-          {/* 3. Deal Progress */}
-          <div className="bg-navy border border-teal/10 rounded-3xl p-8">
-            <div className="flex items-center justify-between mb-8">
-              <h3 className="text-lg font-bold text-white flex items-center gap-2">
-                <Clock className="text-teal" size={20} /> Deal Progress
-              </h3>
-              {isRejected && (
-                <span className="px-3 py-1 bg-red-500/20 text-red-400 text-xs font-bold rounded-full border border-red-500/30">
-                  REJECTED
-                </span>
-              )}
-            </div>
-            <div className="relative">
-              <div className="hidden md:block absolute top-5 left-0 w-full h-0.5 bg-gray-800" />
-              <div className="md:hidden absolute left-5 top-0 bottom-0 w-0.5 bg-gray-800" />
-              <div className="relative flex flex-col md:flex-row justify-between gap-8 md:gap-0">
-                {dealStages.map((stage, idx) => {
-                  const stageNum = idx + 1;
-                  const isDone = stageNum < activeStage;
-                  const isActive = stageNum === activeStage;
-                  let bgColor = "bg-gray-800";
-                  let borderColor = "border-gray-700";
-                  let textColor = "text-gray-500";
-                  let iconColor = "text-gray-600";
-                  if (isDone) {
-                    bgColor = "bg-gold/20";
-                    borderColor = "border-gold/50";
-                    textColor = "text-gold";
-                    iconColor = "text-gold";
-                  }
-                  if (isActive) {
-                    if (isRejected && stageNum === 1) {
-                      bgColor = "bg-red-500/20";
-                      borderColor = "border-red-500/50";
-                      textColor = "text-red-400";
-                      iconColor = "text-red-400";
-                    } else {
-                      bgColor = "bg-teal/20";
-                      borderColor = "border-teal/50";
-                      textColor = "text-teal";
-                      iconColor = "text-teal";
-                    }
-                  }
-                  return (
-                    <div
-                      key={idx}
-                      className="flex md:flex-col items-center gap-4 md:gap-3 relative z-10 md:w-1/6"
-                    >
-                      <div
-                        className={`w-10 h-10 rounded-full border-2 flex items-center justify-center flex-shrink-0 ${bgColor} ${borderColor}`}
-                      >
-                        {isDone ? (
-                          <CheckCircle2 size={18} className={iconColor} />
-                        ) : (
-                          <span className={`text-xs font-bold ${textColor}`}>
-                            {stageNum}
-                          </span>
-                        )}
-                      </div>
-                      <div className="text-left md:text-center">
-                        <p
-                          className={`text-[10px] font-bold uppercase tracking-tighter px-1 ${textColor}`}
-                        >
-                          {stage}
-                        </p>
-                        {isActive && (
-                          <p className="text-[8px] text-white/40 uppercase tracking-tighter mt-1 font-bold md:px-1">
-                            Current Stage
-                          </p>
-                        )}
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
+
 
           {/* 4. Financial Analysis */}
           <div className="bg-navy border border-teal/20 rounded-3xl p-8">
@@ -726,7 +607,6 @@ const AdminPropertyDetail = () => {
               </div>
             </div>
 
-
             {/* Offer Details */}
             {(assignment?.offerAmount || assignment?.offerDate) && (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 border-t border-white/5 pt-8">
@@ -735,7 +615,7 @@ const AdminPropertyDetail = () => {
                     <p className="text-xs text-gray-500 uppercase tracking-widest mb-2">
                       Offer Price
                     </p>
-                    <p className="text-xl font-bold text-gold">
+                    <p className="text-2xl font-bold text-gold">
                       ${Number(assignment.offerAmount).toLocaleString()}
                     </p>
                   </div>
@@ -745,19 +625,17 @@ const AdminPropertyDetail = () => {
                     <p className="text-xs text-gray-500 uppercase tracking-widest mb-2">
                       Offer Date
                     </p>
-                    <p className="text-xl font-bold text-white">
-                      {assignment.offerDate.split('T')[0].split('-').reverse().join('-')}
+                    <p className="text-2xl font-bold text-white">
+                      {assignment.offerDate
+                        .split("T")[0]
+                        .split("-")
+                        .reverse()
+                        .join("-")}
                     </p>
                   </div>
                 )}
               </div>
             )}
-          </div>
-
-          {/* 5. Property Overview */}
-          <div className="space-y-4">
-            <h3 className="text-xl font-bold text-white">Property Overview</h3>
-            <p className="text-gray-400 leading-relaxed text-lg">{overview}</p>
           </div>
 
           {/* 6. Documents & Media */}
@@ -834,7 +712,12 @@ const AdminPropertyDetail = () => {
                             videoId = u.searchParams.get("v");
                             if (!videoId) {
                               const seg = u.pathname.split("/").filter(Boolean);
-                              if (seg.length >= 2 && ["shorts", "live", "embed", "v"].includes(seg[0])) {
+                              if (
+                                seg.length >= 2 &&
+                                ["shorts", "live", "embed", "v"].includes(
+                                  seg[0],
+                                )
+                              ) {
                                 videoId = seg[1];
                               }
                             }
@@ -845,17 +728,20 @@ const AdminPropertyDetail = () => {
                             return {
                               embedUrl: `https://www.youtube.com/embed/${videoId}`,
                               thumbnailUrl: `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`,
-                              caption: vid.caption
+                              caption: vid.caption,
                             };
                           }
                         } catch {}
                         return { rawUrl: raw, caption: vid.caption };
                       };
 
-                      const videoInfos = documents.externalVideos.map(getEmbedInfo).filter(Boolean);
+                      const videoInfos = documents.externalVideos
+                        .map(getEmbedInfo)
+                        .filter(Boolean);
                       if (videoInfos.length === 0) return null;
 
-                      const activeInfo = videoInfos[activeExternalVideoIndex] || videoInfos[0];
+                      const activeInfo =
+                        videoInfos[activeExternalVideoIndex] || videoInfos[0];
 
                       return (
                         <div className="flex flex-col gap-4">
@@ -873,7 +759,9 @@ const AdminPropertyDetail = () => {
                                 />
                               </div>
                               {activeInfo.caption && (
-                                <p className="text-sm font-medium text-white px-1">{activeInfo.caption}</p>
+                                <p className="text-sm font-medium text-white px-1">
+                                  {activeInfo.caption}
+                                </p>
                               )}
                             </div>
                           ) : (
@@ -894,7 +782,10 @@ const AdminPropertyDetail = () => {
                                   {activeInfo.rawUrl}
                                 </p>
                               </div>
-                              <ExternalLink size={16} className="text-gray-500 shrink-0" />
+                              <ExternalLink
+                                size={16}
+                                className="text-gray-500 shrink-0"
+                              />
                             </a>
                           )}
 
@@ -904,14 +795,23 @@ const AdminPropertyDetail = () => {
                               {videoInfos.map((info, idx) => (
                                 <button
                                   key={idx}
-                                  onClick={() => setActiveExternalVideoIndex(idx)}
-                                  className={`relative shrink-0 w-32 aspect-video rounded-xl overflow-hidden border-2 transition-all ${activeExternalVideoIndex === idx ? 'border-teal' : 'border-transparent opacity-60 hover:opacity-100'}`}
+                                  onClick={() =>
+                                    setActiveExternalVideoIndex(idx)
+                                  }
+                                  className={`relative shrink-0 w-32 aspect-video rounded-xl overflow-hidden border-2 transition-all ${activeExternalVideoIndex === idx ? "border-teal" : "border-transparent opacity-60 hover:opacity-100"}`}
                                 >
                                   {info.thumbnailUrl ? (
                                     <>
-                                      <img src={info.thumbnailUrl} alt={`Video ${idx+1}`} className="w-full h-full object-cover" />
+                                      <img
+                                        src={info.thumbnailUrl}
+                                        alt={`Video ${idx + 1}`}
+                                        className="w-full h-full object-cover"
+                                      />
                                       <div className="absolute inset-0 flex items-center justify-center bg-black/30">
-                                        <Play size={20} className="text-white drop-shadow-md" />
+                                        <Play
+                                          size={20}
+                                          className="text-white drop-shadow-md"
+                                        />
                                       </div>
                                     </>
                                   ) : (
