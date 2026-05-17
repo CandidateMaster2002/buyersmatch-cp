@@ -124,17 +124,13 @@ public class ClientController {
             allAssignments = assignmentRepository.findAllByZohoBriefId(brief.getZohoBriefId());
         }
 
-        // Exclude assignments whose buyer brief is Closed
-        Set<String> activeBriefIds = allBriefs.stream()
-                .filter(b -> !"Closed".equalsIgnoreCase(b.getStatus()))
-                .map(BuyerBrief::getZohoBriefId)
-                .filter(Objects::nonNull)
-                .collect(Collectors.toSet());
-
+        // Return all assignments for this contact, regardless of brief status.
+        // The only exclusion is "Brief Confirmed" (a Zoho workflow pre-stage, not a real deal step).
         allAssignments = allAssignments.stream()
-                .filter(a -> a.getZohoBriefId() == null || activeBriefIds.contains(a.getZohoBriefId()))
                 .filter(a -> !"Brief Confirmed".equalsIgnoreCase(a.getZohoStatus()))
                 .collect(Collectors.toList());
+
+
 
         // 2. Enrich assignments with property data
         List<Map<String, Object>> assignmentsData = new ArrayList<>();

@@ -1,26 +1,55 @@
 import React from "react";
+import { analyzeStatus } from "./DealProgress";
+
+// Purchased = has reached Contract Unconditional (idx 10) or beyond
+// Uses the same analyzeStatus from DealProgress for consistency
+export const isPurchasedItem = (item) => {
+  // Explicit portal override
+  if (item.portalStatus === "PURCHASED") return true;
+  const { isTerminal, currentIdx } = analyzeStatus(item.assignment);
+  if (isTerminal) return false;
+  return currentIdx >= 10; // 10 = Contract Unconditional
+};
+
+// Terminal: Property Rejected or Offer Withdrawn
+export const isRejectedItem = (item) => {
+  if (item.portalStatus === "REJECTED") return true;
+  const { isTerminal, terminalType } = analyzeStatus(item.assignment);
+  return isTerminal && terminalType === "rejected";
+};
+
+export const isWithdrawnItem = (item) => {
+  const { isTerminal, terminalType } = analyzeStatus(item.assignment);
+  return isTerminal && terminalType === "withdrawn";
+};
+
+// Either rejected or withdrawn — used for the REJECTED scorecard/tab
+export const isTerminalItem = (item) => isRejectedItem(item) || isWithdrawnItem(item);
 
 export const getStatusConfig = (item) => {
   const zohoLabel = item.assignment?.zohoStatus;
   const portalStatus = item.portalStatus;
-  
-  const isPurchased = (it) => {
-    const zs = (it.assignment?.zohoStatus || "").toLowerCase();
-    return [
-      "purchased", "settled", "contract unconditional", "tenanted", "done",
-      "settlement done", "psi", "social media & gift completed"
-    ].includes(zs.trim());
-  };
 
-  if (isPurchased(item)) {
-    return { cls: "bg-gold text-navy", label: zohoLabel || "Purchased" };
+  if (isPurchasedItem(item)) {
+    return { cls: "bg-gold text-navy", label: "Purchased" };
+  }
+
+  // Terminal statuses
+  const { isTerminal, terminalType } = analyzeStatus(item.assignment);
+  if (isTerminal) {
+    if (terminalType === "rejected" || portalStatus === "REJECTED") {
+      return { cls: "bg-red-500/20 text-red-300 border border-red-500/30", label: zohoLabel || "Rejected" };
+    }
+    if (terminalType === "withdrawn") {
+      return { cls: "bg-amber-500/20 text-amber-300 border border-amber-500/30", label: "Offer Withdrawn" };
+    }
   }
 
   switch (portalStatus) {
     case "ACCEPTED":
       return { cls: "bg-teal text-navy", label: zohoLabel || "Accepted" };
     case "REJECTED":
-      return { cls: "bg-red-500 text-white", label: zohoLabel || "Rejected" };
+      return { cls: "bg-red-500/20 text-red-300 border border-red-500/30", label: zohoLabel || "Rejected" };
     case "PENDING":
       return {
         cls: "bg-blue-500/20 text-blue-300 border border-blue-500/30",

@@ -1,6 +1,6 @@
 import React from "react";
-import { Bed, Bath, Car, Check, Lock, Users } from "lucide-react";
-import StatusBadge from "./StatusBadge";
+import { Bed, Bath, Car, Check, Lock, Users, ShoppingBag } from "lucide-react";
+import StatusBadge, { isPurchasedItem } from "./StatusBadge";
 
 const PropertyTable = ({ 
   properties, 
@@ -51,7 +51,14 @@ const PropertyTable = ({
                   )}
                   <td className="px-6 py-4">
                     <div>
-                      <p className="text-white font-bold text-sm">{item.property.addressLine1}</p>
+                      <div className="flex items-start gap-2 flex-wrap">
+                        <p className="text-white font-bold text-sm">{item.property.addressLine1}</p>
+                        {isPurchasedItem(item) && (
+                          <span className="inline-flex items-center gap-1 px-2 py-0.5 bg-gold/20 border border-gold/40 text-gold text-[8px] font-bold rounded-full tracking-widest shrink-0 mt-0.5">
+                            <ShoppingBag size={8} /> PURCHASED
+                          </span>
+                        )}
+                      </div>
                       <p className="text-teal text-xs mt-0.5">{item.property.suburb}, {item.property.state}</p>
                       <div className="flex items-center gap-2 mt-2 flex-wrap">
                         {isOffMarket && (

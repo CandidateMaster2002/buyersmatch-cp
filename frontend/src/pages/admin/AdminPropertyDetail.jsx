@@ -322,13 +322,13 @@ const AdminPropertyDetail = () => {
                 </p>
               </div>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                <div className="sm:col-span-2 flex items-center gap-3 bg-white/[0.03] border border-white/5 rounded-xl px-4 py-3">
-                  <Home size={15} className="text-teal shrink-0" />
+                <div className="sm:col-span-2 flex items-center gap-4 bg-white/[0.03] border border-teal/20 rounded-xl px-5 py-4">
+                  <Home size={20} className="text-gold shrink-0" />
                   <div>
                     <p className="text-[10px] text-gray-500 uppercase tracking-wider mb-0.5">
                       Address
                     </p>
-                    <p className="text-sm text-white font-semibold">
+                    <p className="text-lg font-bold text-gold leading-tight">
                       {property.address || property.addressLine1 || "—"}
                     </p>
                   </div>

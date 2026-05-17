@@ -30,6 +30,7 @@ import {
   LayoutList,
 } from "lucide-react";
 import PropertyTable from "../../components/shared/PropertyTable";
+import { isPurchasedItem, isTerminalItem } from "../../components/shared/StatusBadge";
 import {
   getAdminClientProfile,
   getClientProperties,
@@ -287,21 +288,7 @@ const ComparisonModal = ({ properties, onClose }) => {
   );
 };
 
-// ─── Purchased detection ───────────────────────────────────────────────────────
-// Purchased = zohoStatus is "Contract Signed" or any later stage:
-// Contract Signed → BNP Done → Contract Unconditional → Tenanted → Done
-const PURCHASED_STATUSES = new Set([
-  "contract signed",
-  "bnp done",
-  "contract unconditional",
-  "tenanted",
-  "done",
-]);
-const isPurchasedItem = (item) => {
-  if (item.portalStatus === "PURCHASED") return true;
-  const zs = (item.assignment?.zohoStatus || "").toLowerCase().trim();
-  return PURCHASED_STATUSES.has(zs);
-};
+
 
 // ─── Main component ────────────────────────────────────────────────────────────
 const ClientDetail = () => {
@@ -336,17 +323,14 @@ const ClientDetail = () => {
   const [refreshing, setRefreshing] = useState(false);
   const [refreshMsg, setRefreshMsg] = useState(null);
 
-  const activeBriefs = useMemo(
-    () => briefs.filter((b) => b.status?.toLowerCase() !== "closed"),
-    [briefs],
-  );
+  const allBriefs = useMemo(() => briefs, [briefs]);
 
   const displayedBrief = useMemo(
     () =>
-      activeBriefs.find((b) => b.zohoBriefId === selectedActiveBriefId) ||
-      activeBriefs[0] ||
+      allBriefs.find((b) => b.zohoBriefId === selectedActiveBriefId) ||
+      allBriefs[0] ||
       null,
-    [activeBriefs, selectedActiveBriefId],
+    [allBriefs, selectedActiveBriefId],
   );
 
   useEffect(() => {
@@ -361,11 +345,8 @@ const ClientDetail = () => {
         const { assignments, briefs: userBriefs } = responseData;
         const loaded = userBriefs || [];
         setBriefs(loaded);
-
-        const firstActive = loaded.find(
-          (b) => b.status?.toLowerCase() !== "closed",
-        );
-        if (firstActive) setSelectedActiveBriefId(firstActive.zohoBriefId);
+        // Default to first brief (open or closed)
+        if (loaded.length > 0) setSelectedActiveBriefId(loaded[0].zohoBriefId);
 
         const propertiesWithImages = await Promise.all(
           assignments.map(async (item) => {
@@ -391,37 +372,23 @@ const ClientDetail = () => {
     fetchData();
   }, [id]);
 
-  const isPurchasedItem = (item) => {
-    const zs = (item.assignment?.zohoStatus || "").toLowerCase();
-    return [
-      "purchased",
-      "settled",
-      "contract unconditional",
-      "tenanted",
-      "done",
-      "settlement done",
-      "psi",
-      "social media & gift completed",
-    ].includes(zs.trim());
-  };
 
   const stats = useMemo(() => {
     const relevant = properties.filter(
       (item) =>
         selectedBriefId === "ALL" || item.zohoBriefId === selectedBriefId,
     );
-    const purchased = relevant.filter(isPurchasedItem);
-    const purchasedIds = new Set(purchased.map((p) => p.assignment?.id));
-    const notPurchased = relevant.filter(
-      (p) => !purchasedIds.has(p.assignment?.id),
-    );
+    const purchased = relevant.filter(isPurchasedItem).length;
+    const rejected  = relevant.filter((p) => isTerminalItem(p)).length;
+    const active    = relevant.filter((p) => !isPurchasedItem(p) && !isTerminalItem(p));
+    const assigned  = active.filter((p) => p.portalStatus === "PENDING").length;
+    const accepted  = active.filter((p) => p.portalStatus === "ACCEPTED").length;
     return {
-      total: relevant.length,
-      assigned: notPurchased.filter((p) => p.portalStatus === "PENDING").length,
-      accepted: notPurchased.filter((p) => p.portalStatus === "ACCEPTED")
-        .length,
-      rejected: relevant.filter((p) => p.portalStatus === "REJECTED").length,
-      purchased: purchased.length,
+      total: assigned + accepted + rejected + purchased,
+      assigned,
+      accepted,
+      rejected,
+      purchased,
     };
   }, [properties, selectedBriefId]);
 
@@ -441,8 +408,7 @@ const ClientDetail = () => {
     let matchesTab;
     if (activeTab === "ALL") matchesTab = true;
     else if (activeTab === "PURCHASED") matchesTab = purchased;
-    else if (activeTab === "REJECTED")
-      matchesTab = item.portalStatus === "REJECTED";
+    else if (activeTab === "REJECTED") matchesTab = isTerminalItem(item);
     else if (activeTab === "ACCEPTED")
       matchesTab = item.portalStatus === "ACCEPTED" && !purchased;
     else if (activeTab === "PENDING")
@@ -592,45 +558,44 @@ const ClientDetail = () => {
         {/* ── MY BUYER BRIEF TAB ──────────────────────────────────────────────── */}
         {mainTab === "BRIEF" && (
           <div>
-            {activeBriefs.length === 0 ? (
+            {allBriefs.length === 0 ? (
               <div className="flex flex-col items-center justify-center py-20 bg-white/5 border border-dashed border-white/10 rounded-3xl">
                 <Briefcase className="text-teal mb-4" size={40} />
                 <h3 className="text-xl font-bold text-white mb-2">
-                  No active buyer briefs
+                  No buyer briefs
                 </h3>
                 <p className="text-gray-400 text-center max-w-sm">
-                  No active buyer briefs found for this client.
+                  No buyer briefs found for this client.
                 </p>
               </div>
             ) : (
               <>
-                {activeBriefs.length > 1 && (
-                  <div className="flex items-center gap-3 mb-6">
-                    <span className="text-xs font-bold text-gray-500 uppercase tracking-widest whitespace-nowrap">
-                      Viewing brief:
-                    </span>
-                    <div className="relative">
-                      <select
-                        value={selectedActiveBriefId || ""}
-                        onChange={(e) =>
-                          setSelectedActiveBriefId(e.target.value)
-                        }
-                        className="appearance-none bg-navy border border-teal/30 rounded-xl px-4 py-2 pr-10 text-sm font-bold text-teal focus:outline-none focus:border-teal transition-all cursor-pointer"
-                      >
-                        {activeBriefs.map((b) => (
-                          <option key={b.zohoBriefId} value={b.zohoBriefId}>
-                            {b.zohoName || b.zohoBriefId}
-                            {b.status ? ` — ${b.status}` : ""}
-                          </option>
-                        ))}
-                      </select>
-                      <ChevronDown
-                        size={14}
-                        className="absolute right-3 top-1/2 -translate-y-1/2 text-teal pointer-events-none"
-                      />
-                    </div>
+                {/* Brief selector — always visible */}
+                <div className="flex items-center gap-3 mb-6">
+                  <span className="text-xs font-bold text-gray-500 uppercase tracking-widest whitespace-nowrap">
+                    Viewing brief:
+                  </span>
+                  <div className="relative">
+                    <select
+                      value={selectedActiveBriefId || ""}
+                      onChange={(e) =>
+                        setSelectedActiveBriefId(e.target.value)
+                      }
+                      className="appearance-none bg-navy border border-teal/30 rounded-xl px-4 py-2 pr-10 text-sm font-bold text-teal focus:outline-none focus:border-teal transition-all cursor-pointer"
+                    >
+                      {allBriefs.map((b) => (
+                        <option key={b.zohoBriefId} value={b.zohoBriefId}>
+                          {b.zohoName || b.zohoBriefId}
+                          {" — "}{b.status || "Active"}
+                        </option>
+                      ))}
+                    </select>
+                    <ChevronDown
+                      size={14}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-teal pointer-events-none"
+                    />
                   </div>
-                )}
+                </div>
                 <BuyerBriefView brief={displayedBrief} />
               </>
             )}
@@ -687,7 +652,8 @@ const ClientDetail = () => {
                 ))}
               </div>
 
-              {activeBriefs.length > 1 && (
+              {/* Brief filter — always shown */}
+              {allBriefs.length > 0 && (
                 <div className="flex items-center gap-3">
                   <span className="text-xs font-bold text-gray-500 uppercase tracking-widest whitespace-nowrap">
                     Filter by brief:
@@ -698,12 +664,10 @@ const ClientDetail = () => {
                       onChange={(e) => setSelectedBriefId(e.target.value)}
                       className="appearance-none bg-navy border border-teal/30 rounded-xl px-4 py-2 pr-10 text-sm font-bold text-teal focus:outline-none focus:border-teal transition-all cursor-pointer"
                     >
-                      <option value="ALL">
-                        All Briefs ({activeBriefs.length})
-                      </option>
-                      {activeBriefs.map((b) => (
+                      <option value="ALL">All Briefs ({allBriefs.length})</option>
+                      {allBriefs.map((b) => (
                         <option key={b.zohoBriefId} value={b.zohoBriefId}>
-                          {b.zohoName || b.zohoBriefId}
+                          {b.zohoName || b.zohoBriefId} — {b.status || "Active"}
                         </option>
                       ))}
                     </select>
