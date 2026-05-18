@@ -8,7 +8,7 @@ export const isPurchasedItem = (item) => {
   if (item.portalStatus === "PURCHASED") return true;
   const { isTerminal, currentIdx } = analyzeStatus(item.assignment);
   if (isTerminal) return false;
-  return currentIdx >= 10; // 10 = Contract Unconditional
+  return currentIdx >= 9; // 9 = Contract Unconditional (was 10)
 };
 
 // Terminal: Property Rejected or Offer Withdrawn

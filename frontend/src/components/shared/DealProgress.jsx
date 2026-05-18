@@ -10,7 +10,6 @@ export const DEAL_STAGES = [
   { key: "offer_accepted",       label: "Offer\nAccepted",                 optional: false },
   { key: "contract_received",    label: "Contract\nReceived",              optional: false },
   { key: "conveyancer_approved", label: "Conveyancer\nApproved",           optional: false },
-  { key: "ppi_done",             label: "PPI\nDone",                       optional: true  },
   { key: "contract_signed",      label: "Contract\nSigned",                optional: false },
   { key: "bnp_done",             label: "BNP\nDone",                       optional: true  },
   { key: "finance_done",         label: "Finance\nDone",                   optional: false },
@@ -45,18 +44,17 @@ export const analyzeStatus = (assignment) => {
   // ── Normal stage detection (most-advanced → least-advanced) ──
   let currentIdx = 0;
 
-  if      (/\bdone\b/.test(zsL) && !/bnp|finance|settle/i.test(zsL))   currentIdx = 15;
-  else if (/social.?media/i.test(zsL))                                  currentIdx = 14;
-  else if (/tenant/i.test(zsL))                                         currentIdx = 13;
-  else if (/settle/i.test(zsL))                                         currentIdx = 12;
-  else if (/\bpsi\b/i.test(zsL))                                        currentIdx = 11;
-  else if (/unconditional/i.test(zsL))                                  currentIdx = 10;
-  else if (/finance/i.test(zsL))                                        currentIdx = 9;
-  else if (/\bbnp\b/i.test(zsL))                                        currentIdx = 8;
-  else if (/contract.{0,5}sign/i.test(zsL))                             currentIdx = 7;
-  else if (/\bppi\b/i.test(zsL))                                        currentIdx = 6;
-  // Zoho typo "Conveyencer" handled via flexible regex
-  else if (/convey[ae]nc[ae]r?.{0,10}approv/i.test(zsL))               currentIdx = 5;
+  if      (/\bdone\b/.test(zsL) && !/bnp|finance|settle|ppi|psi/i.test(zsL))   currentIdx = 14;
+  else if (/social.?media/i.test(zsL))                                  currentIdx = 13;
+  else if (/tenant/i.test(zsL))                                         currentIdx = 12;
+  else if (/settle/i.test(zsL))                                         currentIdx = 11;
+  else if (/\bpsi\b/i.test(zsL))                                        currentIdx = 10;
+  else if (/unconditional/i.test(zsL))                                  currentIdx = 9;
+  else if (/finance/i.test(zsL))                                        currentIdx = 8;
+  else if (/\bbnp\b/i.test(zsL))                                        currentIdx = 7;
+  else if (/contract.{0,5}sign/i.test(zsL) || /\bppi\s*done\b/i.test(zsL)) currentIdx = 6;
+  // Zoho typo "Conveyencer" handled via flexible regex, also treat PPI Completed as this stage
+  else if (/convey[ae]nc[ae]r?.{0,10}approv/i.test(zsL) || /\bppi\s*completed\b/i.test(zsL)) currentIdx = 5;
   // "Offer Accepted" (no trailing digit) → Contract Received
   else if (/offer accepted(?!\d)/i.test(zsL))                           currentIdx = 4;
   // "Offer Accepted1" → Offer Accepted
@@ -123,19 +121,25 @@ const DealProgress = ({ assignment }) => {
   // Build per-stage state
   // optional stages that are "between" already-completed stages are shown as "skipped"
   const stageStates = DEAL_STAGES.map((stage, idx) => {
-    if (idx < currentIdx)  return "complete";
+    if (idx < currentIdx) {
+      if (stage.optional) {
+        if (stage.key === "bnp_done" && assignment?.bnpReportLink) return "complete";
+        return "skipped";
+      }
+      return "complete";
+    }
     if (idx === currentIdx) return "active";
     return "pending";
   });
 
-  // Split into rows: [0-5], [6-11], [12-15]
+  // Split into rows: [0-4], [5-9], [10-14] (5 items per row)
   const rows = [
-    DEAL_STAGES.slice(0, 6).map((s, i) => ({ ...s, idx: i, state: stageStates[i] })),
-    DEAL_STAGES.slice(6, 12).map((s, i) => ({ ...s, idx: i + 6, state: stageStates[i + 6] })),
-    DEAL_STAGES.slice(12).map((s, i) => ({ ...s, idx: i + 12, state: stageStates[i + 12] })),
+    DEAL_STAGES.slice(0, 5).map((s, i) => ({ ...s, idx: i, state: stageStates[i] })),
+    DEAL_STAGES.slice(5, 10).map((s, i) => ({ ...s, idx: i + 5, state: stageStates[i + 5] })),
+    DEAL_STAGES.slice(10).map((s, i) => ({ ...s, idx: i + 10, state: stageStates[i + 10] })),
   ];
 
-  const isDone = currentIdx === 15;
+  const isDone = currentIdx === 14;
 
   return (
     <div className="bg-navy border border-teal/10 rounded-3xl p-8 mb-8">
@@ -180,8 +184,8 @@ const DealProgress = ({ assignment }) => {
         {rows.map((row, rowIdx) => (
           <div key={rowIdx} className={`flex items-start ${rowIdx === 2 ? "justify-center" : ""}`}>
             {row.map((item, cellIdx) => {
-              // For last row, cap width so 4 items don't spread across full 6-col width
-              const itemWidthClass = rowIdx === 2 ? "w-[16.666%]" : "flex-1";
+              // For last row, keep it evenly spaced as 5 items
+              const itemWidthClass = "flex-1";
               const { state, optional, label, idx } = item;
               const isFirst = cellIdx === 0;
               const isLast  = cellIdx === row.length - 1;
@@ -189,15 +193,16 @@ const DealProgress = ({ assignment }) => {
 
               // Connector colours
               const leftConn  = isFirst       ? "bg-transparent"
-                              : prevState === "complete" ? "bg-teal/50" : "bg-white/15";
+                              : (prevState === "complete" || prevState === "skipped") ? "bg-teal/50" : "bg-white/15";
               // Right connector: light up if current (runner travels here) or already complete
               const rightConn = isLast        ? "bg-transparent"
-                              : (state === "complete" || state === "active") ? "bg-teal/50" : "bg-white/15";
+                              : (state === "complete" || state === "active" || state === "skipped") ? "bg-teal/50" : "bg-white/15";
 
               // Dot style — active treated same as complete (you've REACHED this stage)
               const dotClass =
                 state === "complete" ? "border-teal bg-teal" :
                 state === "active"   ? "border-teal bg-teal shadow-[0_0_14px_rgba(42,191,191,0.7)]" :
+                state === "skipped"  ? "border-white/30 bg-white/5 border-dashed" :
                 optional             ? "border-white/30 bg-white/5 border-dashed" :
                                        "border-white/30 bg-white/5";
 
@@ -205,7 +210,8 @@ const DealProgress = ({ assignment }) => {
               const labelClass =
                 state === "complete" ? "text-gray-400" :
                 state === "active"   ? "text-white font-bold" :
-                optional             ? "text-gray-400" :
+                state === "skipped"  ? "text-gray-500" :
+                optional             ? "text-gray-500" :
                                        "text-gray-400";
 
               // Runner shows on the RIGHT connector after the current stage
@@ -258,7 +264,7 @@ const DealProgress = ({ assignment }) => {
                     )}
 
 
-                    {isDone && idx === 15 && (
+                    {isDone && idx === 14 && (
                       <span className="inline-block px-1.5 py-0.5 bg-teal/10 border border-teal/20 text-teal text-[8px] font-bold rounded-full uppercase tracking-widest">
                         Done
                       </span>
