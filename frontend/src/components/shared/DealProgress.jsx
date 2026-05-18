@@ -123,7 +123,7 @@ const DealProgress = ({ assignment }) => {
   const stageStates = DEAL_STAGES.map((stage, idx) => {
     if (idx < currentIdx) {
       if (stage.optional) {
-        if (stage.key === "bnp_done" && assignment?.bnpReportLink) return "complete";
+        if (stage.key === "bnp_done") return "complete";
         return "skipped";
       }
       return "complete";

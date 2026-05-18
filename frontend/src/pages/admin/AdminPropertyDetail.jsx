@@ -167,7 +167,6 @@ const AdminPropertyDetail = () => {
     ? ((annualIncome / property.askingPriceMax) * 100).toFixed(2)
     : null;
 
-
   const fmtSize = (bytes) => {
     if (!bytes || bytes <= 0) return null;
     return `${(bytes / (1024 * 1024)).toFixed(2)} MB`;
@@ -207,7 +206,9 @@ const AdminPropertyDetail = () => {
       assignment?.cashflowDocLink,
     ].some(Boolean);
 
-  const isPurchased = assignment ? isPurchasedItem({ assignment, portalStatus: assignment.portalStatus }) : false;
+  const isPurchased = assignment
+    ? isPurchasedItem({ assignment, portalStatus: assignment.portalStatus })
+    : false;
 
   return (
     <AdminLayout
@@ -285,7 +286,7 @@ const AdminPropertyDetail = () => {
                 animation: pulse-subtle 3s infinite ease-in-out;
               }
             `}</style>
-            
+
             <div className="relative overflow-hidden bg-gradient-to-r from-amber-500/10 via-yellow-500/20 to-amber-500/10 border border-gold/40 rounded-3xl p-6 sm:p-8 mb-8 flex flex-col sm:flex-row items-center justify-between gap-6 shadow-[0_0_35px_rgba(212,175,55,0.2)] backdrop-blur-md animate-pulse-subtle">
               {/* Confetti particles */}
               <div className="absolute inset-0 pointer-events-none overflow-hidden">
@@ -296,14 +297,20 @@ const AdminPropertyDetail = () => {
                     style={{
                       left: `${Math.random() * 100}%`,
                       top: `${70 + Math.random() * 30}%`,
-                      backgroundColor: ['#d4af37', '#ffdf00', '#ffffff', '#4fd1c5', '#f687b3'][i % 5],
+                      backgroundColor: [
+                        "#d4af37",
+                        "#ffdf00",
+                        "#ffffff",
+                        "#4fd1c5",
+                        "#f687b3",
+                      ][i % 5],
                       animationDelay: `${i * 0.25}s`,
-                      animationDuration: `${3.5 + Math.random() * 2.5}s`
+                      animationDuration: `${3.5 + Math.random() * 2.5}s`,
                     }}
                   />
                 ))}
               </div>
-              
+
               <div className="flex flex-col sm:flex-row items-center gap-6 z-10 text-center sm:text-left">
                 <div className="relative">
                   <div className="absolute inset-0 bg-gold rounded-full blur-xl opacity-40 animate-pulse" />
@@ -316,11 +323,12 @@ const AdminPropertyDetail = () => {
                     🎉 Property Purchased! 🎉
                   </h2>
                   <p className="text-sm text-yellow-100/80 font-bold tracking-wider uppercase mt-2">
-                    Congratulations! This deal is officially complete and secured!
+                    Congratulations! This deal is officially complete and
+                    secured!
                   </p>
                 </div>
               </div>
-              
+
               <div className="px-8 py-3 bg-gradient-to-r from-gold to-yellow-300 text-navy font-black text-sm rounded-xl shadow-[0_4px_20px_rgba(212,175,55,0.5)] tracking-widest uppercase hover:scale-105 transition-transform duration-300 shrink-0 z-10">
                 ⭐ Celebrating Success
               </div>
@@ -668,8 +676,6 @@ const AdminPropertyDetail = () => {
               </div>
             )}
           </div>
-
-
 
           {/* 4. Financial Analysis */}
           <div className="bg-navy border border-teal/20 rounded-3xl p-8">
@@ -1120,7 +1126,7 @@ const AdminPropertyDetail = () => {
           )}
 
           {/* 7. Agent Notes (editable by admin) */}
-          <div className="bg-navy border border-teal/10 rounded-3xl p-8">
+          {/* <div className="bg-navy border border-teal/10 rounded-3xl p-8">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-3">
                 <MessageSquare className="text-teal" size={24} />
@@ -1150,7 +1156,7 @@ const AdminPropertyDetail = () => {
               rows={6}
               className="w-full bg-white/[0.03] border border-white/10 rounded-2xl px-5 py-4 text-sm text-gray-200 placeholder:text-gray-600 focus:outline-none focus:border-teal/50 resize-y leading-relaxed transition-colors"
             />
-          </div>
+          </div> */}
 
           {/* 8. Property Notes */}
           <div className="bg-navy border border-teal/10 rounded-3xl p-8">
