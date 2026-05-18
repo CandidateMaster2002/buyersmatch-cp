@@ -376,7 +376,9 @@ const ClientDetail = () => {
   const stats = useMemo(() => {
     const relevant = properties.filter(
       (item) =>
-        selectedBriefId === "ALL" || item.zohoBriefId === selectedBriefId,
+        selectedBriefId === "ALL" || 
+        (selectedBriefId === "NULL" && !item.zohoBriefId) || 
+        item.zohoBriefId === selectedBriefId,
     );
     const purchased = relevant.filter(isPurchasedItem).length;
     const rejected  = relevant.filter((p) => isTerminalItem(p)).length;
@@ -396,7 +398,9 @@ const ClientDetail = () => {
   const filteredProperties = properties.filter((item) => {
     if (!item.property) return false;
     const matchesBrief =
-      selectedBriefId === "ALL" || item.zohoBriefId === selectedBriefId;
+      selectedBriefId === "ALL" || 
+      (selectedBriefId === "NULL" && !item.zohoBriefId) || 
+      item.zohoBriefId === selectedBriefId;
     const matchesSearch =
       (item.property.addressLine1 || "")
         .toLowerCase()
@@ -665,6 +669,7 @@ const ClientDetail = () => {
                       className="appearance-none bg-navy border border-teal/30 rounded-xl px-4 py-2 pr-10 text-sm font-bold text-teal focus:outline-none focus:border-teal transition-all cursor-pointer"
                     >
                       <option value="ALL">All Briefs ({allBriefs.length})</option>
+                      <option value="NULL">Unassigned / No Brief</option>
                       {allBriefs.map((b) => (
                         <option key={b.zohoBriefId} value={b.zohoBriefId}>
                           {b.zohoName || b.zohoBriefId} — {b.status || "Active"}
