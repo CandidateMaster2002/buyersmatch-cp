@@ -31,7 +31,7 @@ export const getStatusConfig = (item) => {
   const portalStatus = item.portalStatus;
 
   if (isPurchasedItem(item)) {
-    return { cls: "bg-gold text-navy", label: "Purchased" };
+    return { cls: "bg-gold text-navy", label: zohoLabel || "Purchased" };
   }
 
   // Terminal statuses
